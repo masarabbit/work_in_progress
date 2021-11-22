@@ -1,0 +1,146 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+p, h1, h2, h3, h4 {
+  display: inline-block;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
+}
+
+body {
+  background-color: white;
+  font-family: sans-serif;
+}
+
+.wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.penguin_wrapper {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  overflow: hidden;
+  transition: 2s;
+  mix-blend-mode: multiply;
+}
+
+.penguin_wrapper svg { fill: rgb(173, 1, 87); }
+
+.penguin_wrapper.stop { transition: 0 !important; }
+
+.penguin_inner_wrapper {
+  height: 100%;
+  width: 100%;
+  transition: 0;
+}
+
+.facing_upleft,
+.facing_left,
+.facing_downleft { 
+  transform: scale(-1 , 1);
+}
+
+.penguin_sprite {
+  position: absolute;
+  height: 96px;
+  width: calc(5 * 96px);
+  pointer-events: none;
+}
+
+.penguin_sprite img {
+  height: 100px;
+  width: 100%;
+  display: block;
+}
+
+.hit_wrapper {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.hit_area {
+  height: 50px;
+  width: 40px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.penguin_wrapper.stop .hit_area {
+  margin-top: 10px;
+  height: 40px;
+}
+
+/* need to flip because the parent divs are flipped */
+.facing_upleft .hit_area,
+.facing_left .hit_area,
+.facing_downleft .hit_area {
+  transform: scale(-1 , 1);
+}
+
+.hit_corner {
+  height: 50%;
+  width: 50%;
+  opacity: 0.1;
+}
+
+.sign {
+  position: fixed;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+  bottom: 10px;
+  right: 10px;
+  font-size: 10px;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+a:hover { text-decoration: underline; }
+
+
+/* .upleft {
+  border: 1px solid yellow;
+}
+
+.upright {
+  border: 1px solid rgb(0, 255, 179);
+}
+
+.downleft {
+  border: 1px solid rgb(224, 152, 123);
+}
+
+.downright {
+  border: 1px solid rgb(84, 51, 85);
+} */
+
+/* .indicator {
+  position: absolute;
+  padding: 0 5px;
+  bottom: 0;
+  width: 100%;
+  height: 100px;
+  display: flex;
+  flex-wrap: wrap;
+  pointer-events: none;
+}
+
+.indicator p {
+  font-size: 10px;
+  margin: 5px;
+} */
