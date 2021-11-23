@@ -46,7 +46,7 @@ function init() {
 
   const randomMoveSpeed = () =>{
     // const range = [850, 900, 950, 1000, 1100]
-    const range = [1200, 1500]
+    const range = [ 900, 900, 1800]
     return range[Math.floor(Math.random() * range.length)]
   }
 
@@ -89,11 +89,13 @@ function init() {
   }
 
   const moveOrStopPenguin = (penguin, penguinObj) =>{
-    const status = ['move','stop'][Math.floor(Math.random() * 1)]
+    const option = ['move','stop','stop']
+    const status = option[Math.floor(Math.random() * option.length)]
     if (status === 'move') {
       penguinObj.stop = false
+      changeAnimation(penguinObj, 'walk')
       moveAbout(penguin, penguinObj)
-    } else {
+    } else if (!penguinObj.knocked) {
       stopPenguin(penguin, penguinObj)
       penguinObj.moveTimer = setTimeout(()=> {
         moveOrStopPenguin(penguin, penguinObj)

@@ -30,7 +30,7 @@ body {
   width: 96px;
   height: 96px;
   overflow: hidden;
-  transition: 2s;
+  transition: 1.5s;
   mix-blend-mode: multiply;
 }
 
