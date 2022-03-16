@@ -3,10 +3,6 @@ function init() {
   // const decodeRef = { a: ' h 1', b: ' h 2', e: ' h 3', g: ' h 4', j: ' h 5', A: ' v 1', B: ' v 2', E: ' v 3', G: ' v 4', J: ' v 5', n: 'h -1', u: ' h -2', k: ' h -3', x: ' h -4', i: ' h -5', N: ' v -1', U: ' v -2', K: ' v -3', X: ' v -4', I: ' v -5', w: ' v ', W: ' h ', D: '<path d="M', o: '<path fill="pink" d="M', F: '<path fill="#fff" d="M', '/': '/>', d: '<path d="M', f: '<path fill="#fff" d="M'}
   // const decode = arr => arr.split('').map(c=> !decodeRef[c] ? c : decodeRef[c]).join('')
 
-  // TODO need to adjust penguin within the wrapper
-  
-
-  const indicator = document.querySelector('.indicator')
   const body = document.querySelector('.wrapper')
   const animationFrames = {
     walk: [0, 1, 2, 1, 3, 4],
@@ -38,10 +34,6 @@ function init() {
   const penguinImpact = 10
   const frameSpeed = 150
   let penguinCount = 0
-  const control = {
-    x: null,
-    y: null,
-  }
   
   const animatePenguin = (penguin, penguinObj) =>{
     const { frame:i, animation, frameSpeed} = penguinObj
@@ -116,22 +108,6 @@ function init() {
     const turnOptions = [1, 1, -1, -1, 0]
     const turnValue = turnOptions[Math.floor(Math.random() * turnOptions.length)]
     penguinObj.turnIndex += turnValue
-
-
-
-    // TODO turn according to control.x and control.y
-    console.log(penguinObj)
-    const { width, height, left, top } = penguin.getBoundingClientRect()
-
-    const mark = document.createElement('div')
-    mark.classList.add('mark')
-    penguinObj.pos.x = left + (width / 2)
-    penguinObj.pos.y = top + (height / 2)
-    mark.style.top = `${penguinObj.pos.y}px`
-    mark.style.left = `${penguinObj.pos.x}px`
-    body.append(mark)
-    // ['up', 'upright', 'right', 'downright', 'down', 'downleft', 'left', 'upleft']
-
     if (penguinObj.turnIndex < 0) penguinObj.turnIndex = 7
     if (penguinObj.turnIndex > 7) penguinObj.turnIndex = 0
     penguinObj.direction = turnDirections[penguinObj.turnIndex]
@@ -194,7 +170,6 @@ function init() {
     penguin.style.marginLeft = `${x}px`
     penguin.style.zIndex = y
     body.append(penguin)
-    const { width, height, left, top } = penguin.getBoundingClientRect()
 
     penguins[penguinCount] = { 
       penguin,
@@ -208,10 +183,6 @@ function init() {
       defaultFallDirection: randomDirection(),
       moveSpeed: randomMoveSpeed(),
       prev: [penguin.style.marginLeft, penguin.style.marginTop], 
-      pos: {
-        x: left + (width / 2),
-        y: top + (height / 2),
-      }
     }
     const penguinObj = penguins[penguinCount]
     const penguinStatus = document.createElement('p')
@@ -267,7 +238,7 @@ function init() {
 
 
 
-  const hitObj = n =>{
+const hitObj = n =>{
     let obj = {}
     for(let i = 0; i < n; i++){
       obj[i] = {
@@ -335,9 +306,10 @@ function init() {
     }
   }
   
+ 
   
   // Create penguin and set up collision check
-  new Array(1).fill('').map(()=>{
+  new Array(15).fill('').map(()=>{
     return [randomP(body.clientWidth - 100), randomP(body.clientHeight - 100)]
   }).forEach( pos => {
     createPenguin(pos[0], pos[1])
@@ -373,12 +345,6 @@ function init() {
 
   //   console.log(penguins)
   // })
-
-  window.addEventListener('click', e =>{
-    control.x = e.pageX
-    control.y = e.pageY
-    indicator.innerHTML = `pageX:${e.pageX} pageY:${e.pageY}`
-  })
 
 }
 

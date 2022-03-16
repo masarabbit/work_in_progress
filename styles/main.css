@@ -32,6 +32,7 @@ body {
   overflow: hidden;
   transition: 1.5s;
   mix-blend-mode: multiply;
+  border: yellow 1px solid;
 }
 
 .penguin_wrapper svg { fill: rgb(173, 1, 87); }
@@ -69,6 +70,7 @@ body {
   justify-content: center;
   align-items: center;
   pointer-events: none;
+  border:blue 1px solid;
 }
 
 .hit_area {
@@ -76,6 +78,7 @@ body {
   width: 40px;
   display: flex;
   flex-wrap: wrap;
+  border: hotpink 1px solid;
 }
 
 .penguin_wrapper.stop .hit_area {
@@ -112,6 +115,13 @@ a {
 
 a:hover { text-decoration: underline; }
 
+.mark {
+  height: 2px;
+  width: 2px;
+  position: absolute;
+  background-color: hotpink;
+}
+
 
 /* .upleft {
   border: 1px solid yellow;
@@ -144,3 +154,14 @@ a:hover { text-decoration: underline; }
   font-size: 10px;
   margin: 5px;
 } */
+
+.indicator {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  width: 200px;
+  color: hotpink;
+  height: 20px;
+  border: 1px solid hotpink;
+  z-index: 200;
+}
