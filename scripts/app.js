@@ -4,7 +4,8 @@ function init() {
   // const decode = arr => arr.split('').map(c=> !decodeRef[c] ? c : decodeRef[c]).join('')
 
   // TODO need to adjust penguin within the wrapper
-  
+  // TODO change turning direction (clockwise, anti clockwise)
+  //TODO stop penguiin once at destination
 
   const indicator = document.querySelector('.indicator')
   const body = document.querySelector('.wrapper')
@@ -41,6 +42,7 @@ function init() {
   const control = {
     x: null,
     y: null,
+    angle: 360,
   }
   
   const animatePenguin = (penguin, penguinObj) =>{
@@ -52,10 +54,23 @@ function init() {
     penguinObj.frameTimer = setTimeout(()=> animatePenguin(penguin, penguinObj), frameSpeed)
   }
 
-  const randomMoveSpeed = () =>{
-    // const range = [850, 900, 950, 1000, 1100]
-    const range = [ 900, 900, 1800]
-    return range[Math.floor(Math.random() * range.length)]
+  // const randomMoveSpeed = () =>{
+  //   // const range = [850, 900, 950, 1000, 1100]
+  //   const range = [ 900, 900, 1800]
+  //   return range[Math.floor(Math.random() * range.length)]
+  // }
+
+
+  const radToDeg = rad => Math.round(rad * (180 / Math.PI))
+
+  const nearestN = (n, denom) =>{
+    return n === 0 ? 0 : (n - 1) + Math.abs(((n - 1) % denom) - denom)
+  }
+
+  const clickedAngle = () =>{
+    const angle = radToDeg(Math.atan2(penguins[0].pos.y - control.y, penguins[0].pos.x - control.x)) - 90
+    const adjustedAngle = angle < 0 ? angle + 360 : angle
+    return nearestN(adjustedAngle, 45)
   }
 
   const changeAnimation = (penguinObj, animation) => {
@@ -96,40 +111,76 @@ function init() {
     }
   }
 
-  const moveOrStopPenguin = (penguin, penguinObj) =>{
-    const option = ['move','stop','stop']
-    const status = option[Math.floor(Math.random() * option.length)]
-    if (status === 'move') {
-      penguinObj.stop = false
-      changeAnimation(penguinObj, 'walk')
-      moveAbout(penguin, penguinObj)
-    } else if (!penguinObj.knocked) {
-      stopPenguin(penguin, penguinObj)
-      penguinObj.moveTimer = setTimeout(()=> {
-        moveOrStopPenguin(penguin, penguinObj)
-      }, penguinObj.moveSpeed)
-    }
+  // const moveOrStopPenguin = (penguin, penguinObj) =>{
+  //   const option = ['move','stop','stop']
+  //   const status = option[Math.floor(Math.random() * option.length)]
+  //   if (status === 'move') {
+  //     penguinObj.stop = false
+  //     changeAnimation(penguinObj, 'walk')
+  //     moveAbout(penguin, penguinObj)
+  //   } else if (!penguinObj.knocked) {
+  //     stopPenguin(penguin, penguinObj)
+  //     penguinObj.moveTimer = setTimeout(()=> {
+  //       moveOrStopPenguin(penguin, penguinObj)
+  //     }, penguinObj.moveSpeed)
+  //   }
+  // }
+
+  const directionConversions = {
+    360: 'up',
+    45: 'upright',
+    90: 'right',
+    135: 'downright',
+    180: 'down',
+    225: 'downleft',
+    270: 'left',
+    315: 'upleft',
   }
+
+
+  const reverseDirectionConversions = () =>{
+    const obj = {}
+    Object.keys(directionConversions).forEach( k =>{
+      obj[directionConversions[k]] = k
+    })
+    return obj
+  }
+
+  // console.log(reverseDirectionConversions())
 
   const moveAbout = (penguin, penguinObj) =>{
     if (penguinObj.hit) return
-    const turnOptions = [1, 1, -1, -1, 0]
-    const turnValue = turnOptions[Math.floor(Math.random() * turnOptions.length)]
-    penguinObj.turnIndex += turnValue
-
-
-
+  
     // TODO turn according to control.x and control.y
-    console.log(penguinObj)
+    // console.log(penguinObj)
     const { width, height, left, top } = penguin.getBoundingClientRect()
-
     const mark = document.createElement('div')
     mark.classList.add('mark')
     penguinObj.pos.x = left + (width / 2)
     penguinObj.pos.y = top + (height / 2)
-    mark.style.top = `${penguinObj.pos.y}px`
     mark.style.left = `${penguinObj.pos.x}px`
+    mark.style.top = `${penguinObj.pos.y}px`
     body.append(mark)
+
+    const penguinDir = +reverseDirectionConversions()[penguinObj.direction]
+    const angle = clickedAngle()
+
+    console.log(penguinDir, angle)
+    const turnValue = penguinDir === angle
+      ? 0 
+      : penguinDir < angle
+        ? 1
+        : -1
+
+    // const turnValue = penguinDir < angle
+    //   ? 1
+    //   : -1    
+
+
+    // const turnOptions = [1, 1, -1, -1, 0]
+    // const turnValue = turnOptions[Math.floor(Math.random() * turnOptions.length)]
+    penguinObj.turnIndex += turnValue
+    
     // ['up', 'upright', 'right', 'downright', 'down', 'downleft', 'left', 'upleft']
 
     if (penguinObj.turnIndex < 0) penguinObj.turnIndex = 7
@@ -152,8 +203,8 @@ function init() {
     
     checkBoundaryAndUpdatePenguinPos(x, y, penguin, penguinObj)
     if (!penguinObj.stop) penguinObj.moveTimer = setTimeout(()=> {
-      // moveAbout(penguin, penguinObj)
-      moveOrStopPenguin(penguin, penguinObj)
+      // moveOrStopPenguin(penguin, penguinObj)
+      moveAbout(penguin, penguinObj)
     }, penguinObj.moveSpeed)
   }
   
@@ -206,7 +257,7 @@ function init() {
       turnIndex: Math.floor(Math.random() * 7),
       frameSpeed,
       defaultFallDirection: randomDirection(),
-      moveSpeed: randomMoveSpeed(),
+      moveSpeed: 400,
       prev: [penguin.style.marginLeft, penguin.style.marginTop], 
       pos: {
         x: left + (width / 2),
@@ -374,10 +425,18 @@ function init() {
   //   console.log(penguins)
   // })
 
+
+
   window.addEventListener('click', e =>{
-    control.x = e.pageX
-    control.y = e.pageY
-    indicator.innerHTML = `pageX:${e.pageX} pageY:${e.pageY}`
+    console.log(penguins)
+    const x = e.pageX 
+    const y = e.pageY
+    control.x = x
+    control.y = y
+    // const angle = radToDeg(Math.atan2(penguins[0].pos.y - control.y, penguins[0].pos.x - control.x)) - 90
+    // const adjustedAngle = angle < 0 ? angle + 360 : angle
+    // control.angle = nearestN(adjustedAngle, 45)
+    indicator.innerHTML = `pageX:${x} pageY:${y} angle:${clickedAngle()}`
   })
 
 }
