@@ -36,8 +36,7 @@ function init() {
   }
   const turnDirections = Object.keys(sprites)
   const penguins = {}
-  const penguinImpact = 10
-  const frameSpeed = 150
+  const frameSpeed = 100
   let penguinCount = 0
   const control = {
     x: null,
@@ -54,17 +53,18 @@ function init() {
     penguinObj.frameTimer = setTimeout(()=> animatePenguin(penguin, penguinObj), frameSpeed)
   }
 
-  // const randomMoveSpeed = () =>{
-  //   // const range = [850, 900, 950, 1000, 1100]
-  //   const range = [ 900, 900, 1800]
-  //   return range[Math.floor(Math.random() * range.length)]
-  // }
 
 
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
 
   const nearestN = (n, denom) =>{
     return n === 0 ? 0 : (n - 1) + Math.abs(((n - 1) % denom) - denom)
+  }
+
+
+  const overlap = (a, b) =>{
+    const buffer = 20
+    return Math.abs(a - b) < buffer
   }
 
   const clickedAngle = () =>{
@@ -80,6 +80,7 @@ function init() {
 
   const stopPenguin = (penguin, penguinObj) =>{
     changeAnimation(penguinObj, 'stop')
+    penguin.classList.add('stop')
     const { offsetTop, offsetLeft } = penguin.style
     penguin.style.marginLeft = offsetLeft
     penguin.style.marginTop = offsetTop
@@ -111,20 +112,6 @@ function init() {
     }
   }
 
-  // const moveOrStopPenguin = (penguin, penguinObj) =>{
-  //   const option = ['move','stop','stop']
-  //   const status = option[Math.floor(Math.random() * option.length)]
-  //   if (status === 'move') {
-  //     penguinObj.stop = false
-  //     changeAnimation(penguinObj, 'walk')
-  //     moveAbout(penguin, penguinObj)
-  //   } else if (!penguinObj.knocked) {
-  //     stopPenguin(penguin, penguinObj)
-  //     penguinObj.moveTimer = setTimeout(()=> {
-  //       moveOrStopPenguin(penguin, penguinObj)
-  //     }, penguinObj.moveSpeed)
-  //   }
-  // }
 
   const directionConversions = {
     360: 'up',
@@ -146,13 +133,7 @@ function init() {
     return obj
   }
 
-  // console.log(reverseDirectionConversions())
-
-  const moveAbout = (penguin, penguinObj) =>{
-    if (penguinObj.hit) return
-  
-    // TODO turn according to control.x and control.y
-    // console.log(penguinObj)
+  const createMark = (penguin, penguinObj) => {
     const { width, height, left, top } = penguin.getBoundingClientRect()
     const mark = document.createElement('div')
     mark.classList.add('mark')
@@ -161,27 +142,29 @@ function init() {
     mark.style.left = `${penguinObj.pos.x}px`
     mark.style.top = `${penguinObj.pos.y}px`
     body.append(mark)
+  }
+
+
+  const moveAbout = (penguin, penguinObj) =>{
+    if (penguinObj.hit) return
+  
+    // TODO turn according to control.x and control.y
+    // console.log(penguinObj)
+    createMark(penguin, penguinObj)
 
     const penguinDir = +reverseDirectionConversions()[penguinObj.direction]
     const angle = clickedAngle()
 
-    console.log(penguinDir, angle)
+    // console.log(penguinDir, angle)
     const turnValue = penguinDir === angle
       ? 0 
       : penguinDir < angle
         ? 1
         : -1
-
-    // const turnValue = penguinDir < angle
-    //   ? 1
-    //   : -1    
-
-
-    // const turnOptions = [1, 1, -1, -1, 0]
-    // const turnValue = turnOptions[Math.floor(Math.random() * turnOptions.length)]
-    penguinObj.turnIndex += turnValue
     
-    // ['up', 'upright', 'right', 'downright', 'down', 'downleft', 'left', 'upleft']
+    penguinObj.turnIndex += turnValue
+
+    indicator.innerHTML = `penguinDir: ${penguinDir} angle:${angle} turnValue: ${turnValue}`
 
     if (penguinObj.turnIndex < 0) penguinObj.turnIndex = 7
     if (penguinObj.turnIndex > 7) penguinObj.turnIndex = 0
@@ -193,19 +176,22 @@ function init() {
     let y = penguinMarginTop(penguin)
     
     const distance = 10
-    if (dir !== 'up' && 'dir' !== 'down') x += (dir.includes('left')) ? -distance : distance
-    if (dir !== 'left' && 'dir' !== 'right') y += (dir.includes('up')) ? -distance : distance
+    if (dir !== 'up' && dir !== 'down') x += (dir.includes('left')) ? -distance : distance
+    if (dir !== 'left' && dir !== 'right') y += (dir.includes('up')) ? -distance : distance
 
-    if (x === penguinObj.prev[0] && y === penguinObj.prev[1]){
+    if (
+      x === penguinObj.prev[0] && y === penguinObj.prev[1] || 
+      overlap(control.x, penguinObj.pos.x) && overlap(control.y, penguinObj.pos.y)
+    ){
       console.log('trigger')
       stopPenguin(penguin, penguinObj)
     } 
     
     checkBoundaryAndUpdatePenguinPos(x, y, penguin, penguinObj)
     if (!penguinObj.stop) penguinObj.moveTimer = setTimeout(()=> {
-      // moveOrStopPenguin(penguin, penguinObj)
       moveAbout(penguin, penguinObj)
     }, penguinObj.moveSpeed)
+    
   }
   
 
@@ -256,8 +242,8 @@ function init() {
       moveTimer: null,
       turnIndex: Math.floor(Math.random() * 7),
       frameSpeed,
-      defaultFallDirection: randomDirection(),
-      moveSpeed: 400,
+      moveSpeed: 150,
+      stop: true,
       prev: [penguin.style.marginLeft, penguin.style.marginTop], 
       pos: {
         x: left + (width / 2),
@@ -270,122 +256,12 @@ function init() {
     
     startPenguin(penguin, penguinObj)
     moveAbout(penguin, penguinObj)
+    stopPenguin(penguin, penguinObj)
     penguinCount++
   }
 
 
-    const slidepenguin = (penguin, penguinObj) =>{
-    let x = penguinMarginLeft(penguin)
-    let y = penguinMarginTop(penguin)
 
-    if (penguinObj.hit.includes('left')) x += penguinImpact
-    if (penguinObj.hit.includes('right')) x -= penguinImpact
-    if (penguinObj.hit.includes('up')) y += penguinImpact
-    if (penguinObj.hit.includes('down')) y -= penguinImpact
-    
-    checkBoundaryAndUpdatePenguinPos(x, y, penguin, penguinObj)
-  } 
-
-  const knockPenguin = (penguin, penguinObj) =>{
-    if (penguinObj.knocked) return
-    penguinObj.knocked = true 
-    penguinObj.stop = true
-    slidepenguin(penguin, penguinObj)
-    // changeAnimation(penguinObj, 'stop')
-
-    const a = frameSpeed * 6
-    // const b = 1000 * (Math.ceil(Math.random() * 4) + 1)
-    // const c = frameSpeed * 6
-
-    // penguinObj.frameTimer = setTimeout(()=>{
-    //   changeAnimation(penguinObj, 'fallen')
-    // }, a)
-
-    // penguinObj.frameTimer = setTimeout(()=>{
-    //   changeAnimation(penguinObj, 'standUp')
-    // }, a + b)
-
-    penguinObj.frameTimer = setTimeout(()=>{
-      changeAnimation(penguinObj, 'walk')
-      penguinObj.hit = false
-      penguinObj.knocked = false
-      penguinObj.stop = false
-      penguin.classList.remove('stop')
-      moveAbout(penguin, penguinObj)
-    }, a)
-  }
-
-
-
-
-  const hitObj = n =>{
-    let obj = {}
-    for(let i = 0; i < n; i++){
-      obj[i] = {
-        upleft: false,
-        upright: false,
-        downleft: false,
-        downright: false,
-      }
-    }
-    return obj
-  }
-
-  const hitCheck = (hitDirection, penguinObj, penguinDirection) =>{
-    if (hitDirection) { 
-      penguinObj.direction = penguinDirection 
-      penguinObj.hit = penguinDirection
-    }
-  }
-
-  const overlap = (a, b) =>{
-    const buffer = 20
-    return Math.abs(a - b) < buffer
-  }
-
-  const collisionCheck = () =>{
-    const hitCorners = document.querySelectorAll('.hit_corner')
-    const hit = hitObj(penguinCount)
-    // hitCorners.forEach(h=>h.style.backgroundColor = 'transparent')
-    hitCorners.forEach(a=>{
-      const { x:aX, y:aY, width:aW, height:aH } = a.getBoundingClientRect()
-      const { id:aId, pos:aPos } = a.dataset
-      hitCorners.forEach(b=>{
-        const { id:bId, pos:bPos } = b.dataset
-        if (aId === bId) return
-        const { x:bX, y:bY, width:bW, height:bH } = b.getBoundingClientRect()
-        if (overlap(aX, bX) && overlap(aX + aW, bX + bW) && overlap(aY, bY) && overlap(aY + aH, bY + bH)
-          ) {
-            hit[aId][aPos] = true
-            hit[bId][bPos] = true
-            // a.style.backgroundColor = 'orange'
-            // b.style.backgroundColor = 'orange'
-          }
-      })
-    })
-    for (let i = 0; i < penguinCount; i++){
-      const { upleft, upright, downleft, downright } = hit[i]
-      const penguin = penguins[i]
-
-      hitCheck(upleft, penguin, 'upleft')
-      hitCheck(downleft, penguin, 'downleft')
-      hitCheck(upright, penguin, 'upright')
-      hitCheck(downright, penguin, 'downright')
-      hitCheck(upleft && downleft, penguin, 'left')
-      hitCheck(upright && downright, penguin, 'right')
-      hitCheck(upleft && upright, penguin, 'up')
-      hitCheck(downleft && downright, penguin, 'down')
-      hitCheck(upleft && upright && downleft && downright, penguin, penguin.defaultFallDirection )
-
-      if ( upleft || upright || downleft || downright && !penguin.knocked) {
-        // penguins[i].penguin.classList.add('stop')
-        const { direction } = penguin
-        penguin.penguin.childNodes[1].className = `penguin_inner_wrapper facing_${direction}`
-        knockPenguin(penguin.penguin, penguin)
-      }
-    }
-  }
-  
   
   // Create penguin and set up collision check
   new Array(1).fill('').map(()=>{
@@ -394,99 +270,24 @@ function init() {
     createPenguin(pos[0], pos[1])
   })
 
-  setInterval(collisionCheck, 50)
-
-
-  // window.addEventListener('keyup',(e)=>{
-  //   const hitAreas = document.querySelectorAll('.hit_area')
-  //   const k = e.key.toLowerCase().replace('arrow','')[0]
-  //   const pObj = penguins[0]
-  //   // console.log(penguin)
-  //   const { turnIndex:t, penguin:p } = pObj
-  //   if (k === 'x') pObj.turnIndex = t === 7 ? 0 : t + 1
-  //   if (k === 'z') pObj.turnIndex = t === 0 ? 7 : t - 1
-    
-  //   hitAreas[0].style.backgroundColor = 'transparent'
-  //   if (pObj.stop) startPenguin(p, pObj)
-
-  //   pObj.direction = turnDirections[pObj.turnIndex]
-  //   const { direction: dir } = pObj
-  //   p.childNodes[1].className = `penguin_inner_wrapper facing_${dir}`
-
-  //   const { marginLeft, marginTop } = p.style
-  //   let x = +marginLeft.replace('px','')
-  //   let y = +marginTop.replace('px','')
-
-  //   if (k === 'u') p.style.marginTop = `${y - 10}px`
-  //   if (k === 'd') p.style.marginTop = `${y + 10}px`
-  //   if (k === 'r') p.style.marginLeft = `${x + 10}px`
-  //   if (k === 'l') p.style.marginLeft = `${x - 10}px`
-
-  //   console.log(penguins)
-  // })
-
 
 
   window.addEventListener('click', e =>{
-    console.log(penguins)
-    const x = e.pageX 
-    const y = e.pageY
-    control.x = x
-    control.y = y
-    // const angle = radToDeg(Math.atan2(penguins[0].pos.y - control.y, penguins[0].pos.x - control.x)) - 90
-    // const adjustedAngle = angle < 0 ? angle + 360 : angle
-    // control.angle = nearestN(adjustedAngle, 45)
-    indicator.innerHTML = `pageX:${x} pageY:${y} angle:${clickedAngle()}`
+    // console.log(penguins)
+    control.x = e.pageX 
+    control.y = e.pageY
+    if (penguins[0].stop){
+      changeAnimation(penguins[0], 'walk')
+      penguins[0].stop = false
+      // penguins[0].penguin.classList.remove('stop')
+      moveAbout(penguins[0].penguin, penguins[0])
+    }
+    
   })
 
 }
 
 window.addEventListener('DOMContentLoaded', init)
-
-
-
-//   for (let x = 0; x < penguinCount; x++){
-//     const p = penguins[`penguin-${x}`]
-//     makeDraggable(p.penguin, p)
-//   }
-// }
-
-
-  // const makeDraggable = (penguin, penguinObj) =>{
-
-  //   const onDrag = e => {
-  //     // const { x: offSetX, y: offSetY } = body.getBoundingClientRect()
-  //     const newX = e.clientX
-  //     const newY = e.clientY
-  //     penguin.style.marginLeft = `${newX - 50}px`
-  //     penguin.style.marginTop = `${newY - 50}px`
-  //   }
-  //   const onLetGo = () => {
-  //     document.removeEventListener('mousemove', onDrag)
-  //     document.removeEventListener('mouseup', onLetGo)
-
-  //     if (!penguinObj.hit) {
-  //       penguinObj.stop = false
-  //       moveAbout(penguin, penguinObj)
-  //       penguin.classList.remove('stop')
-  //     }
-      
-  //   } 
-  //   const onGrab = () => {
-  //     // if (!penguinObj.hit) return
-  //     document.addEventListener('mousemove', onDrag)
-  //     document.addEventListener('mouseup', onLetGo)
-  //     penguinObj.stop = true
-  //     penguin.classList.add('stop')
-  //   }
-  //   penguin.addEventListener('mousedown', onGrab)
-  // }
-
-
-
-
-
-
 
 
 
