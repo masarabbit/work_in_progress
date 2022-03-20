@@ -34,7 +34,7 @@ function init() {
     left: 'side',
     upleft: 'dUp',
   }
-  const turnDirections = Object.keys(sprites)
+  let turnDirections = Object.keys(sprites)
   const penguins = {}
   const frameSpeed = 100
   let penguinCount = 0
@@ -42,6 +42,25 @@ function init() {
     x: null,
     y: null,
     angle: 360,
+  }
+
+  const directionConversions = {
+    360: 'up',
+    45: 'upright',
+    90: 'right',
+    135: 'downright',
+    180: 'down',
+    225: 'downleft',
+    270: 'left',
+    315: 'upleft',
+  }
+
+  const reverseDirectionConversions = () =>{
+    const obj = {}
+    Object.keys(directionConversions).forEach( k =>{
+      obj[directionConversions[k]] = k
+    })
+    return obj
   }
   
   const animatePenguin = (penguin, penguinObj) =>{
@@ -53,7 +72,33 @@ function init() {
     penguinObj.frameTimer = setTimeout(()=> animatePenguin(penguin, penguinObj), frameSpeed)
   }
 
+  // const testArray = [0, 1, 2, 3, 4, 5, 6, 7]
 
+  const shuffleArray = (arr, center) =>{
+    const copyArr = [...arr]
+    while(copyArr.indexOf(center) !== Math.round(copyArr.length / 2)){
+      const last = copyArr.pop()
+      copyArr.unshift(last)
+    }
+    return copyArr
+  }
+
+  
+
+  // console.log(shuffleArray(testArray, 7))
+  const oppositeAngle = angle =>{
+    return angle < 225 ? angle + 180 : angle - 180
+  }
+
+  // console.log(Object.keys(directionConversions))
+  // console.log(
+  //   shuffleArray(
+  //     Object.keys(directionConversions).map(n => +n),
+  //     oppositeAngle(180)
+  //     ).map(n => directionConversions[n])
+  // )
+
+  // turnDirections = shuffleArray(Object.keys(sprites), )
 
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
 
@@ -113,25 +158,10 @@ function init() {
   }
 
 
-  const directionConversions = {
-    360: 'up',
-    45: 'upright',
-    90: 'right',
-    135: 'downright',
-    180: 'down',
-    225: 'downleft',
-    270: 'left',
-    315: 'upleft',
-  }
 
 
-  const reverseDirectionConversions = () =>{
-    const obj = {}
-    Object.keys(directionConversions).forEach( k =>{
-      obj[directionConversions[k]] = k
-    })
-    return obj
-  }
+
+
 
   const createMark = (penguin, penguinObj) => {
     const { width, height, left, top } = penguin.getBoundingClientRect()
@@ -155,16 +185,18 @@ function init() {
     const penguinDir = +reverseDirectionConversions()[penguinObj.direction]
     const angle = clickedAngle()
 
-    // console.log(penguinDir, angle)
+
+    indicator.innerHTML = `penguinDir: ${directionConversions[penguinDir]} angle:${directionConversions[angle]} turnDirections: ${turnDirections.join('-')}`
+
     const turnValue = penguinDir === angle
       ? 0 
-      : penguinDir < angle
+      : turnDirections.indexOf(directionConversions[penguinDir]) < turnDirections.indexOf(directionConversions[angle])
         ? 1
         : -1
     
     penguinObj.turnIndex += turnValue
 
-    indicator.innerHTML = `penguinDir: ${penguinDir} angle:${angle} turnValue: ${turnValue}`
+    // indicator.innerHTML = `penguinDir: ${penguinDir} angle:${angle} turnValue: ${turnValue}`
 
     if (penguinObj.turnIndex < 0) penguinObj.turnIndex = 7
     if (penguinObj.turnIndex > 7) penguinObj.turnIndex = 0
@@ -279,6 +311,11 @@ function init() {
     if (penguins[0].stop){
       changeAnimation(penguins[0], 'walk')
       penguins[0].stop = false
+      turnDirections = shuffleArray(
+        Object.keys(directionConversions).map(n => +n),
+        oppositeAngle(clickedAngle())
+        ).map(n => directionConversions[n])
+        console.log(turnDirections)
       // penguins[0].penguin.classList.remove('stop')
       moveAbout(penguins[0].penguin, penguins[0])
     }
