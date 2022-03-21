@@ -32,10 +32,13 @@ body {
   overflow: hidden;
   transition: 0.5s;
   mix-blend-mode: multiply;
-  border: yellow 1px solid;
+  /* border: yellow 1px solid; */
 }
 
-.penguin_wrapper svg { fill: rgb(173, 1, 87); }
+.penguin_wrapper svg { 
+  /* fill: rgb(173, 1, 87);  */
+  display: block;
+}
 
 .penguin_wrapper.stop { transition: 0 !important; }
 
@@ -53,16 +56,17 @@ body {
 
 .penguin_sprite {
   position: absolute;
-  height: 96px;
+  height: calc(5 * 96px);
   width: calc(5 * 96px);
   pointer-events: none;
 }
 
 .penguin_sprite img {
-  height: 100px;
+  height: 100%;
   width: 100%;
   display: block;
 }
+
 
 .hit_wrapper {
   height: 100%;
@@ -70,7 +74,7 @@ body {
   justify-content: center;
   align-items: center;
   pointer-events: none;
-  border:blue 1px solid;
+  /* border:blue 1px solid; */
 }
 
 .hit_area {
