@@ -7,7 +7,7 @@ function init() {
     up: `d 22 11eAbBaBaEaBaAaAaAbAaExGnBuAaBnAkKnNnAuBxUaNuNnInAuAuKaNaNaNaNaNaIaUaUaNbN"/D 68 12jAaAaBaEaBbAbAaAbBiw6nExUnAxAaBkKuNnInAuAuKaUaNbNaUaIaUaNaN"/D 167 12eAbAaBaJaAaBbAaAaAaBW-6AnEnGkUaNuNuNuAaBxUaNuUnKiUaNbNbNaNaUaKaUaNbN"/D 115 13W6AaAaBaGaAbAbAeAaBnAxNnJnAnAkNnAkAaBnAuNnUaNkUnXnAxKaNbNaNaXaXaNaN"/D 215 13gAbBaGaEaAbAaAaGkNnEnBuGkXkNnAxNnNnKnAuAuKaNaNaNaNaNaNaKaKaNaNbN"/`,
     dUp: `d 22 12eAbAaAaAaJaBbAaAaBaEaBiAnAnAnEkUnNxBuUkUnKkKaNaNaNaNaUaXaKaNbN"/D 69 12jAaAaEaBaBaAaAaAbAaAaExNnGnAnExNxAaBuAuKxUaKnNxUaNaNaUbUaXaKaUbN"/D 116 12jAaAeBnAaBaAaAbAbAbAaAaAnAxNuAaJnAnBuAuNiEkKkw-6nAxUaUbUbNaIaXaNaN"/D 167 13jAaAaAaw7aAaAaAaAaAaAaEiNuBnBuAaBxUnNnNuAkNuUnXaNiUaNeNaNaNaNaUaUaNaNaN"/D 216 13W6AaAaAaw8nAbAaBaAaGkNkAnBnEkUuNuNiNkw-6aUxUaNeNeNaNaNaUaNaNaN"/`,
     side: `d 23 11eAeAaBaBeBnAkBaAaAbAaAaBaEkNnNnNnKnUnNnNnNkAuBnBnBnBnBnEnNnNnUnKaKaNaNaUaUaXaNaNbN"/D 69 12jAbAaAjBnAuAnEaAaAbAbAaEkNkUnKnNuNuAuAuBnAnw7aAaAbEkNnKuNnUaUnAxKaNaUbUaIaKaNbN"/D 117 12W6AaAaAaAeAaBxEbAaAeAaBiNuNnUnUW-6AnAnBnw6aBaAaAaBkUiNnUbNaKnAxKaNaNbNaUaw-6aNaNaN"/D 168 12gAbAaBaAaAeBxAnBaAbAaBaEkNnUnKnNnNnNxAnAnAnAnAnBnGnKnAxKaNaNaNaNaNaNaNaXaNaUbN"/D 216 12gAbAaBbAbBkAnEaAbAaAaAaBxNuXnUnNiAnAnAnAnAnAnGaAuNuUaNaNnAxUaNaNbNaNaNaNaNaKaUaNaN"/F 24 16aBnU"/F 71 16aBnU"/F 119 16aBnU"/F 168 16aBnU"/F 216 16aBnU"/F 24 20eAaAaAaBaEaGnAnAkAW-6NkUnNaUaUaUaUaUbN"/F 73 21bAbAaEaBaBnAnAuAuAuAkNnNnw-7aNaUbNbN"/F 118 21W6BaBaAaGnBuAuAiNnUnw-6aUaNaN"/F 168 21gAaAaAaEaGnBnAW-7NiIaUaNaNaNaNaN"/F 216 21jAaBaw7nAnAnAkNiNnNnXaNaNaNaNaNaN"/D 126 31bBxNbN"/D 76 32gBxU"/D 211 32aAnN"/D 163 33gBxU"/D 212 33eAkN"/D 19 34bAeBiK"/D 27 34gBnAkK"/D 170 34gGuNnNnU"/D 218 34eAaBkNnU"/`,
-    dDown: `d 23 12eAbAaAaGaGaAaAaAaAaEkNnUnKnUnNnAnNnNxAnAnAnGnBnAnEnNxUaUaUaNaNaNaUaXaUaNaNbN"/D 119 12eAbAaAaJaBaBaAaAaAaEkNnUnKnUnNnAnNnNkAuAnAnBnGnAnBaAaAuNnNxKaUaUaNaNaNaNaXaUaNaNbN"/D 168 12eAbAaAaBaw6aAaBaAaAaBxNnKnKnNnNnAnNnNiAnAnBnBnBnGnNnUkKaNaNbNaNaNaUaUaUaNaNbN"/D 215 12jAbBaw7aBbBbBaBxNnKnKnNuNnNxAnAnAnAnBnGnGuNnKaKaNuAxNnNaNaNbNbNbNaNaUaUaNaNaN"/D 68 13W6AaAaAaBaEaAaAaAeAaBiNnNnUnNnNnAuNxAnAnJnBnAnAW-6KaNaNaNaNaNaNaIaKaNaN"/F 21 16aBnU"/F 117 16aBnU"/F 215 16aBnU"/F 75 17aBnU"/F 167 17aAnN"/F 68 18aBnU"/F 173 18aAnN"/F 22 20gAaAaNaAaBaEaBaAnBnAnAkAnAxNuAnNuUnKaNaUaXaNaNaN"/F 119 20eAaAaNaAaBaEaBaEuAnAkAkAuNxUnNnUaNaXaUaNaNbN"/F 165 20jAaAaNaAaAaEaw6nAnAkAiNiUnXaUaUaUaNaN"/F 215 20gAaAbAaEaw6nAnAn3XaXaUaNaNaNaN"/F 69 21gAbNaAaAaBaAaJnAuAnBuAxNnAnNuUnKaUaIaNaN"/D 77 32aAaBkUaN"/D 160 32aAnN"/D 16 33aAnN"/D 27 34eAaBxK"/D 123 34eAaBxK"/D 163 34eAaBkNnU"/D 171 34eAaBkNnU"/D 211 34gBxU"/D 219 34bAbBnAkX"/D 20 35bAaBnAuX"/D 69 35aAbBuAuKaN"/D 116 35bAaBnAuX"/`,
+    dDown: `d 23 12eAbAaAaGaGaAaAaAaAaEkNnUnKnUnNnAnNnNxAnAnAnGnBnAnEnNxUaUaUaNaNaNaUaXaUaNaNbN"/D 168 12eAbAaAaBaw6aAaBaAaAaBxNnKnKnNnNnAnNnNiAnAnBnBnBnGnNnUkKaNaNbNaNaNaUaUaUaNaNbN"/D 215 12jAbBaw7aBbBbBaBxNnKnKnNuNnNxAnAnAnAnBnGnGuNnKaKaNuAxNnNaNaNbNbNbNaNaUaUaNaNaN"/D 68 13W6AaAaAaBaEaAaAaAeAaBiNnNnUnNnNnAuNxAnAnJnBnAnAW-6KaNaNaNaNaNaNaIaKaNaN"/D 115 13jAbAaAnBaUaAaBaBeAeAaBW-6UnNnNnNuAkNnAuAnBnGnEnAuAkXaNaUaNaNaNnIaKaNbN"/F 21 16aBnU"/F 122 16aBnU"/F 215 16aBnU"/F 75 17aBnU"/F 167 17aAnN"/F 68 18aBnU"/F 114 18aBnU"/F 173 18aAnN"/F 22 20gAaAaNaAaBaEaBaAnBnAnAkAnAxNuAnNuUnKaNaUaXaNaNaN"/F 118 20aAeNbAaAaAaBaJnBuAnAnAuAxNkNnw-6aXaUaNbN"/F 165 20jAaAaNaAaAaEaw6nAnAkAiNiUnXaUaUaUaNaN"/F 215 20gAaAbAaEaw6nAnAn3XaXaUaNaNaNaN"/F 69 21gAbNaAaAaBaAaJnAuAnBuAxNnAnNuUnKaUaIaNaN"/D 77 32aAaBkUaN"/D 125 32eEkNnNaN"/D 160 32aAnN"/D 16 33aAnN"/D 27 34eAaBxK"/D 163 34eAaBkNnU"/D 171 34eAaBkNnU"/D 211 34gBxU"/D 219 34bAbBnAkX"/D 20 35bAaBnAuX"/D 69 35aAbBuAuKaN"/D 116 35aAbAaAnAkX"/`,
     down: `d 22 11eAbBaBaEaBaAaAaAbAaEiUnUnUnNnNuAnAnNnNuAnBnBnBnAnAuAuXaNaNaNaNaNaXaUaUaNbN"/D 68 12jAaAaBaEaAaAaAbAaAbBiNnUnUnNuNnAnBuUuAnAnBnEnAnAuAuKaUaNaNaNaNaIaUaNaN"/D 167 12eAbAaBaJaAaBaAbAaAaBiNnNnKnKuNnAnAnNnNuAuBnBnBuAkNnNaNaNbNaNaNaUaKaUaNbN"/D 115 13W6AaAaBaEaBbAbAbAaAaAnAxNuNnUnNnNnNkBnNnNnAuBnBnBnAxKaNaNaNaNaXaKaNaN"/D 215 13gAbBaGaEaAbAaAaGxNnNnKnUnNnNnAnAnNnNuAnAnBnBnAnAxUaUaNbNaNaKaKaNaNbN"/F 19 16aBnU"/F 26 16aBnU"/F 73 16aBnU"/F 165 16aBnU"/F 67 17aBnU"/F 120 17aAnN"/F 171 17aBnU"/F 213 17aBnU"/F 114 18aAnN"/F 219 18aBnU"/F 73 19aAbAaBaBaw6nAnAkAW-7NnNnUnKaKaUaNaNbBbUaN"/F 20 20bAaAaNaNbAaAaBaBaBaEnAnAnAnAW-7NuNnNnNnXaUaUaUaN"/F 165 20bAaAaNaNaAbEaEaw6nAxNkNxNnNnIaUaUbN"/F 116 21aAaAaUeAaAaAaBaw6nAxAW-6NnNnNnIaUaUbN"/F 213 21bAaAaNaNaAaAaBaEaJnAW-6NkNkNnXaUaUaNaN"/D 77 32aExUeN"/D 163 32bAaBxUaN"/D 211 32bAaAxNaN"/D 122 33eAkN"/D 19 34bAaBxUaN"/D 28 34aAaBnAkKbN"/D 67 34bAaBkK"/D 116 34bAaBnAuNnUaN"/D 171 34bEkUaN"/D 218 34bAaEkX"/`,
   }
 
@@ -65,7 +65,7 @@ function init() {
   const setMargin = (target, x, y) =>{
     target.style.marginLeft = `${x}px`
     target.style.marginTop = `${y}px`
-    target.style.zIndex = y
+    target.style.zIndex = y + 100
   }
 
   const reverseDirectionConversions = () =>{
@@ -76,16 +76,6 @@ function init() {
     return obj
   }
 
-  // const shuffleArray = (arr, center) =>{
-  //   const copyArr = [...arr]
-  //   while(copyArr.indexOf(center) !== Math.round(copyArr.length / 2)){
-  //     const last = copyArr.pop()
-  //     copyArr.unshift(last)
-  //   }
-  //   return copyArr
-  // }
-
-  
   const animatePenguin = penguin =>{
     const { frame:i, animation, frameSpeed} = penguinData
     const penguinSprite = penguin.childNodes[1].childNodes[1]
@@ -112,12 +102,13 @@ function init() {
     moveSpeed: 150,
     stop: true,
     prev: [0, 0], 
+    step: 'left',
     pos: {
       x: 0,
       y: 0,
     }
   }
-
+  
 
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
 
@@ -175,39 +166,33 @@ function init() {
 
 
 
-  const createMark = penguin => {
-    const { width, height, left, top } = penguin.getBoundingClientRect()
+  const createMark = (penguin, angle) => {
+    const { height, left, top } = penguin.getBoundingClientRect()
     const mark = document.createElement('div')
-    mark.classList.add('mark')
-    penguinData.pos.x = left + (width / 2)
-    penguinData.pos.y = top + (height / 2)
+    penguinData.step = penguinData.step === 'left' ? 'right' : 'left'
+    mark.className = `foot_print ${penguinData.step}`
+    mark.style.transform = `rotate(${angle}deg)`
+    penguinData.pos.x = left + 5
+    penguinData.pos.y = top + (height - 20)
     setPos(mark, penguinData.pos.x, penguinData.pos.y)
     body.append(mark)
+    setTimeout(()=> body.removeChild(mark), 10000)
   }
   
-  // const turnDirectionIndex = angle =>{
-  //   return turnDirections.indexOf(directionConversions[angle])
-  // }
 
   const moveAbout = penguin =>{
     if (penguinData.hit) return //TODO this might become redundant
+    // console.log(penguin.childNodes[1].childNodes[3].childNodes)
 
-    createMark(penguin)
+  
 
     const penguinDir = +reverseDirectionConversions()[penguinData.direction]
     const angle = clickedAngle()
     // if (angle === 0) console.log('zero') //TODO this is here for testing
 
-    // turnDirections = shuffleArray(
-    //   Object.keys(directionConversions).map(n => +n),
-    //   clickedAngle()
-    //   ).map(n => directionConversions[n])
-
-
     const turnValue = penguinDir === angle
       ? 0 
-      // : turnDirectionIndex(penguinDir) < turnDirectionIndex(angle) //TODO refactor
-      : penguinDir < angle //TODO refactor
+      : penguinDir < angle
         ? 1
         : -1
     
@@ -219,6 +204,8 @@ function init() {
     penguinData.direction = turnDirections[penguinData.turnIndex]
     const { direction: dir } = penguinData
     penguin.childNodes[1].className = `penguin_inner_wrapper facing_${dir}`
+
+    createMark(penguin.childNodes[1].childNodes[3].childNodes[1], penguinDir)
     
     let x = penguinMarginLeft(penguin)
     let y = penguinMarginTop(penguin)
@@ -242,14 +229,6 @@ function init() {
     
   }
   
-
-
-
-  // const mapPenguinAssets = () =>{
-  //   return ['up','dUp','side','dDown','down'].map(png =>{
-  //     return  `<img src="assets/${png}.png" alt=${png}/>`
-  //   }).join('')
-  // }
 
   const mapPenguinAssets = () =>{
     return Object.keys(directions).map(dir =>{
@@ -295,16 +274,9 @@ function init() {
     stopPenguin(penguin)
   }
 
-
-
   
-  // Create penguin and set up collision check
-  new Array(1).fill('').map(()=>{
-    return [randomP(body.clientWidth - 100), randomP(body.clientHeight - 100)]
-  }).forEach( pos => {
-    createPenguin(pos[0], pos[1])
-  })
-
+  // Create penguin
+  createPenguin(randomP(body.clientWidth - 100), randomP(body.clientWidth - 100))
 
 
   window.addEventListener('click', e =>{
