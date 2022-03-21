@@ -11,10 +11,6 @@ function init() {
     down: `d 22 11eAbBaBaEaBaAaAaAbAaEiUnUnUnNnNuAnAnNnNuAnBnBnBnAnAuAuXaNaNaNaNaNaXaUaUaNbN"/D 68 12jAaAaBaEaAaAaAbAaAbBiNnUnUnNuNnAnBuUuAnAnBnEnAnAuAuKaUaNaNaNaNaIaUaNaN"/D 167 12eAbAaBaJaAaBaAbAaAaBiNnNnKnKuNnAnAnNnNuAuBnBnBuAkNnNaNaNbNaNaNaUaKaUaNbN"/D 115 13W6AaAaBaEaBbAbAbAaAaAnAxNuNnUnNnNnNkBnNnNnAuBnBnBnAxKaNaNaNaNaXaKaNaN"/D 215 13gAbBaGaEaAbAaAaGxNnNnKnUnNnNnAnAnNnNuAnAnBnBnAnAxUaUaNbNaNaKaKaNaNbN"/F 19 16aBnU"/F 26 16aBnU"/F 73 16aBnU"/F 165 16aBnU"/F 67 17aBnU"/F 120 17aAnN"/F 171 17aBnU"/F 213 17aBnU"/F 114 18aAnN"/F 219 18aBnU"/F 73 19aAbAaBaBaw6nAnAkAW-7NnNnUnKaKaUaNaNbBbUaN"/F 20 20bAaAaNaNbAaAaBaBaBaEnAnAnAnAW-7NuNnNnNnXaUaUaUaN"/F 165 20bAaAaNaNaAbEaEaw6nAxNkNxNnNnIaUaUbN"/F 116 21aAaAaUeAaAaAaBaw6nAxAW-6NnNnNnIaUaUbN"/F 213 21bAaAaNaNaAaAaBaEaJnAW-6NkNkNnXaUaUaNaN"/D 77 32aExUeN"/D 163 32bAaBxUaN"/D 211 32bAaAxNaN"/D 122 33eAkN"/D 19 34bAaBxUaN"/D 28 34aAaBnAkKbN"/D 67 34bAaBkK"/D 116 34bAaBnAuNnUaN"/D 171 34bEkUaN"/D 218 34bAaEkX"/`,
   }
 
-  // TODO need to adjust penguin within the wrapper
-  // TODO change turning direction (clockwise, anti clockwise)
-
-  const indicator = document.querySelector('.indicator')
   const body = document.querySelector('.wrapper')
   const animationFrames = {
     walk: [0, 1, 2, 1, 3, 4],
@@ -45,7 +41,6 @@ function init() {
     y: null,
     angle: 360,
   }
-
   const directionConversions = {
     360: 'up',
     45: 'upright',
@@ -56,6 +51,7 @@ function init() {
     270: 'left',
     315: 'upleft',
   }
+  const distance = 10
 
   const setPos = (target, x, y) =>{
     target.style.left = `${x}px`
@@ -65,7 +61,6 @@ function init() {
   const setMargin = (target, x, y) =>{
     target.style.marginLeft = `${x}px`
     target.style.marginTop = `${y}px`
-    target.style.zIndex = y + 100
   }
 
   const reverseDirectionConversions = () =>{
@@ -89,7 +84,6 @@ function init() {
     return turnDirections[Math.floor(Math.random() * turnDirections.length)]
   }
 
-  
   const penguinData = { 
     penguin: null,
     animation: 'walk',
@@ -109,13 +103,11 @@ function init() {
     }
   }
   
-
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
 
   const nearestN = (n, denom) =>{
     return n === 0 ? 0 : (n - 1) + Math.abs(((n - 1) % denom) - denom)
   }
-
 
   const overlap = (a, b) =>{
     const buffer = 20
@@ -150,7 +142,7 @@ function init() {
   const randomP = max => Math.ceil(Math.random() * max)
 
   const checkBoundaryAndUpdatePenguinPos = (x, y, penguin, penguinData) =>{
-    const lowerLimit = -40 // arbitrary buffer set to prevent penduin leaving window
+    const lowerLimit = -40 // buffer from window edge
     const upperLimit = 40
 
     if (x > lowerLimit && x < (body.clientWidth - upperLimit)){
@@ -159,12 +151,9 @@ function init() {
     } 
     if (y > lowerLimit && y < (body.clientHeight - upperLimit)){
       penguin.style.marginTop = `${y}px`
-      penguin.style.zIndex = y
       penguinData.prev[1] = y
     }
   }
-
-
 
   const createMark = (penguin, angle) => {
     const { height, left, top } = penguin.getBoundingClientRect()
@@ -179,16 +168,9 @@ function init() {
     setTimeout(()=> body.removeChild(mark), 10000)
   }
   
-
   const moveAbout = penguin =>{
-    if (penguinData.hit) return //TODO this might become redundant
-    // console.log(penguin.childNodes[1].childNodes[3].childNodes)
-
-  
-
     const penguinDir = +reverseDirectionConversions()[penguinData.direction]
     const angle = clickedAngle()
-    // if (angle === 0) console.log('zero') //TODO this is here for testing
 
     const turnValue = penguinDir === angle
       ? 0 
@@ -197,8 +179,6 @@ function init() {
         : -1
     
     penguinData.turnIndex += turnValue
-    indicator.innerHTML = `penguinDir: ${penguinDir} angle:${angle} turnValue: ${turnValue}`
-
     if (penguinData.turnIndex < 0) penguinData.turnIndex = 7
     if (penguinData.turnIndex > 7) penguinData.turnIndex = 0
     penguinData.direction = turnDirections[penguinData.turnIndex]
@@ -210,7 +190,6 @@ function init() {
     let x = penguinMarginLeft(penguin)
     let y = penguinMarginTop(penguin)
     
-    const distance = 10
     if (dir !== 'up' && dir !== 'down') x += (dir.includes('left')) ? -distance : distance
     if (dir !== 'left' && dir !== 'right') y += (dir.includes('up')) ? -distance : distance
 
@@ -218,7 +197,6 @@ function init() {
       x === penguinData.prev[0] && y === penguinData.prev[1] || 
       overlap(control.x, penguinData.pos.x) && overlap(control.y, penguinData.pos.y)
     ){
-      console.log('stop')
       stopPenguin(penguin)
     } 
     
@@ -226,19 +204,11 @@ function init() {
     if (!penguinData.stop) penguinData.moveTimer = setTimeout(()=> {
       moveAbout(penguin)
     }, penguinData.moveSpeed)
-    
   }
   
-
   const mapPenguinAssets = () =>{
     return Object.keys(directions).map(dir =>{
       return  `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="100%" height="20%" viewBox="0 0 240 48">${decode(penguinSvg[dir])}</svg>`
-    }).join('')
-  }
-
-  const mapHitCorners = () =>{
-    return ['upleft', 'upright', 'downleft', 'downright'].map(dir =>{
-      return  `<div class="hit_corner" data-pos="${dir}" ></div>`
     }).join('')
   }
 
@@ -252,7 +222,6 @@ function init() {
       </div>
       <div class="hit_wrapper">
         <div class="hit_area">
-          ${mapHitCorners()}
         </div>
       </div>
     </div>
@@ -269,18 +238,13 @@ function init() {
         y: top + (height / 2),
       }
     })
-    
     startPenguin(penguin)
     stopPenguin(penguin)
   }
 
-  
-  // Create penguin
   createPenguin(randomP(body.clientWidth - 100), randomP(body.clientWidth - 100))
 
-
   window.addEventListener('click', e =>{
-    // console.log(penguins)
     control.x = e.pageX 
     control.y = e.pageY
     if (penguinData.stop){
@@ -288,7 +252,6 @@ function init() {
       penguinData.stop = false
       moveAbout(penguinData.penguin, penguinData)
     }
-    
   })
 
 }
