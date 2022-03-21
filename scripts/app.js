@@ -5,16 +5,12 @@ function init() {
 
   // TODO need to adjust penguin within the wrapper
   // TODO change turning direction (clockwise, anti clockwise)
-  //TODO stop penguiin once at destination
 
   const indicator = document.querySelector('.indicator')
   const body = document.querySelector('.wrapper')
   const animationFrames = {
     walk: [0, 1, 2, 1, 3, 4],
     stop: [0],
-    // fall: [3, 4, 5, 6, 5, 7],
-    // fallen: [7],
-    // standUp: [7, 8, 9, 10, 11, 12]
   }
   const cellSize = 96
   const directions = {
@@ -34,10 +30,8 @@ function init() {
     left: 'side',
     upleft: 'dUp',
   }
-  let turnDirections = Object.keys(sprites)
-  const penguins = {}
+  const turnDirections = Object.keys(sprites)
   const frameSpeed = 100
-  let penguinCount = 0
   const control = {
     x: null,
     y: null,
@@ -55,6 +49,17 @@ function init() {
     315: 'upleft',
   }
 
+  const setPos = (target, x, y) =>{
+    target.style.left = `${x}px`
+    target.style.top = `${y}px`
+  }
+
+  const setMargin = (target, x, y) =>{
+    target.style.marginLeft = `${x}px`
+    target.style.marginTop = `${y}px`
+    target.style.zIndex = y
+  }
+
   const reverseDirectionConversions = () =>{
     const obj = {}
     Object.keys(directionConversions).forEach( k =>{
@@ -62,43 +67,49 @@ function init() {
     })
     return obj
   }
+
+  // const shuffleArray = (arr, center) =>{
+  //   const copyArr = [...arr]
+  //   while(copyArr.indexOf(center) !== Math.round(copyArr.length / 2)){
+  //     const last = copyArr.pop()
+  //     copyArr.unshift(last)
+  //   }
+  //   return copyArr
+  // }
+
   
-  const animatePenguin = (penguin, penguinObj) =>{
-    const { frame:i, animation, frameSpeed} = penguinObj
+  const animatePenguin = penguin =>{
+    const { frame:i, animation, frameSpeed} = penguinData
     const penguinSprite = penguin.childNodes[1].childNodes[1]
     penguinSprite.style.marginLeft = `-${animationFrames[animation][i] * cellSize}px`
-    penguinSprite.style.marginTop = `-${cellSize * directions[sprites[penguinObj.direction]]}px`
-    penguinObj.frame = i === animationFrames[animation].length - 1 ? 0 : i + 1
-    penguinObj.frameTimer = setTimeout(()=> animatePenguin(penguin, penguinObj), frameSpeed)
+    penguinSprite.style.marginTop = `-${cellSize * directions[sprites[penguinData.direction]]}px`
+    penguinData.frame = i === animationFrames[animation].length - 1 ? 0 : i + 1
+    penguinData.frameTimer = setTimeout(()=> animatePenguin(penguin), frameSpeed)
   }
 
-  // const testArray = [0, 1, 2, 3, 4, 5, 6, 7]
-
-  const shuffleArray = (arr, center) =>{
-    const copyArr = [...arr]
-    while(copyArr.indexOf(center) !== Math.round(copyArr.length / 2)){
-      const last = copyArr.pop()
-      copyArr.unshift(last)
-    }
-    return copyArr
+  const randomDirection = () =>{
+    return turnDirections[Math.floor(Math.random() * turnDirections.length)]
   }
 
   
-
-  // console.log(shuffleArray(testArray, 7))
-  const oppositeAngle = angle =>{
-    return angle < 225 ? angle + 180 : angle - 180
+  const penguinData = { 
+    penguin: null,
+    animation: 'walk',
+    frame: 0, 
+    direction: randomDirection(),
+    frameTimer: null,
+    moveTimer: null,
+    turnIndex: Math.floor(Math.random() * 7),
+    frameSpeed,
+    moveSpeed: 150,
+    stop: true,
+    prev: [0, 0], 
+    pos: {
+      x: 0,
+      y: 0,
+    }
   }
 
-  // console.log(Object.keys(directionConversions))
-  // console.log(
-  //   shuffleArray(
-  //     Object.keys(directionConversions).map(n => +n),
-  //     oppositeAngle(180)
-  //     ).map(n => directionConversions[n])
-  // )
-
-  // turnDirections = shuffleArray(Object.keys(sprites), )
 
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
 
@@ -113,95 +124,92 @@ function init() {
   }
 
   const clickedAngle = () =>{
-    const angle = radToDeg(Math.atan2(penguins[0].pos.y - control.y, penguins[0].pos.x - control.x)) - 90
+    const angle = radToDeg(Math.atan2(penguinData.pos.y - control.y, penguinData.pos.x - control.x)) - 90
     const adjustedAngle = angle < 0 ? angle + 360 : angle
     return nearestN(adjustedAngle, 45)
   }
 
-  const changeAnimation = (penguinObj, animation) => {
-    penguinObj.frame = 0
-    penguinObj.animation = animation
+  const changeAnimation = animation => {
+    penguinData.frame = 0
+    penguinData.animation = animation
   }
 
-  const stopPenguin = (penguin, penguinObj) =>{
-    changeAnimation(penguinObj, 'stop')
-    penguin.classList.add('stop')
+  const stopPenguin = penguin =>{
+    changeAnimation('stop')
     const { offsetTop, offsetLeft } = penguin.style
-    penguin.style.marginLeft = offsetLeft
-    penguin.style.marginTop = offsetTop
-    penguin.style.zIndex = offsetTop
-    penguinObj.stop = true
+    setMargin(penguin, offsetLeft, offsetTop)
+    penguinData.stop = true
   }
 
-  const startPenguin = (penguin, penguinObj) =>{
-    animatePenguin(penguin, penguinObj)
-    penguinObj.stop = false
+  const startPenguin = penguin =>{
+    animatePenguin(penguin)
+    penguinData.stop = false
   }
 
   const penguinMarginLeft = penguin => +penguin.style.marginLeft.replace('px', '')
   const penguinMarginTop = penguin => +penguin.style.marginTop.replace('px', '')
   const randomP = max => Math.ceil(Math.random() * max)
 
-  const checkBoundaryAndUpdatePenguinPos = (x, y, penguin, penguinObj) =>{
+  const checkBoundaryAndUpdatePenguinPos = (x, y, penguin, penguinData) =>{
     const lowerLimit = -40
     const upperLimit = 40
 
     if (x > lowerLimit && x < (body.clientWidth - upperLimit)){
       penguin.style.marginLeft = `${x}px`
-      penguinObj.prev[0] = x
+      penguinData.prev[0] = x
     } 
     if (y > lowerLimit && y < (body.clientHeight - upperLimit)){
       penguin.style.marginTop = `${y}px`
       penguin.style.zIndex = y
-      penguinObj.prev[1] = y
+      penguinData.prev[1] = y
     }
   }
 
 
 
-
-
-
-
-  const createMark = (penguin, penguinObj) => {
+  const createMark = penguin => {
     const { width, height, left, top } = penguin.getBoundingClientRect()
     const mark = document.createElement('div')
     mark.classList.add('mark')
-    penguinObj.pos.x = left + (width / 2)
-    penguinObj.pos.y = top + (height / 2)
-    mark.style.left = `${penguinObj.pos.x}px`
-    mark.style.top = `${penguinObj.pos.y}px`
+    penguinData.pos.x = left + (width / 2)
+    penguinData.pos.y = top + (height / 2)
+    setPos(mark, penguinData.pos.x, penguinData.pos.y)
     body.append(mark)
   }
-
-
-  const moveAbout = (penguin, penguinObj) =>{
-    if (penguinObj.hit) return
   
-    // TODO turn according to control.x and control.y
-    // console.log(penguinObj)
-    createMark(penguin, penguinObj)
+  // const turnDirectionIndex = angle =>{
+  //   return turnDirections.indexOf(directionConversions[angle])
+  // }
 
-    const penguinDir = +reverseDirectionConversions()[penguinObj.direction]
+  const moveAbout = penguin =>{
+    if (penguinData.hit) return //TODO this might become redundant
+
+    createMark(penguin)
+
+    const penguinDir = +reverseDirectionConversions()[penguinData.direction]
     const angle = clickedAngle()
+    // if (angle === 0) console.log('zero') //TODO this is here for testing
 
+    // turnDirections = shuffleArray(
+    //   Object.keys(directionConversions).map(n => +n),
+    //   clickedAngle()
+    //   ).map(n => directionConversions[n])
 
-    indicator.innerHTML = `penguinDir: ${directionConversions[penguinDir]} angle:${directionConversions[angle]} turnDirections: ${turnDirections.join('-')}`
 
     const turnValue = penguinDir === angle
       ? 0 
-      : turnDirections.indexOf(directionConversions[penguinDir]) < turnDirections.indexOf(directionConversions[angle])
+      // : turnDirectionIndex(penguinDir) < turnDirectionIndex(angle) //TODO refactor
+      : penguinDir < angle //TODO refactor
         ? 1
         : -1
     
-    penguinObj.turnIndex += turnValue
+    penguinData.turnIndex += turnValue
+    indicator.innerHTML = `penguinDir: ${penguinDir} angle:${angle} turnValue: ${turnValue}`
 
-    // indicator.innerHTML = `penguinDir: ${penguinDir} angle:${angle} turnValue: ${turnValue}`
-
-    if (penguinObj.turnIndex < 0) penguinObj.turnIndex = 7
-    if (penguinObj.turnIndex > 7) penguinObj.turnIndex = 0
-    penguinObj.direction = turnDirections[penguinObj.turnIndex]
-    const { direction: dir } = penguinObj
+    if (penguinData.turnIndex < 0) penguinData.turnIndex = 7
+    if (penguinData.turnIndex > 7) penguinData.turnIndex = 0
+    penguinData.direction = turnDirections[penguinData.turnIndex]
+    const { direction: dir } = penguinData
     penguin.childNodes[1].className = `penguin_inner_wrapper facing_${dir}`
     
     let x = penguinMarginLeft(penguin)
@@ -212,25 +220,22 @@ function init() {
     if (dir !== 'left' && dir !== 'right') y += (dir.includes('up')) ? -distance : distance
 
     if (
-      x === penguinObj.prev[0] && y === penguinObj.prev[1] || 
-      overlap(control.x, penguinObj.pos.x) && overlap(control.y, penguinObj.pos.y)
+      x === penguinData.prev[0] && y === penguinData.prev[1] || 
+      overlap(control.x, penguinData.pos.x) && overlap(control.y, penguinData.pos.y)
     ){
-      console.log('trigger')
-      stopPenguin(penguin, penguinObj)
+      console.log('stop')
+      stopPenguin(penguin)
     } 
     
-    checkBoundaryAndUpdatePenguinPos(x, y, penguin, penguinObj)
-    if (!penguinObj.stop) penguinObj.moveTimer = setTimeout(()=> {
-      moveAbout(penguin, penguinObj)
-    }, penguinObj.moveSpeed)
+    checkBoundaryAndUpdatePenguinPos(x, y, penguin, penguinData)
+    if (!penguinData.stop) penguinData.moveTimer = setTimeout(()=> {
+      moveAbout(penguin)
+    }, penguinData.moveSpeed)
     
   }
   
 
 
-  const randomDirection = () =>{
-    return turnDirections[Math.floor(Math.random() * turnDirections.length)]
-  }
 
   const mapPenguinAssets = () =>{
     return ['up','dUp','side','dDown','down'].map(png =>{
@@ -238,9 +243,9 @@ function init() {
     }).join('')
   }
 
-  const mapHitCorners = penguinCount =>{
+  const mapHitCorners = () =>{
     return ['upleft', 'upright', 'downleft', 'downright'].map(dir =>{
-      return  `<div class="hit_corner" data-pos="${dir}" data-id="${penguinCount}" ></div>`
+      return  `<div class="hit_corner" data-pos="${dir}" ></div>`
     }).join('')
   }
 
@@ -254,42 +259,26 @@ function init() {
       </div>
       <div class="hit_wrapper">
         <div class="hit_area">
-          ${mapHitCorners(penguinCount)}
+          ${mapHitCorners()}
         </div>
       </div>
     </div>
     `
-    penguin.style.marginTop = `${y}px`
-    penguin.style.marginLeft = `${x}px`
-    penguin.style.zIndex = y
+    setMargin(penguin, x, y)
     body.append(penguin)
     const { width, height, left, top } = penguin.getBoundingClientRect()
 
-    penguins[penguinCount] = { 
-      penguin,
-      animation: 'walk',
-      frame: 0, 
-      direction: randomDirection(),
-      frameTimer: null,
-      moveTimer: null,
-      turnIndex: Math.floor(Math.random() * 7),
-      frameSpeed,
-      moveSpeed: 150,
-      stop: true,
+    Object.assign(penguinData, {
+      penguin: penguin,
       prev: [penguin.style.marginLeft, penguin.style.marginTop], 
       pos: {
         x: left + (width / 2),
         y: top + (height / 2),
       }
-    }
-    const penguinObj = penguins[penguinCount]
-    const penguinStatus = document.createElement('p')
-    penguinStatus.dataset.index = penguinCount
+    })
     
-    startPenguin(penguin, penguinObj)
-    moveAbout(penguin, penguinObj)
-    stopPenguin(penguin, penguinObj)
-    penguinCount++
+    startPenguin(penguin)
+    stopPenguin(penguin)
   }
 
 
@@ -308,16 +297,10 @@ function init() {
     // console.log(penguins)
     control.x = e.pageX 
     control.y = e.pageY
-    if (penguins[0].stop){
-      changeAnimation(penguins[0], 'walk')
-      penguins[0].stop = false
-      turnDirections = shuffleArray(
-        Object.keys(directionConversions).map(n => +n),
-        oppositeAngle(clickedAngle())
-        ).map(n => directionConversions[n])
-        console.log(turnDirections)
-      // penguins[0].penguin.classList.remove('stop')
-      moveAbout(penguins[0].penguin, penguins[0])
+    if (penguinData.stop){
+      changeAnimation('walk')
+      penguinData.stop = false
+      moveAbout(penguinData.penguin, penguinData)
     }
     
   })
