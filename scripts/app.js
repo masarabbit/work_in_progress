@@ -1,5 +1,7 @@
 function init() {
 
+  //TODO edit / tidy up sprite
+
   const decodeRef = { a: ' h 1', b: ' h 2', e: ' h 3', g: ' h 4', j: ' h 5', A: ' v 1', B: ' v 2', E: ' v 3', G: ' v 4', J: ' v 5', n: 'h -1', u: ' h -2', k: ' h -3', x: ' h -4', i: ' h -5', N: ' v -1', U: ' v -2', K: ' v -3', X: ' v -4', I: ' v -5', w: ' v ', W: ' h ', D: '<path d="M', o: '<path fill="pink" d="M', F: '<path fill="#fff" d="M', '/': '/>', d: '<path d="M', f: '<path fill="#fff" d="M'}
   const decode = arr => arr.split('').map(c=> !decodeRef[c] ? c : decodeRef[c]).join('')
 
@@ -96,7 +98,7 @@ function init() {
     moveSpeed: 150,
     stop: true,
     prev: [0, 0], 
-    step: 'left',
+    stepLeft: true,
     pos: {
       x: 0,
       y: 0,
@@ -158,9 +160,9 @@ function init() {
   const createMark = (penguin, angle) => {
     const { height, left, top } = penguin.getBoundingClientRect()
     const mark = document.createElement('div')
-    penguinData.step = penguinData.step === 'left' ? 'right' : 'left'
-    mark.className = `foot_print ${penguinData.step}`
-    mark.style.transform = `rotate(${angle}deg)`
+    penguinData.stepLeft = !penguinData.stepLeft
+    mark.className = `foot_print`
+    mark.style.transform = `rotate(${angle}deg) scale(${penguinData.stepLeft ? -1 : 1}, 1)`
     penguinData.pos.x = left + 5
     penguinData.pos.y = top + (height - 20)
     setPos(mark, penguinData.pos.x, penguinData.pos.y)

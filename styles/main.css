@@ -131,10 +131,6 @@ a:hover { text-decoration: underline; }
   animation: forwards fade 10s;
 }
 
-.foot_print.right {
-  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAGVJREFUSEtjZBggwDhA9jKMWky3kB8N6tGgplkIUD1xzX759z/MtanizDjNp6rFyJYSsnzUYooS02hQg4IPV8oeTVwUJS6Q5gEpQEhxNVXjeNRifCEwGtSkpA+K1I4GNUXBR4pmAEZuKB/FEl0QAAAAAElFTkSuQmCC);
-}
-
 @keyframes fade {
   0% {opacity: 0.3}
   50% {opacity: 0.3}
