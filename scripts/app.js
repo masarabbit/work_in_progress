@@ -141,7 +141,6 @@ function init() {
 
   const penguinMarginLeft = penguin => +penguin.style.marginLeft.replace('px', '')
   const penguinMarginTop = penguin => +penguin.style.marginTop.replace('px', '')
-  const randomP = max => Math.ceil(Math.random() * max)
 
   const checkBoundaryAndUpdatePenguinPos = (x, y, penguin, penguinData) =>{
     const lowerLimit = -40 // buffer from window edge
@@ -244,7 +243,7 @@ function init() {
     stopPenguin(penguin)
   }
 
-  createPenguin(randomP(body.clientWidth - 100), randomP(body.clientWidth - 100))
+  createPenguin((body.clientWidth / 2) - 48, (body.clientHeight / 2) - 48)
 
   window.addEventListener('click', e =>{
     control.x = e.pageX 
