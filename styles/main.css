@@ -126,13 +126,13 @@ a:hover { text-decoration: underline; }
   z-index: -10;
   image-rendering: pixelated;
   background-size: 30px; 
-  opacity: 0.3;
-  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAGdJREFUSEtjZBggwDhA9jKMWky3kB8N6tGgplkI4E1cs1/+/Q+zOVWcmaoJEadhyJbSwvJRi+GJaTSoQUFBzZQ9mrhQSqoBKUBoVlZCDaZqMUiKY0ctJiW0KFI7GtQUBR8pmkdeUAMAZuYoHzQogkUAAAAASUVORK5CYII=);
+  /* background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAGdJREFUSEtjZBggwDhA9jKMWky3kB8N6tGgplkI4E1cs1/+/Q+zOVWcmaoJEadhyJbSwvJRi+GJaTSoQUFBzZQ9mrhQSqoBKUBoVlZCDaZqMUiKY0ctJiW0KFI7GtQUBR8pmkdeUAMAZuYoHzQogkUAAAAASUVORK5CYII=); */
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAIJJREFUSEtjZBggwDhA9jKMWky3kB8N6tGgplkIYCSu2S///ofZlirOTLPEh2IwsqW0tpygxSAH0MLnRFlMC8sHh8Ugn2GLZ1rEN9ZUi8tyasY1zuxC6xSON5+iW04XH9OsyIIaTLOSiZDDRy0mFEJUkx8NaqoFJSGDRoOaUAhRTR4AG8kkH7xD504AAAAASUVORK5CYII=);
   animation: forwards fade 10s;
 }
 
 @keyframes fade {
-  0% {opacity: 0.3}
-  50% {opacity: 0.3}
+  0% {opacity: 0.4}
+  50% {opacity: 0.4}
   100% {opacity: 0}
 }
