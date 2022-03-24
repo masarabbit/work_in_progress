@@ -23,6 +23,7 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .penguin_wrapper {
@@ -31,15 +32,12 @@ body {
   height: 96px;
   overflow: hidden;
   transition: 0.5s;
-  /* border: yellow 1px solid; */
 }
 
 .penguin_wrapper svg { 
   fill: navy; 
   display: block;
 }
-
-.penguin_wrapper.stop { transition: 0 !important; }
 
 .penguin_inner_wrapper {
   height: 100%;
@@ -66,14 +64,12 @@ body {
   display: block;
 }
 
-
 .hit_wrapper {
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   pointer-events: none;
-  /* border:blue 1px solid; */
 }
 
 .hit_area {
@@ -81,12 +77,6 @@ body {
   width: 40px;
   display: flex;
   flex-wrap: wrap;
-  /* border: hotpink 1px solid; */
-}
-
-.penguin_wrapper.stop .hit_area {
-  margin-top: 10px;
-  height: 40px;
 }
 
 /* need to flip because the parent divs are flipped */
@@ -94,12 +84,6 @@ body {
 .facing_left .hit_area,
 .facing_downleft .hit_area {
   transform: scale(-1 , 1);
-}
-
-.hit_corner {
-  height: 50%;
-  width: 50%;
-  opacity: 0.1;
 }
 
 .sign {
@@ -122,12 +106,10 @@ a:hover { text-decoration: underline; }
   height: 30px;
   width: 30px;
   position: absolute;
-  /* border: 1px solid hotpink; */
   z-index: -10;
   image-rendering: pixelated;
   background-size: 30px; 
-  /* background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAGdJREFUSEtjZBggwDhA9jKMWky3kB8N6tGgplkI4E1cs1/+/Q+zOVWcmaoJEadhyJbSwvJRi+GJaTSoQUFBzZQ9mrhQSqoBKUBoVlZCDaZqMUiKY0ctJiW0KFI7GtQUBR8pmkdeUAMAZuYoHzQogkUAAAAASUVORK5CYII=); */
-  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAIJJREFUSEtjZBggwDhA9jKMWky3kB8N6tGgplkIYCSu2S///ofZlirOTLPEh2IwsqW0tpygxSAH0MLnRFlMC8sHh8Ugn2GLZ1rEN9ZUi8tyasY1zuxC6xSON5+iW04XH9OsyIIaTLOSiZDDRy0mFEJUkx8NaqoFJSGDRoOaUAhRTR4AG8kkH7xD504AAAAASUVORK5CYII=);
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAHhJREFUSEtjZBggwDhA9jKMWky3kB8N6tGgplkIYE1cs1/+/Q+zMVWcmSYJEMNQZEtpaTlRFoMcQG2fD36Lqe1rgokLOVlTM7gHl8UgX9I6dePNo7TMzzQpHIgp7kYtJiaUqKJmNKipEozEGDIa1MSEElXUDFhQAwDBuiQfjPZDHAAAAABJRU5ErkJggg==);
   animation: forwards fade 10s;
 }
 
