@@ -20,6 +20,7 @@ function init() {
     // frame is counted right to left in the sprite sheet
     walk: [0, 1, 2, 1, 3, 4],
     stop: [0],
+    celebrate: [2, 3, 4], //TODO add celebration frame
   }
   const cellSize = 96
   const directions = {
@@ -130,8 +131,8 @@ function init() {
     penguinData.animation = animation
   }
 
-  const stopPenguin = penguin =>{
-    changeAnimation('stop')
+  const stopPenguin = (penguin, animation) =>{
+    changeAnimation(animation)
     const { offsetTop, offsetLeft } = penguin.style
     setMargin(penguin, offsetLeft, offsetTop)
     penguinData.stop = true
@@ -201,7 +202,7 @@ function init() {
       x === penguinData.prev[0] && y === penguinData.prev[1] || 
       overlap(control.x, penguinData.pos.x) && overlap(control.y, penguinData.pos.y)
     ){
-      stopPenguin(penguin)
+      stopPenguin(penguin, 'celebrate')
       body.removeChild(star)
       star = null
     } 
@@ -243,7 +244,7 @@ function init() {
       }
     })
     startPenguin(penguin)
-    stopPenguin(penguin)
+    stopPenguin(penguin, 'stop')
   }
 
   createPenguin((body.clientWidth / 2) - 48, (body.clientHeight / 2) - 48)
