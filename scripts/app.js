@@ -13,6 +13,8 @@ function init() {
     down: `d 22 11eAbBaBaEaBaAaAaAbAaEiUnUnUnNnNuAnAnNnNuAnBnBnBnAnAuAuXaNaNaNaNaNaXaUaUaNbN"/D 68 12jAaAaBaEaAaAaAbAaAbBiNnUnUnNuNnAnBuUuAnAnBnEnAnAuAuKaUaNaNaNaNaIaUaNaN"/D 167 12eAbAaBaJaAaBaAbAaAaBiNnNnKnKuNnAnAnNnNuAuBnBnBuAkNnNaNaNbNaNaNaUaKaUaNbN"/D 115 13W6AaAaBaEaBbAbAbAaAaAnAxNuNnUnNnNnNkBnNnNnAuBnBnBnAxKaNaNaNaNaXaKaNaN"/D 215 13gAbBaGaEaAbAaAaGxNnNnKnUnNnNnAnAnNnNuAnAnBnBnAnAxUaUaNbNaNaKaKaNaNbN"/F 19 16aBnU"/F 26 16aBnU"/F 73 16aBnU"/F 165 16aBnU"/F 67 17aBnU"/F 120 17aAnN"/F 171 17aBnU"/F 213 17aBnU"/F 114 18aAnN"/F 219 18aBnU"/F 73 19aAbAaBaBaw6nAnAkAW-7NnNnUnKaKaUaNaNbBbUaN"/F 20 20bAaAaNaNbAaAaBaBaBaEnAnAnAnAW-7NuNnNnNnXaUaUaUaN"/F 165 20bAaAaNaNaAbEaEaw6nAxNkNxNnNnIaUaUbN"/F 116 21aAaAaUeAaAaAaBaw6nAxAW-6NnNnNnIaUaUbN"/F 213 21bAaAaNaNaAaAaBaEaJnAW-6NkNkNnXaUaUaNaN"/D 77 32aExUeN"/D 163 32bAaBxUaN"/D 211 32bAaAxNaN"/D 122 33eAkN"/D 19 34bAaBxUaN"/D 28 34aAaBnAkKbN"/D 67 34bAaBkK"/D 116 34bAaBnAuNnUaN"/D 171 34bEkUaN"/D 218 34bAaEkX"/`,
   }
 
+  const starSvg = 'd 7 0bBaBaAjBnAnAnBaBaBkNnNuNuAuAnAkUaUaUnNnNnUjNaUaU"/'
+
   const body = document.querySelector('.wrapper')
   const animationFrames = {
     // frame is counted right to left in the sprite sheet
@@ -55,6 +57,7 @@ function init() {
     315: 'upleft',
   }
   const distance = 10
+  let star
 
   const setPos = (target, x, y) =>{
     target.style.left = `${x}px`
@@ -199,6 +202,8 @@ function init() {
       overlap(control.x, penguinData.pos.x) && overlap(control.y, penguinData.pos.y)
     ){
       stopPenguin(penguin)
+      body.removeChild(star)
+      star = null
     } 
     
     checkBoundaryAndUpdatePenguinPos(x, y, penguin, penguinData)
@@ -206,12 +211,10 @@ function init() {
       moveAbout(penguin)
     }, penguinData.moveSpeed)
   }
+
+  const svgWrapper = (content, w, h, frameNo) => `<svg x="0px" y="0px" width="100%" height="${100 / frameNo}%" viewBox="0 0 ${w} ${h}">${content}</svg>`
   
-  const mapPenguinAssets = () =>{
-    return Object.keys(directions).map(dir =>{
-      return  `<svg x="0px" y="0px" width="100%" height="20%" viewBox="0 0 240 48">${decode(penguinSvg[dir])}</svg>`
-    }).join('')
-  }
+  const mapPenguinAssets = () => Object.keys(directions).map(dir => svgWrapper(decode(penguinSvg[dir]), 240, 48, 5)).join('')
 
   const createPenguin = (x, y) =>{
     const penguin = document.createElement('div')
@@ -245,9 +248,23 @@ function init() {
 
   createPenguin((body.clientWidth / 2) - 48, (body.clientHeight / 2) - 48)
 
+  const createStar = () =>{
+    if (star) {
+      body.removeChild(star)
+      star = null
+    }
+    star = document.createElement('div')
+    star.classList.add('star')
+    star.innerHTML = svgWrapper(decode(starSvg), 16, 16, 1) 
+    setPos(star, control.x - 8, control.y - 8)
+    body.append(star)
+  }
+
   window.addEventListener('click', e =>{
     control.x = e.pageX 
     control.y = e.pageY
+    createStar()
+
     if (penguinData.stop){
       changeAnimation('walk')
       penguinData.stop = false

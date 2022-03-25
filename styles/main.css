@@ -34,9 +34,12 @@ body {
   transition: 0.5s;
 }
 
+svg {
+  display: block;
+}
+
 .penguin_wrapper svg { 
   fill: navy; 
-  display: block;
 }
 
 .penguin_inner_wrapper {
@@ -117,4 +120,22 @@ a:hover { text-decoration: underline; }
   0% {opacity: 0.4}
   50% {opacity: 0.4}
   100% {opacity: 0}
+}
+
+.star{
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  z-index: -20;
+}
+
+.star svg {
+  animation: infinite twinkle 1s;
+  fill: rgb(148, 234, 255)
+}
+
+@keyframes twinkle {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+  100% { transform: scale(1); }
 }
