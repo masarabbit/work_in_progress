@@ -17,7 +17,7 @@ function init() {
 
   const body = document.querySelector('.wrapper')
   const animationFrames = {
-    // sprite sheet frames are numbered left to right
+    // sprite sheet frames are ordered left to right
     walk: [0, 1, 2, 1, 3, 4],
     stop: [0],
     celebrate: [2, 3, 4], //TODO add celebration frame
