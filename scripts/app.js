@@ -6,18 +6,17 @@ function init() {
   const decode = arr => arr.split('').map(c=> !decodeRef[c] ? c : decodeRef[c]).join('')
 
   const penguinSvg = {
-    up: `d 22 11eAbBaBaEaBaAaAaAbAaExGnBuAaBnAkKnNnAuBxUaNuNnInAuAuKaNaNaNaNaNaIaUaUaNbN"/D 68 12jAaAaBaEaBbAbAaAbBiw6nExUnAxAaBkKuNnInAuAuKaUaNbNaUaIaUaNaN"/D 167 12eAbAaBaJaAaBbAaAaAaBW-6AnEnGkUaNuNuNuAaBxUaNuUnKiUaNbNbNaNaUaKaUaNbN"/D 115 13W6AaAaBaGaAbAbAeAaBnAxNnJnAnAkNnAkAaBnAuNnUaNkUnXnAxKaNbNaNaXaXaNaN"/D 215 13gAbBaGaEaAbAaAaGkNnEnBuGkXkNnAxNnNnKnAuAuKaNaNaNaNaNaNaKaKaNaNbN"/`,
-    dUp: `d 22 12eAbAaAaAaJaBbAaAaBaEaBiAnAnAnEkUnNxBuUkUnKkKaNaNaNaNaUaXaKaNbN"/D 69 12jAaAaEaBaBaAaAaAbAaAaExNnGnAnExNxAaBuAuKxUaKnNxUaNaNaUbUaXaKaUbN"/D 116 12jAaAeBnAaBaAaAbAbAbAaAaAnAxNuAaJnAnBuAuNiEkKkw-6nAxUaUbUbNaIaXaNaN"/D 167 13jAaAaAaw7aAaAaAaAaAaAaEiNuBnBuAaBxUnNnNuAkNuUnXaNiUaNeNaNaNaNaUaUaNaNaN"/D 216 13W6AaAaAaw8nAbAaBaAaGkNkAnBnEkUuNuNiNkw-6aUxUaNeNeNaNaNaUaNaNaN"/`,
-    side: `d 23 11eAeAaBaBeBnAkBaAaAbAaAaBaEkNnNnNnKnUnNnNnNkAuBnBnBnBnBnEnNnNnUnKaKaNaNaUaUaXaNaNbN"/D 69 12jAbAaAjBnAuAnEaAaAbAbAaEkNkUnKnNuNuAuAuBnAnw7aAaAbEkNnKuNnUaUnAxKaNaUbUaIaKaNbN"/D 117 12W6AaAaAaAeAaBxEbAaAeAaBiNuNnUnUW-6AnAnBnw6aBaAaAaBkUiNnUbNaKnAxKaNaNbNaUaw-6aNaNaN"/D 168 12gAbAaBaAaAeBxAnBaAbAaBaEkNnUnKnNnNnNxAnAnAnAnAnBnGnKnAxKaNaNaNaNaNaNaNaXaNaUbN"/D 216 12gAbAaBbAbBkAnEaAbAaAaAaBxNuXnUnNiAnAnAnAnAnAnEaBuNuUaNaNnAxUaNaNbNaNaNaNaNaKaUaNaN"/F 24 16aBnU"/F 71 16aBnU"/F 119 16aBnU"/F 168 16aBnU"/F 216 16aBnU"/F 24 20eAaAaAaBaEaGnAnAkAW-6NkUnNaUaUaUaUaUbN"/F 73 21bAbAaEaBaBnAnAuAuAuAkNnNnw-7aNaUbNbN"/F 118 21W6BaBaAaGnBuAuAiNnUnw-6aUaNaN"/F 168 21gAaAaAaEaGnBnAW-7NiIaUaNaNaNaNaN"/F 216 21jAaBaw7nAnAnAkNiNnUnKaNaNaNaNaNaN"/D 126 31bBxNbN"/D 76 32gBxU"/D 211 32aAnN"/D 163 33gBxU"/D 212 33eAkN"/D 19 34bAeBiK"/D 27 34gBnAkK"/D 170 34gGuNnNnU"/D 218 34eAaBkNnU"/`,
-    dDown: `d 23 12eAbAaAaGaGaAaAaAaAaEkNnUnKnUnNnAnNnNxAnAnAnGnBnAnEnNxUaUaUaNaNaNaUaXaUaNaNbN"/D 168 12eAbAaAaBaw6aAaBaAaAaBxNnKnKnNnNnAnNnNiAnAnBnBnBnGnNnUkKaNaNbNaNaNaUaUaUaNaNbN"/D 215 12jAbBaw7aBbBbBaBxNnKnKnNuNnNxAnAnAnAnBnGnGuNnKaKaNuAxNnNaNaNbNbNbNaNaUaUaNaNaN"/D 68 13W6AaAaAaBaEaAaAaAeAaBiNnNnUnNnNnAuNxAnAnJnBnAnAW-6KaNaNaNaNaNaNaIaKaNaN"/D 115 13jAbAaAnBaUaAaBaBeAeAaBW-6UnNnNnNuAkNnAuAnBnGnEnAuAkXaNaUaNaNaNnIaKaNbN"/F 21 16aBnU"/F 122 16aBnU"/F 215 16aBnU"/F 75 17aBnU"/F 167 17aAnN"/F 68 18aBnU"/F 114 18aBnU"/F 173 18aAnN"/F 22 20gAaAaNaAaBaEaBaAnBnAnAkAnAxNuAnNuNnXaNaUaXaNaNaN"/F 118 20aAeNbAaAaAaBaJnBuAnAnAuAxNkNnw-6aXaUaNbN"/F 165 20jAaAaNaAaAaEaw6nAnAkAiNiUnXaUaUaUaNaN"/F 215 20gAaAbAaEaw6nAnAn3XaXaUaNaNaNaN"/F 69 21gAbNaAaAaBaAaJnAuAnBuAxNnAnNuUnKaUaIaNaN"/D 77 32aAaBkUaN"/D 125 32eEkNnNaN"/D 160 32aAnN"/D 27 34eAaBxK"/D 163 34eAaBkNnU"/D 171 34eAaBkNnU"/D 211 34gBxU"/D 219 34bAbBnAkX"/D 20 35bAaBnAuX"/D 69 35aAbBuAuKaN"/D 116 35aAbAaAnAkX"/`,
-    down: `d 22 11eAbBaBaEaBaAaAaAbAaEiUnUnUnNnNuAnAnNnNuAnBnBnBnAnAuAuXaNaNaNaNaNaXaUaUaNbN"/D 68 12jAaAaBaEaAaAaAbAaAbBiNnUnUnNuNnAnBuUuAnAnBnEnAnAuAuKaUaNaNaNaNaIaUaNaN"/D 167 12eAbAaBaJaAaBaAbAaAaBiNnNnKnKuNnAnAnNnNuAuBnBnBuAkNnNaNaNbNaNaNaUaKaUaNbN"/D 115 13W6AaAaBaEaBbAbAbAaAaAnAxNuNnUnNnNnNkBnNnNnAuBnBnBnAxKaNaNaNaNaXaKaNaN"/D 215 13gAbBaGaEaAbAaAaGxNnNnKnUnNnNnAnAnNnNuAnAnBnBnAnAxUaUaNbNaNaKaKaNaNbN"/F 19 16aBnU"/F 26 16aBnU"/F 73 16aBnU"/F 165 16aBnU"/F 67 17aBnU"/F 120 17aAnN"/F 171 17aBnU"/F 213 17aBnU"/F 114 18aAnN"/F 219 18aBnU"/F 73 19aAbAaBaBaw6nAnAkAW-7NnNnUnKaKaUaNaNbBbUaN"/F 20 20bAaAaNaNbAaAaBaBaBaEnAnAnAnAW-7NuNnNnNnXaUaUaUaN"/F 165 20bAaAaNaNaAbEaEaw6nAxNkNxNnNnIaUaUbN"/F 116 21aAaAaUeAaAaAaBaw6nAxAW-6NnNnNnIaUaUbN"/F 213 21bAaAaNaNaAaAaBaEaJnAW-6NkNkNnXaUaUaNaN"/D 77 32aExUeN"/D 163 32bAaBxUaN"/D 211 32bAaAxNaN"/D 122 33eAkN"/D 19 34bAaBxUaN"/D 28 34aAaBnAkKbN"/D 67 34bAaBkK"/D 116 34bAaBnAuNnUaN"/D 171 34bEkUaN"/D 218 34bAaEkX"/`,
+    up: `d 214 11eAbBaBaEaBaAaAaAbAaExGnBuAaBnAkKnNnAuBxUaNuNnInAuAuKaNaNaNaNaNaIaUaUaNbN"/D 71 12eAbAaBaJaAaBbAaAaAaBW-6AnEnGkUaNuNuNuAaBxUaNuUnKiUaNbNbNaNaUaKaUaNbN"/D 164 12jAaAaBaEaBbAbAaAbBiw6nExUnAxAaBkKuNnInAuAuKaUaNbNaUaIaUaNaN"/D 23 13gAbBaGaEaAbAaAaGkNnEnBuGkXkNnAxNnNnKnAuAuKaNaNaNaNaNaNaKaKaNaNbN"/D 115 13W6AaAaBaGaAbAbAeAaBnAxNnJnAnAkNnAkAaBnAuNnUaNkUnXnAxKaNbNaNaXaXaNaN"/`,
+    dUp: `d 116 12jAaAeBnAaBaAaAbAbAbAaAaAnAxNuAaJnAnBuAuNiEkKkw-6nAxUaUbUbNaIaXaNaN"/D 165 12jAaAaEaBaBaAaAaAbAaAaExNnGnAnExNxAaBuAuKxUaKnNxUaNaNaUbUaXaKaUbN"/D 214 12eAbAaAaAaJaBbAaAaBaEaBiAnAnAnEkUnNxBuUkUnKkKaNaNaNaNaUaXaKaNbN"/D 24 13W6AaAaAaw8nAbAaBaAaGkNkAnBnEkUuNuNiNkw-6aUxUaNeNeNaNaNaUaNaNaN"/D 71 13jAaAaAaw7aAaAaAaAaAaAaEiNuBnBuAaBxUnNnNuAkNuUnXaNiUaNeNaNaNaNaUaUaNaNaN"/`,
+    side: `d 215 11eAeAaBaBeBnAkBaAaAbAaAaBaEkNnNnNnKnUnNnNnNkAuBnBnBnBnBnEnNnNnUnKaKaNaNaUaUaXaNaNbN"/D 24 12gAbAaBbAbBkAnEaAbAaAaAaBxNuXnUnNiAnAnAnAnAnAnEaBuNuUaNaNnAxUaNaNbNaNaNaNaNaKaUaNaN"/D 72 12gAbAaBaAaAeBxAnBaAbAaBaEkNnUnKnNnNnNxAnAnAnAnAnBnGnKnAxKaNaNaNaNaNaNaNaXaNaUbN"/D 117 12W6AaAaAaAeAaBxEbAaAeAaBiNuNnUnUW-6AnAnBnw6aBaAaAaBkUiNnUbNaKnAxKaNaNbNaUaw-6aNaNaN"/D 165 12jAbAaAjBnAuAnEaAaAbAbAaEkNkUnKnNuNuAuAuBnAnw7aAaAbEkNnKuNnUaUnAxKaNaUbUaIaKaNbN"/F 24 16aBnU"/F 72 16aBnU"/F 119 16aBnU"/F 167 16aBnU"/F 216 16aBnU"/F 216 20eAaAaAaBaEaGnAnAkAW-6NkUnNaUaUaUaUaUbN"/F 24 21jAaBaw7nAnAnAkNiNnUnKaNaNaNaNaNaN"/F 72 21gAaAaAaEaGnBnAW-7NiIaUaNaNaNaNaN"/F 118 21W6BaBaAaGnBuAuAiNnUnw-6aUaNaN"/F 169 21bAbAaEaBaBnAnAuAuAuAkNnNnw-7aNaUbNbN"/D 126 31bBxNbN"/D 19 32aAnN"/D 172 32gBxU"/D 20 33eAkN"/D 67 33gBxU"/D 26 34eAaBkNnU"/D 74 34gGuNnNnU"/D 211 34bAeBiK"/D 219 34gBnAkK"/`,
+    dDown: `d 23 12jAbBaw7aBbBbBaBxNnKnKnNuNnNxAnAnAnAnBnGnGuNnKaKaNuAxNnNaNaNbNbNbNaNaUaUaNaNaN"/D 72 12eAbAaAaBaw6aAaBaAaAaBxNnKnKnNnNnAnNnNiAnAnBnBnBnGnNnUkKaNaNbNaNaNaUaUaUaNaNbN"/D 215 12eAbAaAaGaGaAaAaAaAaEkNnUnKnUnNnAnNnNxAnAnAnGnBnAnEnNxUaUaUaNaNaNaUaXaUaNaNbN"/D 115 13jAbAaAnBaUaAaBaBeAeAaBW-6UnNnNnNuAkNnAuAnBnGnEnAuAkXaNaUaNaNaNnIaKaNbN"/D 164 13W6AaAaAaBaEaAaAaAeAaBiNnNnUnNnNnAuNxAnAnJnBnAnAW-6KaNaNaNaNaNaNaIaKaNaN"/F 23 16aBnU"/F 122 16aBnU"/F 213 16aBnU"/F 71 17aAnN"/F 171 17aBnU"/F 77 18aAnN"/F 114 18aBnU"/F 164 18aBnU"/F 23 20gAaAbAaEaw6nAnAn3XaXaUaNaNaNaN"/F 69 20jAaAaNaAaAaEaw6nAnAkAiNiUnXaUaUaUaNaN"/F 118 20aAeNbAaAaAaBaJnBuAnAnAuAxNkNnw-6aXaUaNbN"/F 214 20gAaAaNaAaBaEaBaAnBnAnAkAnAxNuAnNuNnXaNaUaXaNaNaN"/F 165 21gAbNaAaAaBaAaJnAuAnBuAxNnAnNuUnKaUaIaNaN"/D 64 32aAnN"/D 125 32eEkNnNaN"/D 173 32aAaBkUaN"/D 19 34gBxU"/D 27 34bAbBnAkX"/D 67 34eAaBkNnU"/D 75 34eAaBkNnU"/D 219 34eAaBxK"/D 116 35aAbAaAnAkX"/D 165 35aAbBuAuKaN"/D 212 35bAaBnAuX"/`,
+    down: `d 214 11eAbBaBaEaBaAaAaAbAaEiUnUnUnNnNuAnAnNnNuAnBnBnBnAnAuAuXaNaNaNaNaNaXaUaUaNbN"/D 71 12eAbAaBaJaAaBaAbAaAaBiNnNnKnKuNnAnAnNnNuAuBnBnBuAkNnNaNaNbNaNaNaUaKaUaNbN"/D 164 12jAaAaBaEaAaAaAbAaAbBiNnUnUnNuNnAnBuUuAnAnBnEnAnAuAuKaUaNaNaNaNaIaUaNaN"/D 23 13gAbBaGaEaAbAaAaGxNnNnKnUnNnNnAnAnNnNuAnAnBnBnAnAxUaUaNbNaNaKaKaNaNbN"/D 115 13W6AaAaBaEaBbAbAbAaAaAnAxNuNnUnNnNnNkBnNnNnAuBnBnBnAxKaNaNaNaNaXaKaNaN"/F 69 16aBnU"/F 169 16aBnU"/F 211 16aBnU"/F 218 16aBnU"/F 21 17aBnU"/F 75 17aBnU"/F 120 17aAnN"/F 163 17aBnU"/F 27 18aBnU"/F 114 18aAnN"/F 169 19aAbAaBaBaw6nAnAkAW-7NnNnUnKaKaUaNaNbBbUaN"/F 69 20bAaAaNaNaAbEaEaw6nAxNkNxNnNnIaUaUbN"/F 212 20bAaAaNaNbAaAaBaBaBaEnAnAnAnAW-7NuNnNnNnXaUaUaUaN"/F 21 21bAaAaNaNaAaAaBaEaJnAW-6NkNkNnXaUaUaNaN"/F 116 21aAaAaUeAaAaAaBaw6nAxAW-6NnNnNnIaUaUbN"/D 19 32bAaAxNaN"/D 67 32bAaBxUaN"/D 173 32aExUeN"/D 122 33eAkN"/D 26 34bAaEkX"/D 75 34bEkUaN"/D 116 34bAaBnAuNnUaN"/D 163 34bAaBkK"/D 211 34bAaBxUaN"/D 220 34aAaBnAkKbN"/`,
   }
 
   const starSvg = 'd 7 0bBaBaAjBnAnAnBaBaBkNnNuNuAuAnAkUaUaUnNnNnUjNaUaU"/'
 
   const body = document.querySelector('.wrapper')
   const animationFrames = {
-    // frame is counted right to left in the sprite sheet
     walk: [0, 1, 2, 1, 3, 4],
     stop: [0],
     celebrate: [2, 3, 4], //TODO add celebration frame
@@ -66,8 +65,7 @@ function init() {
   }
 
   const setMargin = (target, x, y) =>{
-    target.style.marginLeft = `${x}px`
-    target.style.marginTop = `${y}px`
+    target.style.transform = `translate(${x}px, ${y}px)`
   }
 
   const reverseDirectionConversions = () =>{
@@ -81,7 +79,7 @@ function init() {
   const animatePenguin = penguin =>{
     const { frame:i, animation, frameSpeed} = penguinData
     const penguinSprite = penguin.childNodes[1].childNodes[1]
-    setMargin(penguinSprite, `-${animationFrames[animation][i] * cellSize}`, `-${cellSize * directions[sprites[penguinData.direction]]}`)
+    setMargin(penguinSprite, `${(4 - animationFrames[animation][i]) * -cellSize}`, `-${cellSize * directions[sprites[penguinData.direction]]}`)
     penguinData.frame = i === animationFrames[animation].length - 1 ? 0 : i + 1
     penguinData.frameTimer = setTimeout(()=> animatePenguin(penguin), frameSpeed)
   }
@@ -101,12 +99,9 @@ function init() {
     frameSpeed,
     moveSpeed: 150,
     stop: true,
-    prev: [0, 0], 
     stepLeft: true,
-    pos: {
-      x: 0,
-      y: 0,
-    }
+    marginPos: { x: 0, y: 0 },
+    pos: { x: 0, y: 0 }
   }
   
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
@@ -131,10 +126,8 @@ function init() {
     penguinData.animation = animation
   }
 
-  const stopPenguin = (penguin, animation) =>{
+  const stopPenguin = animation =>{
     changeAnimation(animation)
-    const { offsetTop, offsetLeft } = penguin.style
-    setMargin(penguin, offsetLeft, offsetTop)
     penguinData.stop = true
   }
 
@@ -143,21 +136,18 @@ function init() {
     penguinData.stop = false
   }
 
-  const penguinMarginLeft = penguin => +penguin.style.marginLeft.replace('px', '')
-  const penguinMarginTop = penguin => +penguin.style.marginTop.replace('px', '')
 
   const checkBoundaryAndUpdatePenguinPos = (x, y, penguin, penguinData) =>{
     const lowerLimit = -40 // buffer from window edge
     const upperLimit = 40
 
     if (x > lowerLimit && x < (body.clientWidth - upperLimit)){
-      penguin.style.marginLeft = `${x}px`
-      penguinData.prev[0] = x
+      penguinData.marginPos.x = x
     } 
     if (y > lowerLimit && y < (body.clientHeight - upperLimit)){
-      penguin.style.marginTop = `${y}px`
-      penguinData.prev[1] = y
+      penguinData.marginPos.y = y
     }
+    setMargin(penguin, x, y)
   }
 
   const createMark = (penguin, angle) => {
@@ -192,17 +182,16 @@ function init() {
 
     createMark(penguin.childNodes[1].childNodes[3].childNodes[1], penguinDir)
     
-    let x = penguinMarginLeft(penguin)
-    let y = penguinMarginTop(penguin)
+    let { x, y } = penguinData.marginPos
     
     if (dir !== 'up' && dir !== 'down') x += (dir.includes('left')) ? -distance : distance
     if (dir !== 'left' && dir !== 'right') y += (dir.includes('up')) ? -distance : distance
 
     if (
-      x === penguinData.prev[0] && y === penguinData.prev[1] || 
+      x === penguinData.marginPos.x && y === penguinData.marginPos.y || 
       overlap(control.x, penguinData.pos.x) && overlap(control.y, penguinData.pos.y)
     ){
-      stopPenguin(penguin, 'celebrate')
+      stopPenguin('celebrate')
       body.removeChild(star)
       star = null
     } 
@@ -237,14 +226,14 @@ function init() {
 
     Object.assign(penguinData, {
       penguin: penguin,
-      prev: [penguin.style.marginLeft, penguin.style.marginTop], 
+      marginPos: { x, y },
       pos: {
         x: left + (width / 2),
         y: top + (height / 2),
       }
     })
     startPenguin(penguin)
-    stopPenguin(penguin, 'stop')
+    stopPenguin('stop')
   }
 
   createPenguin((body.clientWidth / 2) - 48, (body.clientHeight / 2) - 48)
