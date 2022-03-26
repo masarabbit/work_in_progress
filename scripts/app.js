@@ -17,6 +17,7 @@ function init() {
 
   const body = document.querySelector('.wrapper')
   const animationFrames = {
+    // sprite sheet frames are numbered left to right
     walk: [0, 1, 2, 1, 3, 4],
     stop: [0],
     celebrate: [2, 3, 4], //TODO add celebration frame
@@ -41,6 +42,7 @@ function init() {
   }
   const turnDirections = Object.keys(sprites)
   const frameSpeed = 100
+  const frameNo = 5
   const control = {
     x: null,
     y: null,
@@ -79,7 +81,7 @@ function init() {
   const animatePenguin = penguin =>{
     const { frame:i, animation, frameSpeed} = penguinData
     const penguinSprite = penguin.childNodes[1].childNodes[1]
-    setMargin(penguinSprite, `${(4 - animationFrames[animation][i]) * -cellSize}`, `-${cellSize * directions[sprites[penguinData.direction]]}`)
+    setMargin(penguinSprite, `${((frameNo - 1) - animationFrames[animation][i]) * -cellSize}`, `-${cellSize * directions[sprites[penguinData.direction]]}`)
     penguinData.frame = i === animationFrames[animation].length - 1 ? 0 : i + 1
     penguinData.frameTimer = setTimeout(()=> animatePenguin(penguin), frameSpeed)
   }
