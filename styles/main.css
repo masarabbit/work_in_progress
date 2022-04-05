@@ -39,6 +39,7 @@ svg {
 }
 
 .penguin_wrapper svg { 
+  /* border: 1px solid hotpink; */
   fill: navy; 
 }
 
@@ -56,8 +57,8 @@ svg {
 
 .penguin_sprite {
   position: absolute;
-  height: calc(5 * 96px);
-  width: calc(5 * 96px);
+  height: calc(6 * 96px);
+  width: calc(8 * 96px);
   pointer-events: none;
 }
 
@@ -80,6 +81,7 @@ svg {
   width: 40px;
   display: flex;
   flex-wrap: wrap;
+  /* border: red 1px solid; */
 }
 
 /* need to flip because the parent divs are flipped */
@@ -120,6 +122,18 @@ a:hover { text-decoration: underline; }
   0% {opacity: 0.4}
   50% {opacity: 0.4}
   100% {opacity: 0}
+}
+
+.jump_print {
+  height: 30px;
+  width: 35px;
+  position: absolute;
+  z-index: -10;
+  image-rendering: pixelated;
+  background-size: 30px; 
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAHhJREFUSEtjZBggwDhA9jKMWky3kB8N6tGgplkIYE1cs1/+/Q+zMVWcmSYJEMNQZEtpaTlRFoMcQG2fD36Lqe1rgokLOVlTM7gHl8UgX9I6dePNo7TMzzQpHIgp7kYtJiaUqKJmNKipEozEGDIa1MSEElXUDFhQAwDBuiQfjPZDHAAAAABJRU5ErkJggg==);
+  animation: forwards fade 10s;
+  border: solid 1px hotpink;
 }
 
 .star{

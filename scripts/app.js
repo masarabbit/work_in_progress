@@ -1,26 +1,33 @@
 function init() {
 
-  //TODO edit / tidy up sprite
+  //TODO note that sprite differs to the one saved in assets (frames are the other way round)
+  // TODO add sprite for jump_print, and clean the sprite for penguin jumping. currently too jagged
 
   const decodeRef = { a: ' h 1', b: ' h 2', e: ' h 3', g: ' h 4', j: ' h 5', A: ' v 1', B: ' v 2', E: ' v 3', G: ' v 4', J: ' v 5', n: 'h -1', u: ' h -2', k: ' h -3', x: ' h -4', i: ' h -5', N: ' v -1', U: ' v -2', K: ' v -3', X: ' v -4', I: ' v -5', w: ' v ', W: ' h ', D: '<path d="M', o: '<path fill="pink" d="M', F: '<path fill="#fff" d="M', '/': '/>', d: '<path d="M', f: '<path fill="#fff" d="M'}
   const decode = arr => arr.split('').map(c=> !decodeRef[c] ? c : decodeRef[c]).join('')
 
   const penguinSvg = {
-    up: `d 214 11eAbBaBaEaBaAaAaAbAaExGnBuAaBnAkKnNnAuBxUaNuNnInAuAuKaNaNaNaNaNaIaUaUaNbN"/D 71 12eAbAaBaJaAaBbAaAaAaBW-6AnEnGkUaNuNuNuAaBxUaNuUnKiUaNbNbNaNaUaKaUaNbN"/D 164 12jAaAaBaEaBbAbAaAbBiw6nExUnAxAaBkKuNnInAuAuKaUaNbNaUaIaUaNaN"/D 23 13gAbBaGaEaAbAaAaGkNnEnBuGkXkNnAxNnNnKnAuAuKaNaNaNaNaNaNaKaKaNaNbN"/D 115 13W6AaAaBaGaAbAbAeAaBnAxNnJnAnAkNnAkAaBnAuNnUaNkUnXnAxKaNbNaNaXaXaNaN"/`,
-    dUp: `d 116 12jAaAeBnAaBaAaAbAbAbAaAaAnAxNuAaJnAnBuAuNiEkKkw-6nAxUaUbUbNaIaXaNaN"/D 165 12jAaAaEaBaBaAaAaAbAaAaExNnGnAnExNxAaBuAuKxUaKnNxUaNaNaUbUaXaKaUbN"/D 214 12eAbAaAaAaJaBbAaAaBaEaBiAnAnAnEkUnNxBuUkUnKkKaNaNaNaNaUaXaKaNbN"/D 24 13W6AaAaAaw8nAbAaBaAaGkNkAnBnEkUuNuNiNkw-6aUxUaNeNeNaNaNaUaNaNaN"/D 71 13jAaAaAaw7aAaAaAaAaAaAaEiNuBnBuAaBxUnNnNuAkNuUnXaNiUaNeNaNaNaNaUaUaNaNaN"/`,
-    side: `d 215 11eAeAaBaBeBnAkBaAaAbAaAaBaEkNnNnNnKnUnNnNnNkAuBnBnBnBnBnEnNnNnUnKaKaNaNaUaUaXaNaNbN"/D 24 12gAbAaBbAbBkAnEaAbAaAaAaBxNuXnUnNiAnAnAnAnAnAnEaBuNuUaNaNnAxUaNaNbNaNaNaNaNaKaUaNaN"/D 72 12gAbAaBaAaAeBxAnBaAbAaBaEkNnUnKnNnNnNxAnAnAnAnAnBnGnKnAxKaNaNaNaNaNaNaNaXaNaUbN"/D 117 12W6AaAaAaAeAaBxEbAaAeAaBiNuNnUnUW-6AnAnBnw6aBaAaAaBkUiNnUbNaKnAxKaNaNbNaUaw-6aNaNaN"/D 165 12jAbAaAjBnAuAnEaAaAbAbAaEkNkUnKnNuNuAuAuBnAnw7aAaAbEkNnKuNnUaUnAxKaNaUbUaIaKaNbN"/F 24 16aBnU"/F 72 16aBnU"/F 119 16aBnU"/F 167 16aBnU"/F 216 16aBnU"/F 216 20eAaAaAaBaEaGnAnAkAW-6NkUnNaUaUaUaUaUbN"/F 24 21jAaBaw7nAnAnAkNiNnUnKaNaNaNaNaNaN"/F 72 21gAaAaAaEaGnBnAW-7NiIaUaNaNaNaNaN"/F 118 21W6BaBaAaGnBuAuAiNnUnw-6aUaNaN"/F 169 21bAbAaEaBaBnAnAuAuAuAkNnNnw-7aNaUbNbN"/D 126 31bBxNbN"/D 19 32aAnN"/D 172 32gBxU"/D 20 33eAkN"/D 67 33gBxU"/D 26 34eAaBkNnU"/D 74 34gGuNnNnU"/D 211 34bAeBiK"/D 219 34gBnAkK"/`,
-    dDown: `d 23 12jAbBaw7aBbBbBaBxNnKnKnNuNnNxAnAnAnAnBnGnGuNnKaKaNuAxNnNaNaNbNbNbNaNaUaUaNaNaN"/D 72 12eAbAaAaBaw6aAaBaAaAaBxNnKnKnNnNnAnNnNiAnAnBnBnBnGnNnUkKaNaNbNaNaNaUaUaUaNaNbN"/D 215 12eAbAaAaGaGaAaAaAaAaEkNnUnKnUnNnAnNnNxAnAnAnGnBnAnEnNxUaUaUaNaNaNaUaXaUaNaNbN"/D 115 13jAbAaAnBaUaAaBaBeAeAaBW-6UnNnNnNuAkNnAuAnBnGnEnAuAkXaNaUaNaNaNnIaKaNbN"/D 164 13W6AaAaAaBaEaAaAaAeAaBiNnNnUnNnNnAuNxAnAnJnBnAnAW-6KaNaNaNaNaNaNaIaKaNaN"/F 23 16aBnU"/F 122 16aBnU"/F 213 16aBnU"/F 71 17aAnN"/F 171 17aBnU"/F 77 18aAnN"/F 114 18aBnU"/F 164 18aBnU"/F 23 20gAaAbAaEaw6nAnAn3XaXaUaNaNaNaN"/F 69 20jAaAaNaAaAaEaw6nAnAkAiNiUnXaUaUaUaNaN"/F 118 20aAeNbAaAaAaBaJnBuAnAnAuAxNkNnw-6aXaUaNbN"/F 214 20gAaAaNaAaBaEaBaAnBnAnAkAnAxNuAnNuNnXaNaUaXaNaNaN"/F 165 21gAbNaAaAaBaAaJnAuAnBuAxNnAnNuUnKaUaIaNaN"/D 64 32aAnN"/D 125 32eEkNnNaN"/D 173 32aAaBkUaN"/D 19 34gBxU"/D 27 34bAbBnAkX"/D 67 34eAaBkNnU"/D 75 34eAaBkNnU"/D 219 34eAaBxK"/D 116 35aAbAaAnAkX"/D 165 35aAbBuAuKaN"/D 212 35bAaBnAuX"/`,
-    down: `d 214 11eAbBaBaEaBaAaAaAbAaEiUnUnUnNnNuAnAnNnNuAnBnBnBnAnAuAuXaNaNaNaNaNaXaUaUaNbN"/D 71 12eAbAaBaJaAaBaAbAaAaBiNnNnKnKuNnAnAnNnNuAuBnBnBuAkNnNaNaNbNaNaNaUaKaUaNbN"/D 164 12jAaAaBaEaAaAaAbAaAbBiNnUnUnNuNnAnBuUuAnAnBnEnAnAuAuKaUaNaNaNaNaIaUaNaN"/D 23 13gAbBaGaEaAbAaAaGxNnNnKnUnNnNnAnAnNnNuAnAnBnBnAnAxUaUaNbNaNaKaKaNaNbN"/D 115 13W6AaAaBaEaBbAbAbAaAaAnAxNuNnUnNnNnNkBnNnNnAuBnBnBnAxKaNaNaNaNaXaKaNaN"/F 69 16aBnU"/F 169 16aBnU"/F 211 16aBnU"/F 218 16aBnU"/F 21 17aBnU"/F 75 17aBnU"/F 120 17aAnN"/F 163 17aBnU"/F 27 18aBnU"/F 114 18aAnN"/F 169 19aAbAaBaBaw6nAnAkAW-7NnNnUnKaKaUaNaNbBbUaN"/F 69 20bAaAaNaNaAbEaEaw6nAxNkNxNnNnIaUaUbN"/F 212 20bAaAaNaNbAaAaBaBaBaEnAnAnAnAW-7NuNnNnNnXaUaUaUaN"/F 21 21bAaAaNaNaAaAaBaEaJnAW-6NkNkNnXaUaUaNaN"/F 116 21aAaAaUeAaAaAaBaw6nAxAW-6NnNnNnIaUaUbN"/D 19 32bAaAxNaN"/D 67 32bAaBxUaN"/D 173 32aExUeN"/D 122 33eAkN"/D 26 34bAaEkX"/D 75 34bEkUaN"/D 116 34bAaBnAuNnUaN"/D 163 34bAaBkK"/D 211 34bAaBxUaN"/D 220 34aAaBnAkKbN"/`,
+    up: `d 22 11eAbBaBaEaBaAaAaAbAaExGnBuAaBnAkKnNnAuBxUaNuNnInAuAuKaNaNaNaNaNaIaUaUaNbN"/D 68 12jAaAaBaEaBbAbAaAbBiw6nExUnAxAaBkKuNnInAuAuKaUaNbNaUaIaUaNaN"/D 167 12eAbAaBaJaAaBbAaAaAaBW-6AnEnGkUaNuNuNuAaBxUaNuUnKiUaNbNbNaNaUaKaUaNbN"/D 115 13W6AaAaBaGaAbAbAeAaBnAxNnJnAnAkNnAkAaBnAuNnUaNkUnXnAxKaNbNaNaXaXaNaN"/D 215 13gAbBaGaEaAbAaAaGkNnEnBuGkXkNnAxNnNnKnAuAuKaNaNaNaNaNaNaKaKaNaNbN"/`,
+    dUp: `d 22 12eAbAaAaAaJaBbAaAaBaEaBiAnAnAnEkUnNxBuUkUnKkKaNaNaNaNaUaXaKaNbN"/D 69 12jAaAaEaBaBaAaAaAbAaAaExNnGnAnExNxAaBuAuKxUaKnNxUaNaNaUbUaXaKaUbN"/D 116 12jAaAeBnAaBaAaAbAbAbAaAaAnAxNuAaJnAnBuAuNiEkKkw-6nAxUaUbUbNaIaXaNaN"/D 167 13jAaAaAaw7aAaAaAaAaAaAaEiNuBnBuAaBxUnNnNuAkNuUnXaNiUaNeNaNaNaNaUaUaNaNaN"/D 216 13W6AaAaAaw8nAbAaBaAaGkNkAnBnEkUuNuNiNkw-6aUxUaNeNeNaNaNaUaNaNaN"/`,
+    side: `d 23 11eAeAaBaBeBnAkBaAaAbAaAaBaEkNnNnNnKnUnNnNnNkAuBnBnBnBnBnEnNnNnUnKaKaNaNaUaUaXaNaNbN"/D 69 12jAbAaAjBnAuAnEaAaAbAbAaEkNkUnKnNuNuAuAuBnAnw7aAaAbEkNnKuNnUaUnAxKaNaUbUaIaKaNbN"/D 117 12W6AaAaAaAeAaBxEbAaAeAaBiNuNnUnUW-6AnAnBnw6aBaAaAaBkUiNnUbNaKnAxKaNaNbNaUaw-6aNaNaN"/D 168 12gAbAaBaAaAeBxAnBaAbAaBaEkNnUnKnNnNnNxAnAnAnAnAnBnGnKnAxKaNaNaNaNaNaNaNaXaNaUbN"/D 216 12gAbAaBbAbBkAnEaAbAaAaAaBxNuXnUnNiAnAnAnAnAnAnEaBuNuUaNaNnAxUaNaNbNaNaNaNaNaKaUaNaN"/F 24 16aBnU"/F 71 16aBnU"/F 119 16aBnU"/F 168 16aBnU"/F 216 16aBnU"/F 24 20eAaAaAaBaEaGnAnAkAW-6NkUnNaUaUaUaUaUbN"/F 73 21bAbAaEaBaBnAnAuAuAuAkNnNnw-7aNaUbNbN"/F 118 21W6BaBaAaGnBuAuAiNnUnw-6aUaNaN"/F 168 21gAaAaAaEaGnBnAW-7NiIaUaNaNaNaNaN"/F 216 21jAaBaw7nAnAnAkNiNnUnKaNaNaNaNaNaN"/D 126 31bBxNbN"/D 76 32gBxU"/D 211 32aAnN"/D 163 33gBxU"/D 212 33eAkN"/D 19 34bAeBiK"/D 27 34gBnAkK"/D 170 34gGuNnNnU"/D 218 34eAaBkNnU"/`,
+    dDown: `d 23 12eAbAaAaGaGaAaAaAaAaEkNnUnKnUnNnAnNnNxAnAnAnGnBnAnEnNxUaUaUaNaNaNaUaXaUaNaNbN"/D 168 12eAbAaAaBaw6aAaBaAaAaBxNnKnKnNnNnAnNnNiAnAnBnBnBnGnNnUkKaNaNbNaNaNaUaUaUaNaNbN"/D 215 12jAbBaw7aBbBbBaBxNnKnKnNuNnNxAnAnAnAnBnGnGuNnKaKaNuAxNnNaNaNbNbNbNaNaUaUaNaNaN"/D 68 13W6AaAaAaBaEaAaAaAeAaBiNnNnUnNnNnAuNxAnAnJnBnAnAW-6KaNaNaNaNaNaNaIaKaNaN"/D 115 13jAbAaAnBaUaAaBaBeAeAaBW-6UnNnNnNuAkNnAuAnBnGnEnAuAkXaNaUaNaNaNnIaKaNbN"/F 21 16aBnU"/F 122 16aBnU"/F 215 16aBnU"/F 75 17aBnU"/F 167 17aAnN"/F 68 18aBnU"/F 114 18aBnU"/F 173 18aAnN"/F 22 20gAaAaNaAaBaEaBaAnBnAnAkAnAxNuAnNuNnXaNaUaXaNaNaN"/F 118 20aAeNbAaAaAaBaJnBuAnAnAuAxNkNnw-6aXaUaNbN"/F 165 20jAaAaNaAaAaEaw6nAnAkAiNiUnXaUaUaUaNaN"/F 215 20gAaAbAaEaw6nAnAn3XaXaUaNaNaNaN"/F 69 21gAbNaAaAaBaAaJnAuAnBuAxNnAnNuUnKaUaIaNaN"/D 77 32aAaBkUaN"/D 125 32eEkNnNaN"/D 160 32aAnN"/D 27 34eAaBxK"/D 163 34eAaBkNnU"/D 171 34eAaBkNnU"/D 211 34gBxU"/D 219 34bAbBnAkX"/D 20 35bAaBnAuX"/D 69 35aAbBuAuKaN"/D 116 35aAbAaAnAkX"/`,
+    down: `d 22 11eAbBaBaEaBaAaAaAbAaEiUnUnUnNnNuAnAnNnNuAnBnBnBnAnAuAuXaNaNaNaNaNaXaUaUaNbN"/D 68 12jAaAaBaEaAaAaAbAaAbBiNnUnUnNuNnAnBuUuAnAnBnEnAnAuAuKaUaNaNaNaNaIaUaNaN"/D 167 12eAbAaBaJaAaBaAbAaAaBiNnNnKnKuNnAnAnNnNuAuBnBnBuAkNnNaNaNbNaNaNaUaKaUaNbN"/D 115 13W6AaAaBaEaBbAbAbAaAaAnAxNuNnUnNnNnNkBnNnNnAuBnBnBnAxKaNaNaNaNaXaKaNaN"/D 215 13gAbBaGaEaAbAaAaGxNnNnKnUnNnNnAnAnNnNuAnAnBnBnAnAxUaUaNbNaNaKaKaNaNbN"/F 19 16aBnU"/F 26 16aBnU"/F 73 16aBnU"/F 165 16aBnU"/F 67 17aBnU"/F 120 17aAnN"/F 171 17aBnU"/F 213 17aBnU"/F 114 18aAnN"/F 219 18aBnU"/F 73 19aAbAaBaBaw6nAnAkAW-7NnNnUnKaKaUaNaNbBbUaN"/F 20 20bAaAaNaNbAaAaBaBaBaEnAnAnAnAW-7NuNnNnNnXaUaUaUaN"/F 165 20bAaAaNaNaAbEaEaw6nAxNkNxNnNnIaUaUbN"/F 116 21aAaAaUeAaAaAaBaw6nAxAW-6NnNnNnIaUaUbN"/F 213 21bAaAaNaNaAaAaBaEaJnAW-6NkNkNnXaUaUaNaN"/D 77 32aExUeN"/D 163 32bAaBxUaN"/D 211 32bAaAxNaN"/D 122 33eAkN"/D 19 34bAaBxUaN"/D 28 34aAaBnAkKbN"/D 67 34bAaBkK"/D 116 34bAaBnAuNnUaN"/D 171 34bEkUaN"/D 218 34bAaEkX"/`,
+    turn: `d 357 11eAbAaAaBaAbNaNbNeAnAnAnAnAnAnAnEnUnUnUnNkAnNuAnAnGnAnUuNnNuNnNnNnNeAbAeNaUaUaNbN"/D 22 12eAbAaBaEaAaAeAbAaAxAuw6nBnAnBnUW-6AnAnAnUaNnNnNnKnAnAuNaUaUaNaUaXnNnNbNaNaNaNbN"/D 309 13gAaAaAnAaNaBaBeAeAbAaAiNxNnNnUkAnNxAnBnAiAxNaNbNbNeNaNaUaUbN"/D 68 14jAbAaBaEaw6aBaAaAnAnAuBnBuNaUnInNnUnUnNnNiNuNbNaNaUaNaN"/D 115 14W6AaAaEaBaBaAaAaAbAaAkAaAuAuAuAaAnAnNnNaUaUaNnKnNnNuNuAnAnUuGnw6nAnw-7aKaw-6aNaNaN"/D 165 14gAbBaBaGbAeAaAbBxNkAaBnNnKnUnNuNuAnNuAnAnBnGnUuAxNaNbNaNaNaUaKaUaUbN"/F 355 14aAnN"/F 361 14aAnN"/F 19 16aAnN"/F 308 16aAnN"/F 314 16aAnN"/D 213 17jAaAaBaBaAaAaAgAnAuAkNnNnNuNkAnNuAuBnAxAkNaNbNbNaNaKaUaUbN"/F 356 17bAaNeAaBaBaBaAaEnAnAxNkAxNnNnKaUaXaNaN"/F 69 19aAnN"/F 163 19aAnN"/F 169 19aAnN"/F 307 19gAaNeBaAaBaBaBnAnAiNuAW-6NnUaUaKaUaN"/F 113 20aAnN"/F 119 20aAnN"/D 260 20W6AaAaAaBaAeNbNaBnAnAnAuAnUnNuNxAnNxAnAnBkNnNnNnUaAbAbNaNaUaNaNaN"/F 65 22gAaAaBaBaAaJW-8NnUnw-7aU"/F 113 22bBaNaNbAbAaAaEaAnBnAkAnAxNnNnw-6aX"/F 164 22bAaNbAbAaBaEaAaBnAnAxNkAiNnNnNaNaXaUaNaN"/F 211 22aAnN"/F 217 22aAnN"/F 259 24aAnN"/F 266 24aAnN"/F 212 25bAaNeAbAaAaAaAaEnAuAW-8AxNnNnXaNaNaUbN"/D 63 26aGuAuNaNaUaN"/F 258 26gAaNgAbAaBaAaEnAnAn4NnNnKaNaUaNaN"/D 353 29aBnAuUbN"/D 365 29aAbBuNnU"/D 159 30aAnN"/D 306 30aBuNaN"/D 315 30aAaAkNaN"/D 68 34aBnAnNnNbN"/D 115 34aBnAnUaN"/D 163 34aBaAkNaU"/D 170 34aBaAkNaU"/D 218 35bAnAuNaN"/D 210 36eAkN"/D 258 36eAkN"/D 266 36eAkN"/`
   }
 
   const starSvg = 'd 7 0bBaBaAjBnAnAnBaBaBkNnNuNuAuAnAkUaUaUnNnNnUjNaUaU"/'
 
   const body = document.querySelector('.wrapper')
   const animationFrames = {
-    // sprite sheet frames are ordered left to right
+    //// sprite sheet frames are ordered left to right
     walk: [0, 1, 2, 1, 3, 4],
     stop: [0],
-    celebrate: [2, 3, 4], //TODO add celebration frame
+    celebrate: [5, 6, 7, 6],
+    turnFromup: [0, 1, 2, 3, 4],
+    turnFromdUp: [1, 2, 3, 4],
+    turnFromside: [2, 3, 4],
+    turnFromdDown: [3, 4],
+    turnFromdown: [4],
   }
   const cellSize = 96
   const directions = {
@@ -29,7 +36,9 @@ function init() {
     side: 2,
     dDown: 3,
     down: 4,
+    turn: 5,
   }
+  const spriteNo = Object.keys(penguinSvg).length
   const sprites = {
     up: 'up',
     upright: 'dUp',
@@ -39,10 +48,10 @@ function init() {
     downleft: 'dDown',
     left: 'side',
     upleft: 'dUp',
+    turn: 'turn'
   }
   const turnDirections = Object.keys(sprites)
   const frameSpeed = 100
-  const frameNo = 5
   const control = {
     x: null,
     y: null,
@@ -79,11 +88,17 @@ function init() {
   }
 
   const animatePenguin = penguin =>{
-    const { frame:i, animation, frameSpeed} = penguinData
+    const { frame:i, animation, frameSpeed } = penguinData
     const penguinSprite = penguin.childNodes[1].childNodes[1]
-    setMargin(penguinSprite, `${((frameNo - 1) - animationFrames[animation][i]) * -cellSize}`, `-${cellSize * directions[sprites[penguinData.direction]]}`)
+    setMargin(penguinSprite, `-${animationFrames[animation][i] * cellSize}`, `-${cellSize * directions[sprites[penguinData.direction]]}`)
     penguinData.frame = i === animationFrames[animation].length - 1 ? 0 : i + 1
     penguinData.frameTimer = setTimeout(()=> animatePenguin(penguin), frameSpeed)
+    if (animation === 'celebrate' && i === 0) {
+      penguinData.jump 
+        ? createJumpMark(penguin)
+        : penguinData.jump = true
+    }
+    if (animation !== 'celebrate') penguinData.jump = false
   }
 
   const randomDirection = () =>{
@@ -156,11 +171,21 @@ function init() {
     const { height, left, top } = penguin.getBoundingClientRect()
     const mark = document.createElement('div')
     penguinData.stepLeft = !penguinData.stepLeft
-    mark.className = `foot_print`
+    mark.className = 'foot_print'
     mark.style.transform = `rotate(${angle}deg) scale(${penguinData.stepLeft ? -1 : 1}, 1)`
     penguinData.pos.x = left + 5
     penguinData.pos.y = top + (height - 20)
     setPos(mark, penguinData.pos.x, penguinData.pos.y)
+    body.append(mark)
+    setTimeout(()=> body.removeChild(mark), 10000)
+  }
+
+  const createJumpMark = penguin =>{
+    const { left, top } = penguin.childNodes[1].childNodes[3].childNodes[1].getBoundingClientRect()
+    const mark = document.createElement('div')
+    mark.className = 'jump_print'
+    // console.log(penguin.childNodes[1].childNodes[3].childNodes[1])
+    setPos(mark, left, top + 40)
     body.append(mark)
     setTimeout(()=> body.removeChild(mark), 10000)
   }
@@ -193,7 +218,12 @@ function init() {
       x === penguinData.marginPos.x && y === penguinData.marginPos.y || 
       overlap(control.x, penguinData.pos.x) && overlap(control.y, penguinData.pos.y)
     ){
-      stopPenguin('celebrate')
+      // console.log('turnFrom' + sprites[dir])
+      stopPenguin('turnFrom' + sprites[dir])
+      penguinData.direction = 'turn'
+      setTimeout(()=>{
+        stopPenguin('celebrate')
+      }, 100 * animationFrames['turnFrom' + sprites[dir]].length)
       body.removeChild(star)
       star = null
     } 
@@ -204,9 +234,23 @@ function init() {
     }, penguinData.moveSpeed)
   }
 
-  const svgWrapper = (content, w, h, frameNo) => `<svg x="0px" y="0px" width="100%" height="${100 / frameNo}%" viewBox="0 0 ${w} ${h}">${content}</svg>`
+  const svgWrapper = ({ content, w, h, frameWidth, spriteNo }) => `<svg x="0px" y="0px" width="${frameWidth}%" height="${100 / spriteNo}%" viewBox="0 0 ${w} ${h}">${content}</svg>`
   
-  const mapPenguinAssets = () => Object.keys(directions).map(dir => svgWrapper(decode(penguinSvg[dir]), 240, 48, 5)).join('')
+  const mapPenguinAssets = () => Object.keys(directions).map(dir => {
+    return dir === 'turn' 
+      ? svgWrapper({
+        content: decode(penguinSvg[dir]), 
+        w: 384, h: 48, 
+        frameWidth: 100, 
+        spriteNo
+      })
+      : svgWrapper({
+        content: decode(penguinSvg[dir]), 
+        w: 240, h: 48, 
+        frameWidth: (100 / 8) * 5, 
+        spriteNo
+      })
+  }).join('')
 
   const createPenguin = (x, y) =>{
     const penguin = document.createElement('div')
@@ -247,7 +291,11 @@ function init() {
     }
     star = document.createElement('div')
     star.classList.add('star')
-    star.innerHTML = svgWrapper(decode(starSvg), 16, 16, 1) 
+    star.innerHTML = svgWrapper({
+      content: decode(starSvg), 
+      w: 16, h: 16, 
+      frameWidth: 100, spriteNo: 1
+    }) 
     setPos(star, control.x - 8, control.y - 8)
     body.append(star)
   }
