@@ -114,7 +114,7 @@ a:hover { text-decoration: underline; }
   z-index: -10;
   image-rendering: pixelated;
   background-size: 30px; 
-  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAHhJREFUSEtjZBggwDhA9jKMWky3kB8N6tGgplkIYE1cs1/+/Q+zMVWcmSYJEMNQZEtpaTlRFoMcQG2fD36Lqe1rgokLOVlTM7gHl8UgX9I6dePNo7TMzzQpHIgp7kYtJiaUqKJmNKipEozEGDIa1MSEElXUDFhQAwDBuiQfjPZDHAAAAABJRU5ErkJggg==);
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAHlJREFUSEtjZBggwDhA9jKMWky3kB8N6oEP6tkv//0HuSJVnIkm0YHTULpbDLMQPcyp7XMMHw86i2EhQC2fE+1jmlsMs4DWQU4wVdMqkRHMo+g+p1kco/twwCymVRlKMKhHLaZWCIwGNbVCkqA5o0FNMIiopWDkBTUAjfAoH+hhPScAAAAASUVORK5CYII=);
   animation: forwards fade 10s;
 }
 
@@ -124,16 +124,21 @@ a:hover { text-decoration: underline; }
   100% {opacity: 0}
 }
 
+@keyframes fade_lighter {
+  0% {opacity: 0.1}
+  50% {opacity: 0.1}
+  100% {opacity: 0}
+}
+
 .jump_print {
   height: 30px;
-  width: 35px;
+  width: 36px;
   position: absolute;
   z-index: -10;
   image-rendering: pixelated;
-  background-size: 30px; 
-  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAHhJREFUSEtjZBggwDhA9jKMWky3kB8N6tGgplkIYE1cs1/+/Q+zMVWcmSYJEMNQZEtpaTlRFoMcQG2fD36Lqe1rgokLOVlTM7gHl8UgX9I6dePNo7TMzzQpHIgp7kYtJiaUqKJmNKipEozEGDIa1MSEElXUDFhQAwDBuiQfjPZDHAAAAABJRU5ErkJggg==);
-  animation: forwards fade 10s;
-  border: solid 1px hotpink;
+  background-size: 36px 30px; 
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAeCAYAAABE4bxTAAAAAXNSR0IArs4c6QAAAIlJREFUWEftlUsKwCAMRLWX6Al7qp6wl7DFhVICMg4ofhi3CcnzJah3kx0/GY8TEJqIDMkQMoDi9A7dT3hR0X/8Og+qB5UcGw0DYhsz1mJuyVzR0HCg3gDIYDKWDQnIKJOh9XfI3qD3kq/3DqEZpzhrbt+/rNZY6zz6t28NYOsJCBmWIRlCBlD8A3H7OB+ZtwSFAAAAAElFTkSuQmCC);
+  animation: forwards fade_lighter 10s;
 }
 
 .star{

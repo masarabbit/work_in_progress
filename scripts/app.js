@@ -12,7 +12,7 @@ function init() {
     side: `d 23 11eAeAaBaBeBnAkBaAaAbAaAaBaEkNnNnNnKnUnNnNnNkAuBnBnBnBnBnEnNnNnUnKaKaNaNaUaUaXaNaNbN"/D 69 12jAbAaAjBnAuAnEaAaAbAbAaEkNkUnKnNuNuAuAuBnAnw7aAaAbEkNnKuNnUaUnAxKaNaUbUaIaKaNbN"/D 117 12W6AaAaAaAeAaBxEbAaAeAaBiNuNnUnUW-6AnAnBnw6aBaAaAaBkUiNnUbNaKnAxKaNaNbNaUaw-6aNaNaN"/D 168 12gAbAaBaAaAeBxAnBaAbAaBaEkNnUnKnNnNnNxAnAnAnAnAnBnGnKnAxKaNaNaNaNaNaNaNaXaNaUbN"/D 216 12gAbAaBbAbBkAnEaAbAaAaAaBxNuXnUnNiAnAnAnAnAnAnEaBuNuUaNaNnAxUaNaNbNaNaNaNaNaKaUaNaN"/F 24 16aBnU"/F 71 16aBnU"/F 119 16aBnU"/F 168 16aBnU"/F 216 16aBnU"/F 24 20eAaAaAaBaEaGnAnAkAW-6NkUnNaUaUaUaUaUbN"/F 73 21bAbAaEaBaBnAnAuAuAuAkNnNnw-7aNaUbNbN"/F 118 21W6BaBaAaGnBuAuAiNnUnw-6aUaNaN"/F 168 21gAaAaAaEaGnBnAW-7NiIaUaNaNaNaNaN"/F 216 21jAaBaw7nAnAnAkNiNnUnKaNaNaNaNaNaN"/D 126 31bBxNbN"/D 76 32gBxU"/D 211 32aAnN"/D 163 33gBxU"/D 212 33eAkN"/D 19 34bAeBiK"/D 27 34gBnAkK"/D 170 34gGuNnNnU"/D 218 34eAaBkNnU"/`,
     dDown: `d 23 12eAbAaAaGaGaAaAaAaAaEkNnUnKnUnNnAnNnNxAnAnAnGnBnAnEnNxUaUaUaNaNaNaUaXaUaNaNbN"/D 168 12eAbAaAaBaw6aAaBaAaAaBxNnKnKnNnNnAnNnNiAnAnBnBnBnGnNnUkKaNaNbNaNaNaUaUaUaNaNbN"/D 215 12jAbBaw7aBbBbBaBxNnKnKnNuNnNxAnAnAnAnBnGnGuNnKaKaNuAxNnNaNaNbNbNbNaNaUaUaNaNaN"/D 68 13W6AaAaAaBaEaAaAaAeAaBiNnNnUnNnNnAuNxAnAnJnBnAnAW-6KaNaNaNaNaNaNaIaKaNaN"/D 115 13jAbAaAnBaUaAaBaBeAeAaBW-6UnNnNnNuAkNnAuAnBnGnEnAuAkXaNaUaNaNaNnIaKaNbN"/F 21 16aBnU"/F 122 16aBnU"/F 215 16aBnU"/F 75 17aBnU"/F 167 17aAnN"/F 68 18aBnU"/F 114 18aBnU"/F 173 18aAnN"/F 22 20gAaAaNaAaBaEaBaAnBnAnAkAnAxNuAnNuNnXaNaUaXaNaNaN"/F 118 20aAeNbAaAaAaBaJnBuAnAnAuAxNkNnw-6aXaUaNbN"/F 165 20jAaAaNaAaAaEaw6nAnAkAiNiUnXaUaUaUaNaN"/F 215 20gAaAbAaEaw6nAnAn3XaXaUaNaNaNaN"/F 69 21gAbNaAaAaBaAaJnAuAnBuAxNnAnNuUnKaUaIaNaN"/D 77 32aAaBkUaN"/D 125 32eEkNnNaN"/D 160 32aAnN"/D 27 34eAaBxK"/D 163 34eAaBkNnU"/D 171 34eAaBkNnU"/D 211 34gBxU"/D 219 34bAbBnAkX"/D 20 35bAaBnAuX"/D 69 35aAbBuAuKaN"/D 116 35aAbAaAnAkX"/`,
     down: `d 22 11eAbBaBaEaBaAaAaAbAaEiUnUnUnNnNuAnAnNnNuAnBnBnBnAnAuAuXaNaNaNaNaNaXaUaUaNbN"/D 68 12jAaAaBaEaAaAaAbAaAbBiNnUnUnNuNnAnBuUuAnAnBnEnAnAuAuKaUaNaNaNaNaIaUaNaN"/D 167 12eAbAaBaJaAaBaAbAaAaBiNnNnKnKuNnAnAnNnNuAuBnBnBuAkNnNaNaNbNaNaNaUaKaUaNbN"/D 115 13W6AaAaBaEaBbAbAbAaAaAnAxNuNnUnNnNnNkBnNnNnAuBnBnBnAxKaNaNaNaNaXaKaNaN"/D 215 13gAbBaGaEaAbAaAaGxNnNnKnUnNnNnAnAnNnNuAnAnBnBnAnAxUaUaNbNaNaKaKaNaNbN"/F 19 16aBnU"/F 26 16aBnU"/F 73 16aBnU"/F 165 16aBnU"/F 67 17aBnU"/F 120 17aAnN"/F 171 17aBnU"/F 213 17aBnU"/F 114 18aAnN"/F 219 18aBnU"/F 73 19aAbAaBaBaw6nAnAkAW-7NnNnUnKaKaUaNaNbBbUaN"/F 20 20bAaAaNaNbAaAaBaBaBaEnAnAnAnAW-7NuNnNnNnXaUaUaUaN"/F 165 20bAaAaNaNaAbEaEaw6nAxNkNxNnNnIaUaUbN"/F 116 21aAaAaUeAaAaAaBaw6nAxAW-6NnNnNnIaUaUbN"/F 213 21bAaAaNaNaAaAaBaEaJnAW-6NkNkNnXaUaUaNaN"/D 77 32aExUeN"/D 163 32bAaBxUaN"/D 211 32bAaAxNaN"/D 122 33eAkN"/D 19 34bAaBxUaN"/D 28 34aAaBnAkKbN"/D 67 34bAaBkK"/D 116 34bAaBnAuNnUaN"/D 171 34bEkUaN"/D 218 34bAaEkX"/`,
-    turn: `d 357 11eAbAaAaBaAbNaNbNeAnAnAnAnAnAnAnEnUnUnUnNkAnNuAnAnGnAnUuNnNuNnNnNnNeAbAeNaUaUaNbN"/D 22 12eAbAaBaEaAaAeAbAaAxAuw6nBnAnBnUW-6AnAnAnUaNnNnNnKnAnAuNaUaUaNaUaXnNnNbNaNaNaNbN"/D 309 13gAaAaAnAaNaBaBeAeAbAaAiNxNnNnUkAnNxAnBnAiAxNaNbNbNeNaNaUaUbN"/D 68 14jAbAaBaEaw6aBaAaAnAnAuBnBuNaUnInNnUnUnNnNiNuNbNaNaUaNaN"/D 115 14W6AaAaEaBaBaAaAaAbAaAkAaAuAuAuAaAnAnNnNaUaUaNnKnNnNuNuAnAnUuGnw6nAnw-7aKaw-6aNaNaN"/D 165 14gAbBaBaGbAeAaAbBxNkAaBnNnKnUnNuNuAnNuAnAnBnGnUuAxNaNbNaNaNaUaKaUaUbN"/F 355 14aAnN"/F 361 14aAnN"/F 19 16aAnN"/F 308 16aAnN"/F 314 16aAnN"/D 213 17jAaAaBaBaAaAaAgAnAuAkNnNnNuNkAnNuAuBnAxAkNaNbNbNaNaKaUaUbN"/F 356 17bAaNeAaBaBaBaAaEnAnAxNkAxNnNnKaUaXaNaN"/F 69 19aAnN"/F 163 19aAnN"/F 169 19aAnN"/F 307 19gAaNeBaAaBaBaBnAnAiNuAW-6NnUaUaKaUaN"/F 113 20aAnN"/F 119 20aAnN"/D 260 20W6AaAaAaBaAeNbNaBnAnAnAuAnUnNuNxAnNxAnAnBkNnNnNnUaAbAbNaNaUaNaNaN"/F 65 22gAaAaBaBaAaJW-8NnUnw-7aU"/F 113 22bBaNaNbAbAaAaEaAnBnAkAnAxNnNnw-6aX"/F 164 22bAaNbAbAaBaEaAaBnAnAxNkAiNnNnNaNaXaUaNaN"/F 211 22aAnN"/F 217 22aAnN"/F 259 24aAnN"/F 266 24aAnN"/F 212 25bAaNeAbAaAaAaAaEnAuAW-8AxNnNnXaNaNaUbN"/D 63 26aGuAuNaNaUaN"/F 258 26gAaNgAbAaBaAaEnAnAn4NnNnKaNaUaNaN"/D 353 29aBnAuUbN"/D 365 29aAbBuNnU"/D 159 30aAnN"/D 306 30aBuNaN"/D 315 30aAaAkNaN"/D 68 34aBnAnNnNbN"/D 115 34aBnAnUaN"/D 163 34aBaAkNaU"/D 170 34aBaAkNaU"/D 218 35bAnAuNaN"/D 210 36eAkN"/D 258 36eAkN"/D 266 36eAkN"/`
+    turn: `d 356 11jAaAaAaBbNaNaNaNbEnBnBnAnAnBnNnUnUnNuAnAnNnNnAnBnBnAnUnNnNnNnNnNnKbAbAaAbNaUaNaN"/D 23 12gAbAaBaAbBuEaBaAaBaBaEuNnUnEnAnBaBuNnNnNiBuUnNnUnw-6uNxUbNeNbNaNaKaNaNaN"/D 309 13jAaAaBaAaAaAbAbAbBnAkNuNuNnNnUuAnAnNnNkAnBnAkAuAuNnUaNbNbNbNbUaUbN"/D 71 14jAaAaBaAbAaBW-7AnAnBnBnAnw6aBkUnUuNuUaNaUaKaKaKaUaNaN"/D 120 14jAaAaAaEaGaEaw6uNnw-6nKnNnBnNnNuAuAnAnEnAaBaBaBuNnUnNuNuNaNkNaUbNaNbUaKaUaNbN"/D 167 14gAbBaBaEaAaAaAbAaAaBxNkUnUnNnNnAnAnNnNnAuAnBnAkAnAkNnUbNaNaNbNaNaUaUaUbN"/F 355 14aBnU"/F 361 14aBnU"/F 308 16aBnU"/F 314 16aBnU"/D 214 17W6AaAaEaBaAaAbAeBnAiNnNnUnNkAnAnNnNuAnAnAnAxNuUgNaNaNaUaUaNaN"/F 356 17aAaAaNaNbAaBaBaAaBaEnAuAkNkAkNkNnKaUaNaUaUaN"/F 74 18aBnU"/F 166 18aBnU"/F 172 18aBnU"/F 119 19aBnU"/F 126 19aBnU"/F 307 19eAaAaNaNbBaAaBaBaBnAnAiNuAW-6NnUaUaKaUaN"/D 260 20W6AaAaAaAaBbAgBnAnAuNuUnNuNkAuNxAnAnBuAuNuNnUgNeUaUaNbN"/F 213 21aBnU"/F 219 21aBnU"/F 75 22gBaw7nBnAW-8IaNaUaUaNaN"/F 121 22bAaAaUaAaEaw6nAnAxNnNkNnUnNaKaNaNbN"/F 167 22aAaAaNaNaAaAaBaBaAaEnAnAiNkAxNnNnXaNaNaUaNbN"/F 259 24bAuN"/F 265 24bAuN"/D 80 25aAaBaBaAnAnNnNnI"/F 213 25bAaAaNaNeAaBaAaAaGnAn3NuNnKaNaNaNaNaN"/F 258 26gAbNeAbAaBaAaEnAnAn4NnNnKaNaUaNaN"/D 353 29bBnAkUbN"/D 364 29bAbBkNnU"/D 306 30bBnAuUaN"/D 314 30bAaBuNnU"/D 75 34bAaBkK"/D 124 34bAaBuNnU"/D 164 34bEkUaN"/D 171 34bAaBkK"/D 211 35eBxNaN"/D 219 35eAaAxU"/D 258 36eAkN"/D 266 36eAkN"/`
   }
 
   const starSvg = 'd 7 0bBaBaAjBnAnAnBaBaBkNnNuNuAuAnAkUaUaUnNnNnUjNaUaU"/'
@@ -22,7 +22,7 @@ function init() {
     //// sprite sheet frames are ordered left to right
     walk: [0, 1, 2, 1, 3, 4],
     stop: [0],
-    celebrate: [5, 6, 7, 6],
+    celebrate: [4, 5, 6, 7, 6],
     turnFromup: [0, 1, 2, 3, 4],
     turnFromdUp: [1, 2, 3, 4],
     turnFromside: [2, 3, 4],
@@ -102,7 +102,7 @@ function init() {
   }
 
   const randomDirection = () =>{
-    return turnDirections[Math.floor(Math.random() * turnDirections.length)]
+    return turnDirections.filter(t => t !== 'turn')[Math.floor(Math.random() * turnDirections.length - 1)]
   }
 
   const penguinData = { 
@@ -179,6 +179,8 @@ function init() {
     body.append(mark)
     setTimeout(()=> body.removeChild(mark), 10000)
   }
+
+  const randomBlur = () => (Math.random() * 5) - (Math.random() * 5)
 
   const createJumpMark = penguin =>{
     const { left, top } = penguin.childNodes[1].childNodes[3].childNodes[1].getBoundingClientRect()
