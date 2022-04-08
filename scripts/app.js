@@ -18,12 +18,12 @@ function init() {
   const animationFrames = {
     walk: [0, 1, 2, 1, 3, 4],
     stop: [0],
-    celebrate: [3, 4, 5, 6, 7, 6],
-    turnFromup: [0, 1, 2, 3],
-    turnFromdUp: [1, 2, 3],
-    turnFromside: [2, 3],
-    turnFromdDown: [3],
-    turnFromdown: [],
+    celebrate: [5, 6, 7, 6, 3, 4],
+    turnFromup: [0, 1, 2, 3, 4],
+    turnFromdUp: [1, 2, 3, 4],
+    turnFromside: [2, 3, 4],
+    turnFromdDown: [3, 4],
+    turnFromdown: [4],
   }
   const cellSize = 96
   const directions = {
