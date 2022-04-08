@@ -145,13 +145,25 @@ a:hover { text-decoration: underline; }
   position: absolute;
   width: 16px;
   height: 16px;
-  z-index: -20;
+  overflow: hidden;
+  z-index: 20;
+}
+
+.star_sprite {
+  position: absolute;
+  height: 100%;
+  width: calc(4 * 16px);
+  pointer-events: none;
 }
 
 .star svg {
-  animation: infinite twinkle 1s;
   fill: rgb(148, 234, 255)
 }
+
+.star.twinkle {
+  animation: infinite twinkle 1s;
+}
+
 
 @keyframes twinkle {
   0% { transform: scale(1); }

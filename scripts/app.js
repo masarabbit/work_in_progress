@@ -1,8 +1,5 @@
 function init() {
 
-  //TODO note that sprite differs to the one saved in assets (frames are the other way round)
-  // TODO add sprite for jump_print, and clean the sprite for penguin jumping. currently too jagged
-
   const decodeRef = { a: ' h 1', b: ' h 2', e: ' h 3', g: ' h 4', j: ' h 5', A: ' v 1', B: ' v 2', E: ' v 3', G: ' v 4', J: ' v 5', n: 'h -1', u: ' h -2', k: ' h -3', x: ' h -4', i: ' h -5', N: ' v -1', U: ' v -2', K: ' v -3', X: ' v -4', I: ' v -5', w: ' v ', W: ' h ', D: '<path d="M', o: '<path fill="pink" d="M', F: '<path fill="#fff" d="M', '/': '/>', d: '<path d="M', f: '<path fill="#fff" d="M'}
   const decode = arr => arr.split('').map(c=> !decodeRef[c] ? c : decodeRef[c]).join('')
 
@@ -15,19 +12,18 @@ function init() {
     turn: `d 356 11jAaAaAaBbNaNaNaNbEnBnBnAnAnBnNnUnUnNuAnAnNnNnAnBnBnAnUnNnNnNnNnNnKbAbAaAbNaUaNaN"/D 23 12gAbAaBaAbBuEaBaAaBaBaEuNnUnEnAnBaBuNnNnNiBuUnNnUnw-6uNxUbNeNbNaNaKaNaNaN"/D 309 13jAaAaBaAaAaAbAbAbBnAkNuNuNnNnUuAnAnNnNkAnBnAkAuAuNnUaNbNbNbNbUaUbN"/D 71 14jAaAaBaAbAaBW-7AnAnBnBnAnw6aBkUnUuNuUaNaUaKaKaKaUaNaN"/D 120 14jAaAaAaEaGaEaw6uNnw-6nKnNnBnNnNuAuAnAnEnAaBaBaBuNnUnNuNuNaNkNaUbNaNbUaKaUaNbN"/D 167 14gAbBaBaEaAaAaAbAaAaBxNkUnUnNnNnAnAnNnNnAuAnBnAkAnAkNnUbNaNaNbNaNaUaUaUbN"/F 355 14aBnU"/F 361 14aBnU"/F 308 16aBnU"/F 314 16aBnU"/D 214 17W6AaAaEaBaAaAbAeBnAiNnNnUnNkAnAnNnNuAnAnAnAxNuUgNaNaNaUaUaNaN"/F 356 17aAaAaNaNbAaBaBaAaBaEnAuAkNkAkNkNnKaUaNaUaUaN"/F 74 18aBnU"/F 166 18aBnU"/F 172 18aBnU"/F 119 19aBnU"/F 126 19aBnU"/F 307 19eAaAaNaNbBaAaBaBaBnAnAiNuAW-6NnUaUaKaUaN"/D 260 20W6AaAaAaAaBbAgBnAnAuNuUnNuNkAuNxAnAnBuAuNuNnUgNeUaUaNbN"/F 213 21aBnU"/F 219 21aBnU"/F 75 22gBaw7nBnAW-8IaNaUaUaNaN"/F 121 22bAaAaUaAaEaw6nAnAxNnNkNnUnNaKaNaNbN"/F 167 22aAaAaNaNaAaAaBaBaAaEnAnAiNkAxNnNnXaNaNaUaNbN"/F 259 24bAuN"/F 265 24bAuN"/D 80 25aAaBaBaAnAnNnNnI"/F 213 25bAaAaNaNeAaBaAaAaGnAn3NuNnKaNaNaNaNaN"/F 258 26gAbNeAbAaBaAaEnAnAn4NnNnKaNaUaNaN"/D 353 29bBnAkUbN"/D 364 29bAbBkNnU"/D 306 30bBnAuUaN"/D 314 30bAaBuNnU"/D 75 34bAaBkK"/D 124 34bAaBuNnU"/D 164 34bEkUaN"/D 171 34bAaBkK"/D 211 35eBxNaN"/D 219 35eAaAxU"/D 258 36eAkN"/D 266 36eAkN"/`
   }
 
-  const starSvg = 'd 7 0bBaBaAjBnAnAnBaBaBkNnNuNuAuAnAkUaUaUnNnNnUjNaUaU"/'
+  const starSvg = `d 7 0bBaBaAjAeUaNaEbAaAkBnAnKuNuAnAnBaBaBkNnNuNuAuAnAkUaUaUnNnNnUjNaUaU"/D 27 1aEbAaAkBnAnKuNnNeUaN"/D 44 1aBaAaAuAnAnUnNnNbNaN"/D 60 1aBbAuBnUuNbU"/D 35 4aBaAaAuAnAnUnNnNbNaN"/D 50 4aBbAuBnUuNbU"/D 24 8aEbAaAkBnAnKuNnNeUaN"/D 41 10aBaAaAuAnAnUnNnNbNaN"/D 57 11aBbAuBnUuNbU"/`
 
   const body = document.querySelector('.wrapper')
   const animationFrames = {
-    //// sprite sheet frames are ordered left to right
     walk: [0, 1, 2, 1, 3, 4],
     stop: [0],
-    celebrate: [4, 5, 6, 7, 6],
-    turnFromup: [0, 1, 2, 3, 4],
-    turnFromdUp: [1, 2, 3, 4],
-    turnFromside: [2, 3, 4],
-    turnFromdDown: [3, 4],
-    turnFromdown: [4],
+    celebrate: [3, 4, 5, 6, 7, 6],
+    turnFromup: [0, 1, 2, 3],
+    turnFromdUp: [1, 2, 3],
+    turnFromside: [2, 3],
+    turnFromdDown: [3],
+    turnFromdown: [],
   }
   const cellSize = 96
   const directions = {
@@ -69,6 +65,7 @@ function init() {
   }
   const distance = 10
   let star
+  let starInterval
 
   const setPos = (target, x, y) =>{
     target.style.left = `${x}px`
@@ -138,6 +135,18 @@ function init() {
     return nearestN(adjustedAngle, 45)
   }
 
+  const animateSvg = ({ target, start, end, interval, speed }) => {
+    const startFrame = start || 0
+    let i = startFrame
+    clearInterval(interval)
+    interval = setInterval(()=> {
+      target.style.marginLeft = `${-(i * 100)}%`
+      i = i >= end
+        ? startFrame
+        : i + 1
+    }, speed || 100)
+  }
+
   const changeAnimation = animation => {
     penguinData.frame = 0
     penguinData.animation = animation
@@ -180,14 +189,14 @@ function init() {
     setTimeout(()=> body.removeChild(mark), 10000)
   }
 
-  const randomBlur = () => (Math.random() * 5) - (Math.random() * 5)
+  // const randomBlur = () => (Math.random() * 5) - (Math.random() * 5)
 
   const createJumpMark = penguin =>{
     const { left, top } = penguin.childNodes[1].childNodes[3].childNodes[1].getBoundingClientRect()
     const mark = document.createElement('div')
     mark.className = 'jump_print'
-    // console.log(penguin.childNodes[1].childNodes[3].childNodes[1])
-    setPos(mark, left, top + 40)
+
+    setPos(mark, left + 2, top + 38)
     body.append(mark)
     setTimeout(()=> body.removeChild(mark), 10000)
   }
@@ -220,14 +229,23 @@ function init() {
       x === penguinData.marginPos.x && y === penguinData.marginPos.y || 
       overlap(control.x, penguinData.pos.x) && overlap(control.y, penguinData.pos.y)
     ){
-      // console.log('turnFrom' + sprites[dir])
+      checkBoundaryAndUpdatePenguinPos(control.x, control.y, penguin, penguinData)
       stopPenguin('turnFrom' + sprites[dir])
       penguinData.direction = 'turn'
       setTimeout(()=>{
         stopPenguin('celebrate')
       }, 100 * animationFrames['turnFrom' + sprites[dir]].length)
-      body.removeChild(star)
-      star = null
+      star.classList.remove('twinkle')
+      animateSvg({ 
+        target: star.childNodes[1],
+        end: 3, 
+        interval: starInterval,
+      })
+      setTimeout(()=>{
+        clearInterval(starInterval)
+        body.removeChild(star)
+        star = null
+      }, 400)
     } 
     
     checkBoundaryAndUpdatePenguinPos(x, y, penguin, penguinData)
@@ -292,12 +310,15 @@ function init() {
       star = null
     }
     star = document.createElement('div')
-    star.classList.add('star')
-    star.innerHTML = svgWrapper({
-      content: decode(starSvg), 
-      w: 16, h: 16, 
-      frameWidth: 100, spriteNo: 1
-    }) 
+    star.className = ('star twinkle')
+    star.innerHTML = `
+    <div class="star_sprite">
+      ${svgWrapper({
+        content: decode(starSvg), 
+        w: 64, h: 16, 
+        frameWidth: 100, spriteNo: 1
+      })}
+    </div>`
     setPos(star, control.x - 8, control.y - 8)
     body.append(star)
   }
