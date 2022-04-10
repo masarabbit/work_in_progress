@@ -201,6 +201,11 @@ function init() {
     setTimeout(()=> body.removeChild(mark), 10000)
   }
   
+　const touchedTheStar = (x, y) =>{
+  return x === penguinData.marginPos.x && y === penguinData.marginPos.y || 
+  overlap(control.x, penguinData.pos.x) && overlap(control.y, penguinData.pos.y)
+}
+
   const moveAbout = penguin =>{
     const penguinDir = +reverseDirectionConversions()[penguinData.direction]
     const angle = clickedAngle()
@@ -225,15 +230,14 @@ function init() {
     if (dir !== 'up' && dir !== 'down') x += (dir.includes('left')) ? -distance : distance
     if (dir !== 'left' && dir !== 'right') y += (dir.includes('up')) ? -distance : distance
 
-    if (
-      x === penguinData.marginPos.x && y === penguinData.marginPos.y || 
-      overlap(control.x, penguinData.pos.x) && overlap(control.y, penguinData.pos.y)
-    ){
+    if (touchedTheStar(x, y)){
       checkBoundaryAndUpdatePenguinPos(control.x, control.y, penguin, penguinData)
       stopPenguin('turnFrom' + sprites[dir])
       penguinData.direction = 'turn'
       setTimeout(()=>{
-        stopPenguin('celebrate')
+        if (penguinData.direction === 'turn') {
+          stopPenguin('celebrate')
+        }
       }, 100 * animationFrames['turnFrom' + sprites[dir]].length)
       star.classList.remove('twinkle')
       animateSvg({ 
@@ -242,9 +246,11 @@ function init() {
         interval: starInterval,
       })
       setTimeout(()=>{
-        clearInterval(starInterval)
-        body.removeChild(star)
-        star = null
+        if (touchedTheStar(x, y)) {
+          clearInterval(starInterval)
+          body.removeChild(star)
+          star = null
+        }
       }, 400)
     } 
     
