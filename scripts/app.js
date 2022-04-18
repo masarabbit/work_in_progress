@@ -196,7 +196,7 @@ function init() {
     const mark = document.createElement('div')
     mark.className = 'jump_print'
 
-    setPos(mark, left + 1, top + 34)
+    setPos(mark, left + 1, top + 33)
     body.append(mark)
     setTimeout(()=> body.removeChild(mark), 10000)
   }

@@ -84,13 +84,6 @@ svg {
   /* border: red 1px solid; */
 }
 
-/* need to flip because the parent divs are flipped */
-.facing_upleft .hit_area,
-.facing_left .hit_area,
-.facing_downleft .hit_area {
-  transform: scale(-1 , 1);
-}
-
 .sign {
   position: fixed;
   font-family: Arial, Helvetica, sans-serif;
@@ -164,7 +157,6 @@ a:hover { text-decoration: underline; }
 .star.twinkle {
   animation: infinite twinkle 1s;
 }
-
 
 @keyframes twinkle {
   0% { transform: scale(1); }
