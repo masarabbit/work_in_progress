@@ -55,9 +55,11 @@ function init() {
     const bot = document.createElement('div')
     bot.classList.add('bot_wrapper')
     bot.innerHTML = '<div><div class="bot"></div></div>'
+    bot.setAttribute('time', 99)
     body.appendChild(bot)
     bots.push({...botData})
     const data = bots[bots.length - 1]
+    data.bot = bot
     data.x = x
     data.y = y
     setMargin(bot, x, y)
@@ -82,6 +84,12 @@ function init() {
     changeAnimation(animation)
     data.stop = true
   }
+
+  setInterval(()=>{
+    bots.forEach(bot =>{
+      bot.bot.setAttribute('time', +bot.bot.getAttribute('time') - 1)
+    })
+  }, 1000)
 
 
 }
