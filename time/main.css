@@ -45,6 +45,18 @@ body {
   filter: brightness(0);
 }
 
+.bot_wrapper.hunter > div {
+  filter: hue-rotate(155deg) brightness(10); /* cyan */
+}
+
+.bot_wrapper.flee > div {
+  filter: hue-rotate(5deg) brightness(20); /* red */
+}
+
+.bot_wrapper.hunter::after {
+  color: black;
+}
+
 .bot_wrapper::after {
   position: absolute;
   top: 0px;
@@ -59,11 +71,20 @@ body {
   height: calc(16px * 2);
 }
 
+.bot_wrapper::before {
+  position: absolute;
+  content: attr(index);
+  z-index: 2;
+  color: hotpink;
+}
+
 .bot_wrapper {
+  position: absolute;
   width: calc(16px * 2);
   height: calc(16px * 2);
   overflow: hidden;
   /* background-color: hotpink; */
+  transition: 1s;
 }
 
 .flip { 
