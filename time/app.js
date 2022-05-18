@@ -1,8 +1,10 @@
 function init() {  
 
   // TODO add move about
+  // TODO add number display (do with before?)
 
   const body = document.querySelector('.wrapper')
+  const bots = []
   const botData = {
     interval: null,
     x: 0,
@@ -26,9 +28,8 @@ function init() {
     // turnFromdown: [4],
   }
 
-  const setMargin = (target, x, y) =>{
-    target.style.transform = `translate(${x}px, ${y}px)`
-  }
+  const setMargin = (target, x, y) => target.style.transform = `translate(${x}px, ${y}px)`
+  const randomP = max => Math.ceil(Math.random() * max)
 
   const startBot = (bot, data) =>{
     animate(bot, data)
@@ -37,10 +38,10 @@ function init() {
   
   const animate = (bot, data) =>{
     const { frame:i, animation, frameSpeed } = data
-    const sprite = bot.childNodes[0]
+    const sprite = bot.childNodes[0].childNodes[0]
     const frame = animationFrames[animation][i].split('-')
     setMargin(sprite, `-${frame[1] * cellD}`, 0)
-    bot.classList[frame[0] === 'n' ? 'remove' : 'add']('flip')
+    bot.childNodes[0].classList[frame[0] === 'n' ? 'remove' : 'add']('flip')
     data.frame = i === animationFrames[animation].length - 1 ? 0 : i + 1
     data.frameTimer = setTimeout(()=> animate(bot, data), frameSpeed)
   }
@@ -50,21 +51,32 @@ function init() {
   }
 
 
-  const createBot = () =>{
+  const createBot = (x, y) =>{
     const bot = document.createElement('div')
     bot.classList.add('bot_wrapper')
-    bot.innerHTML = '<div class="bot"></div>'
+    bot.innerHTML = '<div><div class="bot"></div></div>'
     body.appendChild(bot)
-    console.log(bot.childNodes)
-    startBot(bot, botData)
+    bots.push({...botData})
+    const data = bots[bots.length - 1]
+    data.x = x
+    data.y = y
+    setMargin(bot, x, y)
+    startBot(bot, data)
   }
   
-  createBot()
+  new Array(5).fill('').map(()=>{
+    return [randomP(body.clientWidth - 100), randomP(body.clientHeight - 100)]
+  }).forEach( pos => {
+    createBot(pos[0], pos[1])
+  })
+
 
   const changeAnimation = (animation, data) => {
     data.frame = 0
     data.animation = animation
   }
+
+  // console.log(bots)
 
   const stopBot = (animation, data) =>{
     changeAnimation(animation)

@@ -33,13 +33,18 @@ body {
   image-rendering: pixelated;
   background-repeat: no-repeat !important;
   background-size: calc(48px * 2) calc(16px * 2) !important; 
+  /* color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px; */
 }
 
 .bot_wrapper {
   width: calc(16px * 2);
   height: calc(16px * 2);
   overflow: hidden;
-  background-color: hotpink;
+  /* background-color: hotpink; */
 }
 
 .flip { 
