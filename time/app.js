@@ -10,7 +10,7 @@ function init() {
   const botData = {
     interval: null,
     stop: true,
-    frameSpeed: 100,
+    frameSpeed: 200,
     animation: 'walk',
     frame: 0,
     frameTimer: null,
@@ -82,15 +82,15 @@ function init() {
     [400, 100],
   ]
   
-  // new Array(5).fill('').map(()=>{
-  //   return [randomN(body.clientWidth - 100), randomN(body.clientHeight - 100)]
-  // }).forEach( pos => {
-  //   createBot(pos[0], pos[1])
-  // })
-
-  testPos.forEach( pos => {
+  new Array(20).fill('').map(()=>{
+    return [randomN(body.clientWidth - 100), randomN(body.clientHeight - 100)]
+  }).forEach( pos => {
     createBot(pos[0], pos[1])
   })
+
+  // testPos.forEach( pos => {
+  //   createBot(pos[0], pos[1])
+  // })
 
 
   const changeAnimation = (animation, data) => {
@@ -108,8 +108,8 @@ function init() {
   
   const checkBoundaryAndUpdatePos = (x, y, data) =>{
     // TODO not working for some reason
-    const lowerLimit = -100 // buffer from window edge
-    const upperLimit = 100
+    const lowerLimit = -5 // buffer from window edge
+    const upperLimit = 0
     
     if (x > lowerLimit && x < (body.clientWidth - upperLimit)){
       data.xy.x = x
@@ -132,10 +132,11 @@ function init() {
           return {
             index,
             time: bot.time,
+            stop: bot.stop,
             distance: distanceBetween(b.pos, bot.pos)
           }
         })
-        const closestBot = bots[[...distances.filter(d => d.index !== i)].sort((a, b) => a.distance - b.distance )[0].index]
+        const closestBot = bots[[...distances.filter(d => d.index !== i && !d.stop)].sort((a, b) => a.distance - b.distance )[0].index]
         b.mode = b.time >= closestBot.time ? 'hunter' : 'flee'
         const seedDistance = randomN(20) + 10
         const distance = b.mode === 'hunter' ? seedDistance : -seedDistance

@@ -14,7 +14,7 @@ p, h1, h2, h3, h4 {
 }
 
 body {
-  background-color: rgb(105, 105, 105);
+  background-color: rgb(63, 60, 73);
   font-family: sans-serif;
 }
 
@@ -84,7 +84,7 @@ body {
   height: calc(16px * 2);
   overflow: hidden;
   /* background-color: hotpink; */
-  transition: 1s;
+  transition: 1.5s;
 }
 
 .flip { 
