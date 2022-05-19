@@ -1,7 +1,7 @@
 function init() {  
 
-  // TODO add way to absorb other bots when overlapped and time is higher.
-  // TODO when certain distance away from other all other bots, maybe stop motion
+  // TODO what to do with bot with zero?
+  // TODO add charging animation?
 
   const body = document.querySelector('.wrapper')
   const n = 16
@@ -21,17 +21,15 @@ function init() {
 
   const animationFrames = {
     walk: ['n-1', 'n-2', 'n-1', 'r-1', 'r-2', 'r-1'],
-    stop: ['n-0']
-    // stop: [0],
-    // celebrate: [5, 6, 7, 6, 3, 4],
-    // turnFromup: [0, 1, 2, 3, 4],
-    // turnFromdUp: [1, 2, 3, 4],
-    // turnFromside: [2, 3, 4],
-    // turnFromdDown: [3, 4],
-    // turnFromdown: [4],
+    stop: ['n-0'],
+    break: ['n-3', 'n-4', 'n-5']
   }
 
-  const setMargin = (target, x, y) => target.style.transform = `translate(${x}px, ${y}px)`
+  const setMargin = (target, x, y) => {
+    target.style.transform = `translate(${x}px, ${y}px)`
+    target.style.zIndex = y
+  }
+
   const randomN = max => Math.ceil(Math.random() * max)
 
   const startBot = (bot, data) =>{
@@ -50,9 +48,9 @@ function init() {
     data.frameTimer = setTimeout(()=> animate(bot, data), frameSpeed)
   }
 
-  const randomDirection = () =>{
-    return turnDirections.filter(t => t !== 'turn')[Math.floor(Math.random() * turnDirections.length - 1)]
-  }
+  // const randomDirection = () =>{
+  //   return turnDirections.filter(t => t !== 'turn')[Math.floor(Math.random() * turnDirections.length - 1)]
+  // }
 
 
   const createBot = (x, y) =>{
@@ -63,6 +61,7 @@ function init() {
     bots.push({...botData})
     const data = bots[bots.length - 1]
     data.time = randomN(defaultTime)
+    if (data.time < 30) data.time = 30
     data.bot = bot
     data.xy = { x, y }
     data.pos = {
@@ -75,14 +74,14 @@ function init() {
     startBot(bot, data)
   }
 
-  const testPos = [
-    [100, 100],
-    [250, 250],
-    [300, 100],
-    [400, 100],
-  ]
+  // const testPos = [
+  //   [100, 100],
+  //   [250, 250],
+  //   [300, 100],
+  //   [400, 100],
+  // ]
   
-  new Array(20).fill('').map(()=>{
+  new Array(40).fill('').map(()=>{
     return [randomN(body.clientWidth - 100), randomN(body.clientHeight - 100)]
   }).forEach( pos => {
     createBot(pos[0], pos[1])
@@ -103,26 +102,51 @@ function init() {
   const stopBot = (animation, data) =>{
     changeAnimation(animation, data)
     data.stop = true
+    data.bot.className = 'bot_wrapper'
     clearTimeout(data.frameTimer)
   }
   
   const checkBoundaryAndUpdatePos = (x, y, data) =>{
-    // TODO not working for some reason
-    const lowerLimit = -5 // buffer from window edge
-    const upperLimit = 0
+    const buffer = 50
     
-    if (x > lowerLimit && x < (body.clientWidth - upperLimit)){
+    if (x > buffer && x < (body.clientWidth - buffer)){
       data.xy.x = x
     } 
-    if (y > lowerLimit && y < (body.clientHeight - upperLimit)){
+    if (y > buffer && y < (body.clientHeight - buffer)){
       data.xy.y = y
     }
     setMargin(data.bot, data.xy.x, data.xy.y)
   }
 
+  // const overlap = (a, b) =>{
+  //   const buffer = 20
+  //   return Math.abs(a - b) < buffer
+  // }
+
 
   const distanceBetween = (a, b) =>{
     return Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2))
+  }
+
+  const displayTimeAdded = (b, closestBot) =>{
+    const timeAdded = document.createElement('div')
+    timeAdded.classList.add('added')
+    body.append(timeAdded)
+    setMargin(timeAdded, b.xy.x, b.xy.y - 20)
+    setTimeout(()=>{
+      setMargin(timeAdded, b.xy.x, b.xy.y - 40)
+    }, 10)
+    setTimeout(()=>{
+      body.removeChild(timeAdded)
+    }, 1000)
+    timeAdded.innerHTML = `+${closestBot.time}`
+  }
+
+  const updateBotTime = (b, closestBot) =>{
+    b.time = b.time + closestBot.time
+    closestBot.time = 0
+    b.bot.setAttribute('time', b.time)
+    closestBot.bot.setAttribute('time', closestBot.time)
   }
 
   const moveBots = () =>{
@@ -136,21 +160,42 @@ function init() {
             distance: distanceBetween(b.pos, bot.pos)
           }
         })
-        const closestBot = bots[[...distances.filter(d => d.index !== i && !d.stop)].sort((a, b) => a.distance - b.distance )[0].index]
+        const closestBotData = [...distances.filter(d => d.index !== i && !d.stop)].sort((a, b) => a.distance - b.distance )[0]
+        const closestBot = bots[closestBotData.index]
         b.mode = b.time >= closestBot.time ? 'hunter' : 'flee'
-        const seedDistance = randomN(20) + 10
-        const distance = b.mode === 'hunter' ? seedDistance : -seedDistance
-        const xy = {
-          x: b.xy.x > closestBot.xy.x ? b.xy.x - distance : b.xy.x + distance,
-          y: b.xy.y > closestBot.xy.y ? b.xy.y - distance : b.xy.y + distance
-        }
-  
-        checkBoundaryAndUpdatePos(xy.x, xy.y, b)
-        // setMargin(b.bot, b.xy.x, b.xy.y)
-        // const { xy: { x, y } } = b
-        b.pos = {
-          x: b.xy.x + n,
-          y: b.xy.y + n,
+        
+        // fleeing bot rests if there are no bots nearby
+        if (b.mode === 'flee' && closestBotData.distance > 200) {
+          b.mode = 'charging'
+          b.bot.className = 'bot_wrapper'
+        
+        // if hunter bot finds bot nearby, destroy and steal time   
+        } else if (b.mode === 'hunter' && closestBotData.distance < 24) {
+          displayTimeAdded(b, closestBot)
+          updateBotTime(b, closestBot)
+      
+          changeAnimation('break', closestBot)
+          closestBot.frameSpeed = 100
+          setTimeout(()=>{
+            stopBot('stop', closestBot)
+            closestBot.bot.classList.add('fade')
+          }, closestBot.frameSpeed * 3)
+        
+        // else, move about
+        } else {
+          const seedDistance = randomN(20) + closestBotData.distance < 50 ? Math.round(randomN(b.time / 20)) : Math.round(randomN(b.time / 5))
+          const distance = b.mode === 'hunter' ? seedDistance : -seedDistance
+          const xy = {
+            x: b.xy.x > closestBot.xy.x ? b.xy.x - distance : b.xy.x + distance,
+            y: b.xy.y > closestBot.xy.y ? b.xy.y - distance : b.xy.y + distance
+          }
+    
+          checkBoundaryAndUpdatePos(xy.x, xy.y, b)
+          // const { xy: { x, y } } = b
+          b.pos = {
+            x: b.xy.x + n,
+            y: b.xy.y + n,
+          }
         }
       }
     })
@@ -158,12 +203,14 @@ function init() {
 
   setInterval(()=>{
     bots.forEach(bot =>{
-      if (!bot.stop) {
+      if (bot.mode === 'charging' && !bot.stop) {
+        bot.time++
+        bot.bot.setAttribute('time', bot.time)
+      } else if (!bot.stop) {
         bot.time--
         bot.bot.setAttribute('time', bot.time)
         if (bot.time <= 0) {
           stopBot('stop', bot)
-          console.log(bot.bot)
           bot.bot.className = 'bot_wrapper'
         }
       }

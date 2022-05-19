@@ -29,12 +29,12 @@ body {
 /* change colour with hue rotate */
 .bot {
   /* background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAQCAYAAABQrvyxAAAAAXNSR0IArs4c6QAAAH5JREFUSEtjZBjigHGIu59hKHngP1Jgw92N7gFkRfgihxiP4zOLavqp7QFKA4Bk/aMeQEtnJIcgpfpHY4DSEKRU/2gMUBqClOofSjEAciuokEBxM7YKBUMRUijhkwMpw1pb0lI/tT0A8wSumpZQAJCsf6h5AKN5Q0ybZFA3WAElEy4RpESwowAAAABJRU5ErkJggg==); */
-  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAQCAYAAABQrvyxAAAAAXNSR0IArs4c6QAAAIBJREFUSEvtVkEKwDAI0/8/usODzG3VgdpDwF5rxCSlkQn8MPj8BENgES0Vm+me+0HAFkXO2AZeXdSrE99KoCpABj8E7BPKKFjFjwNVBav4caCqYBUP44Bkh3wS7wz5JPGuSFWK7qTGS8uT+FYCSsJL2j8BMngoAru1BWaZ83auC2GOXBHszM11AAAAAElFTkSuQmCC);
-  width: calc(48px * 2);
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAQCAYAAADpunr5AAAAAXNSR0IArs4c6QAAARdJREFUWEftl+sOwyAIhfX9H7qLycycAc5xQNc29mfLRc8HYmvZz2kKHKUcc7J6WvabJ1LEW9Lv1gDGxddSIjYeFoOFAwFIBlLhMgJYsbL8NSEYgZCN9R35dg3TAXgBZvg32IxAyGYDGFpR66Crd4BymnxeZ1TgyhGWkT+qA6w7BOoey/drEGUI8G8ALf+vM4fx817uHgXAGnajUEjYuRCRvQfCowB4O1gDKB1jFpQVgBvAW3V0bV4RVbOV3t8GQK/C1cpjB6QHAOq8vmYIoBVDM7KueawAkp0Vu+fux4DXXxq+aG/WnLA64DIAvAAj/K0YHgDjfJiLgz2e0jsgQkDUJcyNQ4vBxGZs5jWwAOCPGLO5bROrwAvo3toHrg0C/AAAAABJRU5ErkJggg==);
+  width: calc(96px * 2);
   height: calc(16px * 2);
   image-rendering: pixelated;
   background-repeat: no-repeat !important;
-  background-size: calc(48px * 2) calc(16px * 2) !important; 
+  background-size: calc(96px * 2) calc(16px * 2) !important; 
   /* display: flex;
   align-items: center;
   justify-content: center;
@@ -43,6 +43,7 @@ body {
 
 .bot_wrapper > div {
   filter: brightness(0);
+  transition: filter 0.2s;
 }
 
 .bot_wrapper.hunter > div {
@@ -71,12 +72,12 @@ body {
   height: calc(16px * 2);
 }
 
-.bot_wrapper::before {
+/* .bot_wrapper::before {
   position: absolute;
   content: attr(index);
   z-index: 2;
   color: hotpink;
-}
+} */
 
 .bot_wrapper {
   position: absolute;
@@ -84,7 +85,7 @@ body {
   height: calc(16px * 2);
   overflow: hidden;
   /* background-color: hotpink; */
-  transition: 1.5s;
+  transition: 1s ease;
 }
 
 .flip { 
@@ -106,3 +107,44 @@ a {
 }
 
 a:hover { text-decoration: underline; }
+
+.fade {
+  animation: fade_away 0.5s forwards;
+}
+
+@keyframes fade_away {
+  0% {opacity: 1}
+  100% {opacity: 0}
+}
+
+.added {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: hotpink;
+  font-size: 14px;
+  transition: 1s;
+  animation: slow_fade 1s forwards;
+}
+
+@keyframes slow_fade {
+  0% {opacity: 1}
+  90% {opacity: 1}
+  100% {opacity: 0}
+}
+
+/* 
+@keyframes fade_up {
+  0% {opacity: 1}
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+} */
