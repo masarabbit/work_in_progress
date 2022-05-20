@@ -2,11 +2,13 @@ function init() {
 
   // TODO what to do with bot with zero?
   // TODO add charging animation?
+  // TODO maybe just change colour partially for hunter / flee
 
   const body = document.querySelector('.wrapper')
+  const indicator = document.querySelector('.indicator')
   const n = 16
   const defaultTime = 99
-  const bots = []
+  let bots = []
   const botData = {
     interval: null,
     stop: true,
@@ -161,7 +163,16 @@ function init() {
           }
         })
         const closestBotData = [...distances.filter(d => d.index !== i && !d.stop)].sort((a, b) => a.distance - b.distance )[0]
-        const closestBot = bots[closestBotData.index]
+        const closestBot = closestBotData && bots[closestBotData.index]
+        if (!closestBot) {
+          console.log('end')
+          new Array(40).fill('').map(()=>{
+            return [randomN(body.clientWidth - 100), randomN(body.clientHeight - 100)]
+          }).forEach( pos => {
+            createBot(pos[0], pos[1])
+          })
+          return
+        }
         b.mode = b.time >= closestBot.time ? 'hunter' : 'flee'
         
         // fleeing bot rests if there are no bots nearby
@@ -178,23 +189,28 @@ function init() {
           closestBot.frameSpeed = 100
           setTimeout(()=>{
             stopBot('stop', closestBot)
+            closestBot.mode = 'destroyed'
             closestBot.bot.classList.add('fade')
           }, closestBot.frameSpeed * 3)
         
         // else, move about
         } else {
-          const seedDistance = randomN(20) + closestBotData.distance < 50 ? Math.round(randomN(b.time / 20)) : Math.round(randomN(b.time / 5))
+          let seedDistance = randomN(20) + closestBotData.distance < 50 ? Math.round(randomN(b.time / 20)) : Math.round(randomN(b.time / 5))
+          if (seedDistance > closestBotData.distance) seedDistance = closestBotData.distance
           const distance = b.mode === 'hunter' ? seedDistance : -seedDistance
-          const xy = {
-            x: b.xy.x > closestBot.xy.x ? b.xy.x - distance : b.xy.x + distance,
-            y: b.xy.y > closestBot.xy.y ? b.xy.y - distance : b.xy.y + distance
-          }
-    
-          checkBoundaryAndUpdatePos(xy.x, xy.y, b)
-          // const { xy: { x, y } } = b
-          b.pos = {
-            x: b.xy.x + n,
-            y: b.xy.y + n,
+          
+          if (closestBot) {
+            const xy = {
+              x: b.xy.x > closestBot.xy.x ? b.xy.x - distance : b.xy.x + distance,
+              y: b.xy.y > closestBot.xy.y ? b.xy.y - distance : b.xy.y + distance
+            }
+      
+            checkBoundaryAndUpdatePos(xy.x, xy.y, b)
+            // const { xy: { x, y } } = b
+            b.pos = {
+              x: b.xy.x + n,
+              y: b.xy.y + n,
+            }
           }
         }
       }
@@ -211,12 +227,16 @@ function init() {
         bot.bot.setAttribute('time', bot.time)
         if (bot.time <= 0) {
           stopBot('stop', bot)
-          bot.bot.className = 'bot_wrapper'
+          bot.bot.className = 'bot_wrapper stop'
         }
       }
     })
     moveBots()
+    bots = bots.filter(bot => bot.mode !== 'destroyed') 
+    indicator.innerText = bots.length
   }, 1000)
+
+  
 }
 
 window.addEventListener('DOMContentLoaded', init)
