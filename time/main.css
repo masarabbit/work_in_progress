@@ -102,17 +102,19 @@ body {
   bottom: 10px;
   right: 10px;
   font-size: 10px;
+  text-transform: none;
 }
 
 a {
   color: white;
   text-decoration: none;
+  text-transform: none;
 }
 
 a:hover { text-decoration: underline; }
 
 .fade {
-  animation: fade_away 0.5s forwards;
+  animation: fade_away 1s forwards;
 }
 
 @keyframes fade_away {
