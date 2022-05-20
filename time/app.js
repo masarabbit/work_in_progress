@@ -6,6 +6,7 @@ function init() {
 
   const body = document.querySelector('.wrapper')
   const indicator = document.querySelector('.indicator')
+  const log = document.querySelector('.log')
   const n = 16
   const defaultTime = 99
   let bots = []
@@ -20,6 +21,7 @@ function init() {
     time: defaultTime,
   }
   const cellD = 32
+  let count = 0
 
   const animationFrames = {
     walk: ['n-1', 'n-2', 'n-1', 'r-1', 'r-2', 'r-1'],
@@ -70,6 +72,8 @@ function init() {
         x: x + n,
         y: y + n
       }
+    count++
+    data.id = `x-${count}`
     bot.setAttribute('index', bots.length -1)
     bot.setAttribute('time', data.time)
     setMargin(bot, x, y)
@@ -151,7 +155,7 @@ function init() {
     closestBot.bot.setAttribute('time', closestBot.time)
   }
 
-  const moveBots = () =>{
+  const moveBots = logs =>{
     bots.forEach((b, i) =>{
       if (!b.stop){
         const distances = bots.map((bot, index) =>{
@@ -165,7 +169,7 @@ function init() {
         const closestBotData = [...distances.filter(d => d.index !== i && !d.stop)].sort((a, b) => a.distance - b.distance )[0]
         const closestBot = closestBotData && bots[closestBotData.index]
         if (!closestBot) {
-          console.log('end')
+          logs.push(`${b.id} survived`)
           new Array(40).fill('').map(()=>{
             return [randomN(body.clientWidth - 100), randomN(body.clientHeight - 100)]
           }).forEach( pos => {
@@ -183,8 +187,8 @@ function init() {
         // if hunter bot finds bot nearby, destroy and steal time   
         } else if (b.mode === 'hunter' && closestBotData.distance < 24) {
           displayTimeAdded(b, closestBot)
+          logs.push(`${b.id} destroyed ${closestBot.id} and gained ${closestBot.time} sec`)
           updateBotTime(b, closestBot)
-      
           changeAnimation('break', closestBot)
           closestBot.frameSpeed = 100
           setTimeout(()=>{
@@ -218,6 +222,7 @@ function init() {
   } 
 
   setInterval(()=>{
+    const logs = []
     bots.forEach(bot =>{
       if (bot.mode === 'charging' && !bot.stop) {
         bot.time++
@@ -228,11 +233,17 @@ function init() {
         if (bot.time <= 0) {
           stopBot('stop', bot)
           bot.bot.className = 'bot_wrapper stop'
+          logs.push(`${bot.id} has stopped`)
         }
       }
     })
-    moveBots()
+    moveBots(logs)
     bots = bots.filter(bot => bot.mode !== 'destroyed') 
+    // TODO want to leave log for 2 or 3 seconds
+    // prev prev log
+    // prev log
+    // log 
+    log.innerHTML = logs.map(l=> `<p>${l}</p>`).join('')
     indicator.innerText = bots.length
   }, 1000)
 
