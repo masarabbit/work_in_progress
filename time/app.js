@@ -1,8 +1,7 @@
 function init() {  
 
   // TODO what to do with bot with zero?
-  // TODO add charging animation?
-  // TODO maybe just change colour partially for hunter / flee
+  // TODO change how many bots to create based on screen size
 
   const body = document.querySelector('.wrapper')
   const indicator = document.querySelector('.indicator')
@@ -105,22 +104,27 @@ function init() {
 
   // console.log(bots)
 
-  const stopBot = (animation, data) =>{
+  const stopBot = (animation, data) => {
     changeAnimation(animation, data)
     data.stop = true
     data.bot.className = 'bot_wrapper'
     clearTimeout(data.frameTimer)
   }
   
-  const checkBoundaryAndUpdatePos = (x, y, data) =>{
+  // TODO add within Buffer
+  const checkBoundaryAndUpdatePos = (x, y, data) => {
     const buffer = 50
-    
-    if (x > buffer && x < (body.clientWidth - buffer)){
-      data.xy.x = x
-    } 
-    if (y > buffer && y < (body.clientHeight - buffer)){
-      data.xy.y = y
+    const checkBoundaryAndUpdate = (p, n, elem) => {
+      if (n > buffer && n < (body[elem] - buffer)){
+        data.xy[p] = n
+      } else if (n > (body[elem] - buffer)) {
+        data.xy[p] = body[elem] - buffer
+      } else if (n < buffer) {
+        data.xy[p] = buffer
+      }
     }
+    checkBoundaryAndUpdate('x', x, 'clientWidth')
+    checkBoundaryAndUpdate('y', y, 'clientHeight')
     setMargin(data.bot, data.xy.x, data.xy.y)
   }
 
@@ -130,8 +134,16 @@ function init() {
   // }
 
 
-  const distanceBetween = (a, b) =>{
-    return Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2))
+  const distanceBetween = (a, b) => Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2))
+  const withinBuffer = (a, b) => Math.abs(a, b) < 50
+
+  const distanceToMove = (a, b, distance) => {
+    const randomAccuracy = Math.random < 0.4
+    return withinBuffer(a, b) 
+      ? a    
+      : a > b 
+        ? (a - distance) < b && randomAccuracy ? b : a - distance 
+        : (a + distance) > b && randomAccuracy ? b : a + distance
   }
 
   const displayTimeAdded = (b, closestBot) =>{
@@ -139,26 +151,26 @@ function init() {
     timeAdded.classList.add('added')
     body.append(timeAdded)
     setMargin(timeAdded, b.xy.x, b.xy.y - 20)
-    setTimeout(()=>{
+    setTimeout(()=> {
       setMargin(timeAdded, b.xy.x, b.xy.y - 40)
     }, 10)
-    setTimeout(()=>{
+    setTimeout(()=> {
       body.removeChild(timeAdded)
     }, 1000)
     timeAdded.innerHTML = `+${closestBot.time}`
   }
 
-  const updateBotTime = (b, closestBot) =>{
+  const updateBotTime = (b, closestBot) => {
     b.time = b.time + closestBot.time
     closestBot.time = 0
     b.bot.setAttribute('time', b.time)
     closestBot.bot.setAttribute('time', closestBot.time)
   }
 
-  const moveBots = logs =>{
-    bots.forEach((b, i) =>{
+  const moveBots = logs => {
+    bots.forEach((b, i) => {
       if (!b.stop){
-        const distances = bots.map((bot, index) =>{
+        const distances = bots.map((bot, index) => {
           return {
             index,
             time: bot.time,
@@ -170,7 +182,7 @@ function init() {
         const closestBot = closestBotData && bots[closestBotData.index]
         if (!closestBot) {
           logs.push(`${b.id} survived`)
-          new Array(40).fill('').map(()=>{
+          new Array(40).fill('').map(()=> {
             return [randomN(body.clientWidth - 100), randomN(body.clientHeight - 100)]
           }).forEach( pos => {
             createBot(pos[0], pos[1])
@@ -201,16 +213,15 @@ function init() {
         } else {
           let seedDistance = randomN(20) + closestBotData.distance < 50 ? Math.round(randomN(b.time / 20)) : Math.round(randomN(b.time / 5))
           if (seedDistance > closestBotData.distance) seedDistance = closestBotData.distance
-          const distance = b.mode === 'hunter' ? seedDistance : -seedDistance
+          const distance = b.mode === 'hunter' ? seedDistance : -(seedDistance + Math.round(randomN(20)))
           
           if (closestBot) {
             const xy = {
-              x: b.xy.x > closestBot.xy.x ? b.xy.x - distance : b.xy.x + distance,
-              y: b.xy.y > closestBot.xy.y ? b.xy.y - distance : b.xy.y + distance
+              x: distanceToMove(b.xy.x, closestBot.xy.x, distance),
+              y: distanceToMove(b.xy.y, closestBot.xy.y, distance),
             }
       
             checkBoundaryAndUpdatePos(xy.x, xy.y, b)
-            // const { xy: { x, y } } = b
             b.pos = {
               x: b.xy.x + n,
               y: b.xy.y + n,
@@ -221,9 +232,9 @@ function init() {
     })
   } 
 
-  setInterval(()=>{
+  setInterval(()=> {
     const logs = []
-    bots.forEach(bot =>{
+    bots.forEach(bot => {
       if (bot.mode === 'charging' && !bot.stop) {
         bot.time++
         bot.bot.setAttribute('time', bot.time)
@@ -239,11 +250,18 @@ function init() {
     })
     moveBots(logs)
     bots = bots.filter(bot => bot.mode !== 'destroyed') 
-    // TODO want to leave log for 2 or 3 seconds
-    // prev prev log
-    // prev log
-    // log 
-    log.innerHTML = logs.map(l=> `<p>${l}</p>`).join('')
+    logs.forEach(newLog =>{
+      const p = document.createElement('p')
+      p.innerHTML = newLog
+      log.append(p)
+      setTimeout(()=> {
+        log.removeChild(p) 
+      }, 3000)
+    })
+    console.log(log.childNodes.length, log.childNodes.length - 9)
+    // if (log.innerHTML) {
+    //   log.style.height = `${log.childNodes.length * log.childNodes[0].clientHeight}px`
+    // }
     indicator.innerText = bots.length
   }, 1000)
 
