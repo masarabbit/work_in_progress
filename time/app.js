@@ -1,7 +1,9 @@
 function init() {  
 
   // TODO what to do with bot with zero?
-  // TODO change how many bots to create based on screen size
+  // TODO add clickevent to check bot status
+  // TODO record bot activity (hunt, flee, destroy etc) to collect stats
+  // TODO maybe add ways to loop animation after like charge then stop like ['n-1', 'a-charge']
 
   const body = document.querySelector('.wrapper')
   const indicator = document.querySelector('.indicator')
@@ -12,6 +14,7 @@ function init() {
   const botData = {
     interval: null,
     stop: true,
+    // TODO maybe add 'destroyed' as status instead of defining it as mode
     frameSpeed: 200,
     animation: 'walk',
     frame: 0,
@@ -23,10 +26,13 @@ function init() {
   let count = 0
 
   const animationFrames = {
-    walk: ['n-1', 'n-2', 'n-1', 'r-1', 'r-2', 'r-1'],
-    stop: ['n-0'],
-    break: ['n-3', 'n-4', 'n-5']
+    walk: ['n-1','n-2','r-1','r-2'],
+    charge: ['n-3'], // TODO change charge animation
+    stop: ['n-5'],
+    sleep: ['n-0','n-3','n-4', 'n-5'], // probably should rename
+    break: ['n-6', 'n-7', 'n-8']
   }
+  
 
   const setMargin = (target, x, y) => {
     target.style.transform = `translate(${x}px, ${y}px)`
@@ -73,7 +79,7 @@ function init() {
       }
     count++
     data.id = `x-${count}`
-    bot.setAttribute('index', bots.length -1)
+    bot.setAttribute('index', count)
     bot.setAttribute('time', data.time)
     setMargin(bot, x, y)
     startBot(bot, data)
@@ -86,8 +92,8 @@ function init() {
   //   [400, 100],
   // ]
   const createBots = no => {
-    new Array(no).fill('').map(()=>{
-      return [randomN(body.clientWidth - 100), randomN(body.clientHeight - 100)]
+    new Array(no).fill('').map(()=> {
+      return [randomN(body.clientWidth), randomN(body.clientHeight)]
     }).forEach( pos => {
       createBot(pos[0], pos[1])
     })
@@ -117,7 +123,7 @@ function init() {
     clearTimeout(data.frameTimer)
   }
   
-  // TODO add within Buffer
+
   const checkBoundaryAndUpdatePos = (x, y, data) => {
     const buffer = 50
     const checkBoundaryAndUpdate = (p, n, elem) => {
@@ -150,18 +156,20 @@ function init() {
         : (a + distance) > b && randomAccuracy ? b : a + distance
   }
 
-  const displayTimeAdded = (b, closestBot) =>{
-    const timeAdded = document.createElement('div')
-    timeAdded.classList.add('added')
-    body.append(timeAdded)
-    setMargin(timeAdded, b.xy.x, b.xy.y - 20)
+  const displayTimeChange = (b, closestBot, prefix) =>{
+    const time = document.createElement('div')
+    time.className = prefix === '+' ? 'time added' : 'time reduced'
+    body.append(time)
+    setMargin(time, b.xy.x, b.xy.y - 20)
+    if (prefix === '+') {
+      setTimeout(()=> {
+        setMargin(time, b.xy.x, b.xy.y - 40)
+      }, 10)
+    }
     setTimeout(()=> {
-      setMargin(timeAdded, b.xy.x, b.xy.y - 40)
-    }, 10)
-    setTimeout(()=> {
-      body.removeChild(timeAdded)
+      body.removeChild(time)
     }, 1000)
-    timeAdded.innerHTML = `+${closestBot.time}`
+    time.innerHTML = `${prefix}${closestBot.time}`
   }
 
   const updateBotTime = (b, closestBot) => {
@@ -186,27 +194,30 @@ function init() {
         const closestBot = closestBotData && bots[closestBotData.index]
         if (!closestBot) {
           logs.push(`${b.id} survived`)
-          createBots(botNo)
+          createBots(botNo())
           return
         }
+        if (b.mode !== 'destroyed') changeAnimation('walk', b) // TODO might need fixing
         b.mode = b.time >= closestBot.time ? 'hunter' : 'flee'
-        
+    
         // fleeing bot rests if there are no bots nearby
-        if (b.mode === 'flee' && closestBotData.distance > 200) {
+        if (b.mode === 'flee' && closestBotData.distance > 100) {
           b.mode = 'charging'
+          changeAnimation('charge', b)
           b.bot.className = 'bot_wrapper'
-        
+
         // if hunter bot finds bot nearby, destroy and steal time   
         } else if (b.mode === 'hunter' && closestBotData.distance < 24) {
-          displayTimeAdded(b, closestBot)
+          displayTimeChange(b, closestBot, '+')
+          displayTimeChange(closestBot, closestBot, '-')
           logs.push(`${b.id} destroyed ${closestBot.id} and gained ${closestBot.time} sec`)
           updateBotTime(b, closestBot)
           changeAnimation('break', closestBot)
+          closestBot.mode = 'destroyed'
           closestBot.frameSpeed = 100
           setTimeout(()=>{
             stopBot('stop', closestBot)
-            closestBot.mode = 'destroyed'
-            closestBot.bot.classList.add('fade')
+            closestBot.bot.classList.add('fade_away')
           }, closestBot.frameSpeed * 3)
         
         // else, move about
@@ -243,13 +254,20 @@ function init() {
         bot.time--
         bot.bot.setAttribute('time', bot.time)
         if (bot.time <= 0) {
-          stopBot('stop', bot)
-          bot.bot.className = 'bot_wrapper stop'
+          changeAnimation('sleep', bot)
+          bot.stop = true
+          setTimeout(()=> {
+            stopBot('stop', bot)
+          }, bot.frameSpeed * 4)
+          // bot.bot.className = 'bot_wrapper stop'
           logs.push(`${bot.id} has stopped`)
         }
       }
     })
     moveBots(logs)
+    bots.forEach(bot =>{
+      if (bot.mode === 'destroyed') body.removeChild(bot.bot)
+    })
     bots = bots.filter(bot => bot.mode !== 'destroyed') 
     if (logs.length) {
       const newLog = document.createElement('div')
@@ -264,7 +282,7 @@ function init() {
     }
     if (log.childNodes[4]) {
       log.childNodes[0].classList.add('fade')
-      setTimeout(()=>{
+      setTimeout(()=> {
         log.removeChild(log.childNodes[0])
       }, 500)
     }
