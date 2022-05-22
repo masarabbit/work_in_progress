@@ -121,14 +121,12 @@ function init() {
   const checkBoundaryAndUpdatePos = (x, y, data) => {
     const buffer = 50
     const checkBoundaryAndUpdate = (p, n, elem) => {
-      if (n > buffer && n < (body[elem] - buffer)){
-        data.xy[p] = n
-      } else if (n > (body[elem] - buffer)) {
-        data.xy[p] = body[elem] - buffer
-      } else if (n < buffer) {
-        data.xy[p] = buffer
-      }
-    }
+      data.xy[p] = n > (body[elem] - buffer)
+        ? body[elem] - buffer
+        : n < buffer
+          ? buffer
+          : n
+    }      
     checkBoundaryAndUpdate('x', x, 'clientWidth')
     checkBoundaryAndUpdate('y', y, 'clientHeight')
     setMargin(data.bot, data.xy.x, data.xy.y)
@@ -234,6 +232,7 @@ function init() {
     })
   } 
 
+
   setInterval(()=> {
     const logs = []
     bots.forEach(bot => {
@@ -252,19 +251,24 @@ function init() {
     })
     moveBots(logs)
     bots = bots.filter(bot => bot.mode !== 'destroyed') 
-    logs.forEach(newLog =>{
-      const p = document.createElement('p')
-      p.innerHTML = newLog
-      log.append(p)
+    if (logs.length) {
+      const newLog = document.createElement('div')
+      newLog.innerHTML = logs.map(l => `<p>${l}</p>`).join('')
+      log.append(newLog)
       setTimeout(()=> {
-        log.removeChild(p) 
-      }, 3000)
-    })
-    console.log(log.childNodes.length, log.childNodes.length - 9)
-    // if (log.innerHTML) {
-    //   log.style.height = `${log.childNodes.length * log.childNodes[0].clientHeight}px`
-    // }
-    indicator.innerText = bots.length
+        newLog.style.height = `${11 * logs.length}px`
+      }, 100)
+      log.childNodes.forEach((node, i) =>{
+        if (i < (log.childNodes.length - 1)) node.classList.add('light_fade')
+      })
+    }
+    if (log.childNodes[4]) {
+      log.childNodes[0].classList.add('fade')
+      setTimeout(()=>{
+        log.removeChild(log.childNodes[0])
+      }, 1500)
+    }
+    indicator.innerText = `active bots: ${bots.filter(bot => !bot.stop).length}`
   }, 1000)
 
   
