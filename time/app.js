@@ -85,15 +85,21 @@ function init() {
   //   [300, 100],
   //   [400, 100],
   // ]
-  
-  new Array(40).fill('').map(()=>{
-    return [randomN(body.clientWidth - 100), randomN(body.clientHeight - 100)]
-  }).forEach( pos => {
-    createBot(pos[0], pos[1])
-  })
-
-  // testPos.forEach( pos => {
-  //   createBot(pos[0], pos[1])
+  const createBots = no => {
+    new Array(no).fill('').map(()=>{
+      return [randomN(body.clientWidth - 100), randomN(body.clientHeight - 100)]
+    }).forEach( pos => {
+      createBot(pos[0], pos[1])
+    })
+  }
+  const botNo = () => Math.round((body.clientWidth * body.clientHeight) / (100 * 100)) 
+  createBots(botNo())
+　　
+  // window.addEventListener('resize', ()=>{
+  //   body.innerHTML = ''
+  //   bots.length = 0
+  //   count = 0
+  //   createBots(botNo())
   // })
 
 
@@ -182,11 +188,7 @@ function init() {
         const closestBot = closestBotData && bots[closestBotData.index]
         if (!closestBot) {
           logs.push(`${b.id} survived`)
-          new Array(40).fill('').map(()=> {
-            return [randomN(body.clientWidth - 100), randomN(body.clientHeight - 100)]
-          }).forEach( pos => {
-            createBot(pos[0], pos[1])
-          })
+          createBots(botNo)
           return
         }
         b.mode = b.time >= closestBot.time ? 'hunter' : 'flee'
