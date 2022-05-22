@@ -266,7 +266,7 @@ function init() {
       log.childNodes[0].classList.add('fade')
       setTimeout(()=>{
         log.removeChild(log.childNodes[0])
-      }, 1500)
+      }, 500)
     }
     indicator.innerText = `active bots: ${bots.filter(bot => !bot.stop).length}`
   }, 1000)
