@@ -3,11 +3,13 @@ function init() {
 
   // TODO add clickevent to check bot status
 
-  
+
   // TODO record bot activity (hunt, flee, destroy etc) to collect stats
 
   // TODO tweak setting for propagation
   // TODO refactor to tidy up code
+  // TODO add optimum number function to judge when to propagate
+  // TODO mode.new redundant
 
 
   const body = document.querySelector('.wrapper')
