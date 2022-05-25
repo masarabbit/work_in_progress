@@ -1,10 +1,13 @@
 function init() {  
 
-  // TODO what to do with bot with zero?
+
   // TODO add clickevent to check bot status
   // TODO record bot activity (hunt, flee, destroy etc) to collect stats
 
-  // TODO change animation for incubate
+  //TODO fix bug where the time for new bot is not correct
+  // TODO tweak setting for propagation
+  // TODO refactor to tidy up code
+
 
   const body = document.querySelector('.wrapper')
   const indicator = document.querySelector('.indicator')
@@ -28,15 +31,14 @@ function init() {
 
   const animationFrames = {
     walk: ['n-1','n-0','r-1', 'n-0'],
-    charge: ['n-3', 'n-4', 'n-5', 'a-charging'],
-    charging: ['n-5'],
-    stop: ['n-1'],
-    wake: ['n-4', 'n-3', 'n-0', 'a-walk'],
-    // sleep: ['n-0','n-3','n-4', 'n-5'], // probably should rename
-    break: ['n-6', 'n-7', 'n-8'],
-    transform_a: ['n-3','n-4','n-5', 'a-transform_b'],
-    transform_b: ['n-9', 'n-10', 'a-incubate'],
-    incubate: ['n-11', 'r-11'],
+    charge: [3, 4, 5, 'a-charging'],
+    charging: [5],
+    stop: [1],
+    wake: [4, 3, 0, 'a-walk'],
+    break: [6, 7, 8],
+    transform: [3, 4, 5, 'a-incubate'],
+    incubate: ['n-9','n-10','r-10','r-9','r-10','n-10'],
+    load: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 'a-wake'],
   }
   
 
@@ -46,6 +48,10 @@ function init() {
   }
 
   const randomN = max => Math.ceil(Math.random() * max)
+  // const randomPos = () =>{
+  //   const pos = [-200, -150, -100, -50, 50, 100, 150, 200]
+  //   return pos[Math.ceil(Math.random() * pos.length)]
+  // }
 
   const startBot = (bot, data) =>{
     animate(bot, data)
@@ -55,12 +61,14 @@ function init() {
   const animate = (bot, data) =>{
     const { frame:i, animation, frameSpeed, mode } = data
     const sprite = bot.childNodes[0].childNodes[0]
-    const frame = animationFrames[animation][i].split('-')
+    const item = animationFrames[animation][i]
+    const frame = !Number.isInteger(item) && item.split('-')
+    const number = frame[1] || item
     if (frame[0] === 'a') {
       changeAnimation(frame[1], data)
       if (frame[1] === 'charging') data.mode = 'sleep'
     } else {
-      setMargin(sprite, `-${frame[1] * cellD}`, 0)
+      setMargin(sprite, `-${number * cellD}`, 0)
       bot.childNodes[0].classList[frame[0] === 'n' ? 'remove' : 'add']('flip')
       data.frame = i === animationFrames[animation].length - 1 ? 0 : i + 1
     }
@@ -69,7 +77,7 @@ function init() {
   }
 
 
-  const createBot = (x, y) =>{
+  const createBot = ({ x, y, x2, y2, nu }) =>{
     const bot = document.createElement('div')
     bot.classList.add('bot_wrapper')
     bot.innerHTML = '<div><div class="bot"></div></div>'
@@ -78,17 +86,28 @@ function init() {
     const data = bots[bots.length - 1]
     data.time = randomN(defaultTime)
     if (data.time < 30) data.time = 30
+    // console.log(data.time)
     data.bot = bot
     data.xy = { x, y }
-    data.pos = {
-        x: x + n,
-        y: y + n
-      }
     count++
     data.id = `x-${count}`
     bot.setAttribute('index', count)
-    bot.setAttribute('time', data.time)
     setMargin(bot, x, y)
+    bot.setAttribute('time', data.time)
+    if (nu) {
+      data.mode = 'new'   
+      data.animation = 'load'
+      data.frameSpeed = 100
+      data.xy = { x: x2, y: y2 }
+      setTimeout(()=> {
+        setMargin(bot, data.xy.x, data.xy.y)
+      })
+      data.time = 35
+    }
+    data.pos = {
+      x: (x2 || x) + n,
+      y: (y2 || y) + n
+    }
     startBot(bot, data)
   }
 
@@ -96,11 +115,11 @@ function init() {
     new Array(no).fill('').map(()=> {
       return [randomN(body.clientWidth), randomN(body.clientHeight)]
     }).forEach( pos => {
-      createBot(pos[0], pos[1])
+      createBot({ x:pos[0], y: pos[1] })
     })
   }
-  const botNo = () => Math.round((body.clientWidth * body.clientHeight) / (100 * 100))
-  // const botNo = () => 5 
+  // const botNo = () => Math.round((body.clientWidth * body.clientHeight) / (150 * 150))
+  const botNo = () => 5 
   createBots(botNo())
 　　
 
@@ -124,8 +143,8 @@ function init() {
     const checkBoundaryAndUpdate = (p, n, elem) => {
       data.xy[p] = n > (body[elem] - buffer)
         ? body[elem] - buffer
-        : n < buffer
-          ? buffer
+        : n < 0
+          ? 0
           : n
     }      
     checkBoundaryAndUpdate('x', x, 'clientWidth')
@@ -134,7 +153,7 @@ function init() {
   }
 
 
-  const distanceBetween = (a, b) => Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2))
+  const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
   const withinBuffer = (a, b) => Math.abs(a, b) < 50
 
   const distanceToMove = (a, b, distance) => {
@@ -169,43 +188,49 @@ function init() {
     closestBot.bot.setAttribute('time', closestBot.time)
   }
 
+  const distances = bot =>{
+    return bots.map((b, index) => {
+      return {
+        index,
+        time: b.time,
+        stop: b.stop,
+        mode: b.mode,
+        distance: distanceBetween(bot.pos, b.pos)
+      }
+    })
+  }
+
   const moveBots = logs => {
     bots.forEach((b, i) => {
-      if (!b.stop && !['incubate', 'destroyed'].includes(b.mode)){
-        const distances = bots.map((bot, index) => {
-          return {
-            index,
-            time: bot.time,
-            stop: bot.stop,
-            mode: bot.mode,
-            distance: distanceBetween(b.pos, bot.pos)
-          }
-        })
-        const closestBotData = [...distances.filter(d => d.index !== i && !d.stop && !['incubate', 'destroyed'].includes(d.mode))].sort((a, b) => a.distance - b.distance )[0]
+      if (!b.stop && !['incubate', 'destroyed', 'new', 'load'].includes(b.mode)){
+        const closestBotData = [...distances(b, bots).filter(d => d.index !== i && !d.stop && !['incubate', 'destroyed'].includes(d.mode))].sort((a, b) => a.distance - b.distance )[0]
         const closestBot = closestBotData && bots[closestBotData.index]
         if (!closestBot) {
           logs.push(`${b.id} survived`)
-          createBots(botNo())
+          // createBots(botNo())
           return
         }
-        if (b.time > 200) {
-          changeAnimation(b.mode === 'sleep' ? 'transform_b' : 'transform_a', b)
+        if (b.time > 200 && activeBotsNo() < 40) {
+          logs.push(`${b.id} is in incubate mode`) // TODO to edit to something else
+          changeAnimation(b.mode === 'sleep' ? 'incubate' : 'transform', b)
           b.mode = 'incubate'
           return
         }
-        if (b.mode !== 'sleep') {
+        if (!['sleep', 'incubate'].includes(b.mode)) {
           b.mode = b.time >= closestBot.time ? 'hunter' : 'flee'
         }
-        if (b.mode === 'sleep') {
+        if (['sleep', 'incubate'].includes(b.mode)) {
           if (closestBotData.distance < 100) {
             changeAnimation('wake', b)
             b.mode = b.time >= closestBot.time ? 'hunter' : 'flee'
           }
+
         // fleeing bot rests if there are no bots nearby
         } else if (b.mode === 'flee' && closestBotData.distance > 100) {
           b.mode = 'charging'
           changeAnimation('charge', b)
           b.bot.className = 'bot_wrapper charge'
+          logs.push(`${b.id} is charging`)
 
         // if hunter bot finds bot nearby, destroy and steal time   
         } else if (b.mode === 'hunter' && closestBotData.distance < 24) {
@@ -244,18 +269,46 @@ function init() {
     })
   } 
 
+  const activeBotsNo = () => bots.filter(bot => !bot.stop).length
+
+  const createNewBots = (x, y) => {
+    const pos = [
+      {x: -50, y: -50},
+      {x: 50, y: -50},
+      {x: -50, y: 50},
+      {x: 50, y: 50},
+    ]
+    pos.forEach(p =>{
+      createBot({ x, y, x2: x + p.x, y2: y + p.y, nu: true})
+    })
+  }
+
 
   setInterval(()=> {
     const logs = []
     bots.forEach(bot => {
-      if (bot.mode === 'incubate') {
-        
+      if (
+      (bot.mode === 'new' && bot.animation === 'walk') || 
+      (bot.mode === 'incubate' && bot.time < 180)
+      ) {
+        if (bot.mode === 'incubate') changeAnimation('wake', bot)
+        bot.mode = 'flee'
+        bot.frameSpeed = 200
+        bot.time = randomN(99)
+      } else if (bot.mode === 'incubate') {
+        bot.time--
+        if (bot.time % 10 === 0 && activeBotsNo() < 40) {
+          // createBot({ x:bot.xy.x, y: bot.xy.y, nu: true})
+          bot.time = 20
+          logs.push(`${bot.name} created new bots`)
+          createNewBots(bot.xy.x, bot.xy.y)
+        }
       } else if (bot.mode === 'sleep' && !bot.stop) {
-        bot.time += 50
-        bot.bot.setAttribute('time', bot.time)
+        if (bot.time < 300) {
+          bot.time += 10
+        }
       } else if (!bot.stop) {
         bot.time--
-        bot.bot.setAttribute('time', bot.time)
         if (bot.time <= 0) {
           bot.stop = true
           stopBot('stop', bot)
@@ -263,6 +316,7 @@ function init() {
           logs.push(`${bot.id} has stopped`)
         }
       }
+      bot.bot.setAttribute('time', bot.time)
     })
     moveBots(logs)
     bots.forEach(bot =>{
@@ -286,7 +340,7 @@ function init() {
         log.removeChild(log.childNodes[0])
       }, 500)
     }
-    indicator.innerText = `active bots: ${bots.filter(bot => !bot.stop).length}`
+    indicator.innerText = `active bots: ${activeBotsNo()}`
   }, 1000)
 
   
