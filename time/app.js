@@ -2,6 +2,8 @@ function init() {
 
   // TODO add clickevent to check bot status
   // TODO add optimum number function to judge when to multiply
+  // TODO add logic to prevent bots getting stuck in the corner
+
 
   const body = document.querySelector('.wrapper')
   const indicator = document.querySelector('.indicator')
@@ -24,7 +26,7 @@ function init() {
   const botData = {
     interval: null,
     stop: true,
-    frameSpeed: 100,
+    frameSpeed: 90,
     animation: 'load',
     frame: 0,
     frameTimer: null,
@@ -79,22 +81,21 @@ function init() {
     bot.innerHTML = '<div><div class="bot"></div></div>'
     body.appendChild(bot)
     bots.push({...botData})
+    count++
     const data = bots[bots.length - 1]
     data.time = time || randomN(defaultTime)
     if (data.time < 30) data.time = 30
     data.bot = bot
     data.xy = { x, y }
-    count++
     data.id = `x-${count}`
     data.log = []
     bot.setAttribute('index', count)
-    setMargin(bot, x, y)
     bot.setAttribute('time', data.time)
+    setMargin(bot, x, y)
     if (time) {
       data.history = [...history]
       data.mode = 'new'   
       data.animation = 'load'
-      data.frameSpeed = 100
       data.xy = { x: x2, y: y2 }
       setTimeout(()=> {
         setMargin(bot, data.xy.x, data.xy.y)
@@ -145,7 +146,7 @@ function init() {
   }
 
   const distanceToMove = (a, b, distance) => {
-    const randomAccuracy = Math.random < 0.4
+    const randomAccuracy = Math.random < 0.6
     return withinBuffer(a, b) 
       ? a    
       : a > b 
@@ -173,7 +174,7 @@ function init() {
     b.time = b.time + closestBot.time
     closestBot.time = 0
     b.bot.setAttribute('time', b.time)
-    closestBot.bot.setAttribute('time', closestBot.time)
+    closestBot.bot.setAttribute('time', 0)
   }
 
   const distances = bot => {
@@ -189,11 +190,22 @@ function init() {
   }
   
   const charge = (bot, logs) => {
+    bot.frameSpeed = 200
     bot.log.push('charge')
     bot.mode = 'charging'
     changeAnimation('charge', bot)
     bot.bot.className = 'bot_wrapper charge'
     logs.push(`${bot.id} is charging`)
+  }
+
+  const explodeBot = bot => {
+    changeAnimation('break', bot)
+    bot.frameSpeed = 100
+    setTimeout(()=> {
+      bot.mode = 'destroyed'
+      stopBot('stop', bot)
+      bot.bot.classList.add('fade_away')
+    }, bot.frameSpeed * 3)
   }
 
   const huntAndDestroy = (bot, closestBot, logs) => {
@@ -202,13 +214,7 @@ function init() {
     logs.push(`${bot.id} destroyed ${closestBot.id} and gained ${closestBot.time} sec`)
     bot.log.push(`destroyed ${closestBot.id} and gained ${closestBot.time} sec`)
     updateBotTime(bot, closestBot)
-    changeAnimation('break', closestBot)
-    closestBot.frameSpeed = 100
-    setTimeout(()=> {
-      closestBot.mode = 'destroyed'
-      stopBot('stop', closestBot)
-      closestBot.bot.classList.add('fade_away')
-    }, closestBot.frameSpeed * 3)
+    explodeBot(closestBot)
   }
 
   const moveAbout = (bot, closestBot, closestBotData) => {
@@ -230,19 +236,23 @@ function init() {
   }
 
   const decideHuntOrFlee = (bot, closestBot) => {
-    bot.mode = bot.time > closestBot.time ? 'hunter' : 'flee'
+
+    bot.mode = ['multiply', 'sleep'].includes(closestBot.mode)
+      ? 'hunter'
+      : bot.time > closestBot.time ? 'hunter' : 'flee'
+    if (bot.animation !== 'load') bot.frameSpeed = 200
   }
 
   const moveBots = logs => {
     bots.forEach((b, i) => {
       if (!b.stop && !['multiply', 'destroyed', 'load'].includes(b.mode)){
-        const closestBotData = [...distances(b, bots).filter(d => d.index !== i && !['destroyed'].includes(d.mode))].sort((a, b) => a.distance - b.distance )[0]
+        const closestBotData = [...distances(b, bots).filter(d => d.index !== i && !['load','destroyed'].includes(d.mode))].sort((a, b) => a.distance - b.distance )[0]
         const closestBot = closestBotData && bots[closestBotData.index]
         if (!closestBot) {
           logs.push(`${b.id} survived`)
           // createBots(botNo())
           return
-        } else if (b.time > 200 && activeBotsNo() < 40) {
+        } else if ((b.time > 180 && activeBotsNo() < 40 && b.animation !== 'break')) {
           logs.push(`${b.id} is in multiply mode`)
           changeAnimation(b.mode === 'sleep' ? 'multiply' : 'transform', b)
           b.mode = 'multiply'
@@ -251,11 +261,14 @@ function init() {
         }
 
         if (['sleep', 'multiply'].includes(b.mode)) {
-          if (closestBotData.distance < 50) {
+          if (closestBotData.distance < 50 && b.time < 300) {
             changeAnimation('wake', b)
             decideHuntOrFlee(b, closestBot)
           }
-        } else if (b.mode === 'flee' && closestBotData.distance > 100) {
+        } else if (
+          (b.mode === 'flee' && closestBotData.distance > 100)  
+          || (b.time > 200 && activeBotsNo() > 40)
+          ) {
           charge(b, logs)
         } else if (b.mode === 'hunter' && closestBotData.distance < 24) {
           huntAndDestroy(b, closestBot, logs)
@@ -299,13 +312,12 @@ function init() {
   }
 
   const multiply = (bot, logs) => {
-    if (bot.time % 4 === 0 && activeBotsNo() < 40) {
-      stopBot('stop', bot)
+    if (bot.time % 4 === 0 && (activeBotsNo() < 40)) {
       logs.push(`${bot.id} multiplied`)
       createNewBots(bot.xy.x, bot.xy.y, bot.time, bot.history ? [...bot.history, bot.id] : [bot.id])
+      stopBot('stop', bot)
       bot.time = 0
       bot.mode = 'destroyed'
-      // bot.bot.className = 'bot_wrapper clear'
     }
   }
 
@@ -338,6 +350,9 @@ function init() {
       } else if (bot.mode === 'sleep' && !bot.stop) {
         if (bot.time < 300) {
           bot.time += 10
+        } else {
+          explodeBot(bot)
+          logs.push(`${bot.id} exploded due to overcharge`)
         }
       } else if (!bot.stop) {
         countdownTime(bot, logs)
