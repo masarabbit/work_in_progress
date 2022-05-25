@@ -2,9 +2,10 @@ function init() {
 
 
   // TODO add clickevent to check bot status
+
+  
   // TODO record bot activity (hunt, flee, destroy etc) to collect stats
 
-  //TODO fix bug where the time for new bot is not correct
   // TODO tweak setting for propagation
   // TODO refactor to tidy up code
 
@@ -295,12 +296,12 @@ function init() {
         bot.mode = 'flee'
         bot.frameSpeed = 200
         bot.time = randomN(99)
+        if (bot.time < 30) bot.time = 30
       } else if (bot.mode === 'incubate') {
         bot.time--
         if (bot.time % 10 === 0 && activeBotsNo() < 40) {
-          // createBot({ x:bot.xy.x, y: bot.xy.y, nu: true})
           bot.time = 20
-          logs.push(`${bot.name} created new bots`)
+          logs.push(`${bot.id} created new bots`)
           createNewBots(bot.xy.x, bot.xy.y)
         }
       } else if (bot.mode === 'sleep' && !bot.stop) {
