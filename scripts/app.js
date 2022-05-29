@@ -329,7 +329,7 @@ function init() {
     body.append(star)
   }
 
-  window.addEventListener('click', e =>{
+  body.addEventListener('click', e =>{
     control.x = e.pageX 
     control.y = e.pageY
     createStar()
