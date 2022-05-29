@@ -1,34 +1,42 @@
 const vector = {
-	_x: 1,
-	_y: 0,
+	x: 1,
+	y: 0,
 
 	create: function(x, y) {
-		var obj = Object.create(this)
+		const obj = Object.create(this)
 		obj.setX(x)
 		obj.setY(y)
 		return obj
 	},
 
-	setX: function(value) {
-		this._x = value
-	},
+  get: function (elem) {
+    return this[elem]
+  },
 
-	getX: function() {
-		return this._x
-	},
+  set: function(elem, n) {
+    this[elem] = n
+  },
 
-	setY: function(value) {
-		this._y = value
-	},
+	// setX: function(n) {
+	// 	this.x = n
+	// },
 
-	getY: function() {
-		return this._y
-	},
+	// getX: function() {
+	// 	return this.x
+	// },
+
+	// setY: function(n) {
+	// 	this.y = n
+	// },
+
+	// getY: function() {
+	// 	return this.y
+	// },
 
 	setAngle: function(angle) {
-		var length = this.getLength()
-		this._x = Math.cos(angle) * length
-		this._y = Math.sin(angle) * length
+		const length = this.magnitude()
+		this.x = Math.cos(angle) * length
+		this.y = Math.sin(angle) * length
 	},
 
 	getAngle: function() {
@@ -37,49 +45,57 @@ const vector = {
 
 	setLength: function(length) {
 		var angle = this.getAngle()
-		this._x = Math.cos(angle) * length
-		this._y = Math.sin(angle) * length
+		this.x = Math.cos(angle) * length
+		this.y = Math.sin(angle) * length
 	},
 
-	getLength: function() {
-		return Math.sqrt(this._x * this._x + this._y * this._y)
+	magnitude: function() {
+		return Math.sqrt(this.x * this.x + this.y * this.y)
 	},
 
 	add: function(v2) {
-		return vector.create(this._x + v2.getX(), this._y + v2.getY())
+		return vector.create(this.x + v2.getX(), this.y + v2.getY())
 	},
 
 	subtract: function(v2) {
-		return vector.create(this._x - v2.getX(), this._y - v2.getY())
+		return vector.create(this.x - v2.getX(), this.y - v2.getY())
 	},
 
-	multiply: function(val) {
-		return vector.create(this._x * val, this._y * val)
+	multiply: function(n) {
+		return vector.create(this.x * n, this.y * n)
 	},
 
-	divide: function(val) {
-		return vector.create(this._x / val, this._y / val)
+	divide: function(n) {
+		return vector.create(this.x / n, this.y / n)
 	},
 
 	addTo: function(v2) {
-		this._x += v2.getX()
-		this._y += v2.getY()
+		this.x += v2.getX()
+		this.y += v2.getY()
 	},
 
 	subtractFrom: function(v2) {
-		this._x -= v2.getX()
-		this._y -= v2.getY()
+		this.x -= v2.getX()
+		this.y -= v2.getY()
 	},
 
-	multiplyBy: function(val) {
-		this._x *= val
-		this._y *= val
+	multiplyBy: function(n) {
+		this.x *= n
+		this.y *= Navigator
 	},
 
-	divideBy: function(val) {
-		this._x /= val
-		this._y /= val
-	}
+	divideBy: function(n) {
+		this.x /= n
+		this.y /= n
+	},
+  
+  frameRate: 12,
+  incrementFrame: function() {
+    const { count, frameRate, i } = this
+    let n = count % frameRate === 0 ? i + 1 : i
+    if (n > 1) n = 0
+    this.i = n
+  },
 }
 
 export default vector

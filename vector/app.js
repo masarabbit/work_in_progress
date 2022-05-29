@@ -1,3 +1,5 @@
+import vector from './vector.js'
+
 function init() {  
   const canvas = document.querySelector('canvas')
   const ctx = canvas.getContext('2d')
@@ -27,41 +29,58 @@ function init() {
 
   drawImage({ src: testSmile[0], w: 32, h: 32})
   const frames = []
-  const storeImage = src =>{
+  const storeImage = (src, frame) =>{
     const img = document.createElement('img')   
     img.src = src
-    frames.push(img)
+    frame.push(img)
   }
   
-  testSmile.forEach(f => storeImage(f))
+  testSmile.forEach(f => storeImage(f, frames))
 
+  const smily = {
+    ...vector, 
+    frames: [], 
+    count: 0, 
+    i: 0, 
+    s: { x: 3, y: 3 } 
+  }
+  testSmile.forEach(f => storeImage(f, smily.frames))
+  console.log(smily.get('x'))
 
-  console.log(frames)
-
-  let x = 0
-  let y = 0
-  let i = 0
-  let count = 0
-  let xS = 3
-  let yS = 3
+  // let x = 0
+  // let y = 0
+  // let i = 0
+  // let count = 0
+  // let xS = 3
+  // let yS = 3
 
 	const update = () => {
 		ctx.clearRect(0, 0, w, h)
-    // ctx.save()
-    count++
-		i = count % 12 === 0 ? i + 1 : i
-    if (i > 1) i = 0
-    
-    if (x < 0 || (x + 32) > w) xS = xS * -1
-    if (y < 0 || (y + 32) > h) yS = yS * -1
 
-    x += xS
-    y += yS
+    smily.count++
+    smily.incrementFrame()
+    const x = smily.get('x')
+    const y = smily.get('y')
+    //* this could probably live inside the object too.
+    if (x < 0 || (x + 32) > w) smily.s.x *= -1
+    if (y < 0 || (y + 32) > h) smily.s.y *= -1
+    smily.set('x', x + smily.s.x)
+    smily.set('y', y + smily.s.y) 
+
+    ctx.drawImage(smily.frames[smily.i], smily.get('x'), smily.get('y'), 32, 32)
+
+
+    // count++
+		// i = count % 12 === 0 ? i + 1 : i
+    // if (i > 1) i = 0
+    
+    // if (x < 0 || (x + 32) > w) xS = xS * -1
+    // if (y < 0 || (y + 32) > h) yS = yS * -1
+
+    // x += xS
+    // y += yS
   
-	
-    // drawImage({ src: testSmile[0], w: 32, h: 32, x, y})
-    ctx.drawImage(frames[i], x, y, 32, 32)
-    // ctx.restore()
+    // ctx.drawImage(frames[i], x, y, 32, 32)
 
 		requestAnimationFrame(update)
 	}
