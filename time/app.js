@@ -9,6 +9,7 @@ function init() {
   const indicator = document.querySelector('.indicator')
   const log = document.querySelector('.log')
   const info = document.querySelector('.info')
+  const infoCard = document.querySelector('.info_card')
   const cellD = 32
   const n = cellD / 2
   const defaultTime = 99
@@ -52,9 +53,29 @@ function init() {
     data.stop = false
   }
 
-  const displayInfo = data =>{
-    info.classList.toggle('open')
+  const displayInfo = data => {
+    info.classList.add('open')
     if (data) infoToDisplay = data
+  }
+
+  const populateInfo = () => {
+    if (!infoToDisplay.mode) return
+    const { mode, pos:{ x, y }, id, time, animation, log, history } = infoToDisplay 
+    infoCard.innerHTML = `
+      <div class="top_part">
+        <div>
+          <p>id: ${id}</p>
+          <p>mode: ${mode}</p>
+          <p>x: ${x} y:${y}</p>
+        </div>  
+        <div>
+          <p>time: ${time}</p>
+          <p>animation: ${animation}</p>
+        </div>  
+      </div>
+      <div class="log_bar"><p>log:</p>${log.map(l => `<div class="${l}"></div>`).join('')}</div>
+      ${history ? `<p>${history.join('>')}</p>` : ''}
+    `
   }
   
   const animate = (bot, data) =>{
@@ -212,7 +233,7 @@ function init() {
     displayTimeChange(bot, closestBot, '+')
     displayTimeChange(closestBot, closestBot, '-')
     logs.push(`${bot.id} destroyed ${closestBot.id} and gained ${closestBot.time} sec`)
-    bot.log.push(`destroyed ${closestBot.id} and gained ${closestBot.time} sec`)
+    bot.log.push('destroy')
     updateBotTime(bot, closestBot)
     explodeBot(closestBot)
   }
@@ -327,7 +348,7 @@ function init() {
       newLog.innerHTML = logs.map(l => `<p>${l}</p>`).join('')
       log.append(newLog)
       setTimeout(()=> {
-        newLog.style.height = `${11 * logs.length}px`
+        newLog.style.height = `${indicator.clientHeight * logs.length}px`
       }, 100)
       log.childNodes.forEach((node, i) =>{
         if (i < (log.childNodes.length - 1)) node.classList.add('light_fade')
@@ -363,10 +384,11 @@ function init() {
     removeDestroyedBots()
     updateLog(logs)
     indicator.innerText = `active bots: ${activeBotsNo()}`
-    info.innerHTML = Object.keys(infoToDisplay).map(d => `<p>${d}: ${infoToDisplay[d]}</p>`).join('')
+    populateInfo()
   }, 1000)
   
-  info.addEventListener('click', displayInfo)
+  // info.addEventListener('click', displayInfo)
+  infoCard.addEventListener('click', ()=> info.classList.remove('open'))
   createBots(botNo())
 }
 

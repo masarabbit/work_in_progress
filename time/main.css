@@ -41,22 +41,115 @@ body {
   justify-content: center;
   align-items: start;
   top: 0px;
-  right: -100%;
-  background-color: rgba(5, 51, 81, 0.576);
+  left: -100%;
+  /* background-color: rgba(5, 51, 81, 0.576); */
   z-index: 99999;
   transition: 0.4s;
-  cursor: pointer;
+  /* cursor: pointer; */
+  pointer-events: none;
+}
+
+
+
+.info_card {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 10px;
+  width: 300px;
+  color: white;
+  font-size: 10px;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(2, 2, 42, 0.584);
+  pointer-events: none;
+}
+
+.info_card p {
+  margin-bottom: 3px;
+}
+
+.info_card > div {
+  display: flex;
+  /* border: red 1px solid; */
+}
+
+.info_card > .top_part > div {
+  display: flex;
+  flex-direction: column;
+  /* border: 1px blue solid; */
+  width: 100px;
+  margin-right: 10px;
 }
 
 .info.open {
-  right: 0px;
+  left: 0px;
 }
 
-.info p {
-  color: white;
-  margin-left: 100px;
-  font-size: 12px;
+.info_card::before {
+  position: absolute;
+  content: '';
+  top: 5px;
+  right: 5px;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAGNJREFUOE+1U0kOABAM5P+PJkSlatpKJlxEZtG1FvLUpW/rlndmu/nWYAgzExFPriYfgBPCxbG/RSYQQ+Eiomvs5asFOpuLHxXMmkDuNwMqBaqIVBupQXoRSzvhKNPLlG2fi3csRxgRO/A0ngAAAABJRU5ErkJggg==);
+  background-repeat: no-repeat, repeat;
+  background-size: cover; 
+  z-index: 1;
+  image-rendering: pixelated;
+  width: 16px;
+  height: 16px;
+  filter: invert(100%);
+  pointer-events: auto;
 }
+.info_card:hover::before {
+  filter: invert(0);
+  cursor: pointer;
+}
+
+.log_bar {
+  display: flex;
+  /* height: 10px; */
+  /* border: 1px solid white; */
+}
+
+.log_bar > div {
+  margin: 0;
+  height: 10px;
+  width: 5px;
+}
+
+.log_bar > p {
+  margin-right: 5px;
+}
+
+.log_bar > .flee {
+  background-color: purple;
+}
+
+.log_bar > .hunt {
+  background-color: aquamarine;
+}
+
+.log_bar > .charge {
+  background-color: rgba(127, 255, 212, 0.5);
+}
+
+.log_bar > .multiply {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.log_bar > .sleep {
+  background-color: rgb(3, 9, 87);
+}
+
+.log_bar > .destroy {
+  background-color: hotpink;
+}
+
+.log_bar > .destroyed { 
+  background-color: rgb(251, 89, 105);
+}
+
 
 .wrapper {
   width: 100%;
