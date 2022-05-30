@@ -224,6 +224,7 @@ function init() {
     bot.frameSpeed = 100
     setTimeout(()=> {
       bot.mode = 'destroyed'
+      bot.log = 'destroyed'
       stopBot('stop', bot)
       bot.bot.classList.add('fade_away')
     }, bot.frameSpeed * 3)
