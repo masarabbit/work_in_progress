@@ -1,10 +1,5 @@
 function init() {  
 
-  // TODO add clickevent to check bot status
-  // TODO add optimum number function to judge when to multiply
-  // TODO add logic to prevent bots getting stuck in the corner
-
-
   const body = document.querySelector('.wrapper')
   const indicator = document.querySelector('.indicator')
   const log = document.querySelector('.log')
@@ -60,7 +55,7 @@ function init() {
 
   const populateInfo = () => {
     if (!infoToDisplay.mode) return
-    const { mode, pos:{ x, y }, id, time, animation, log, history } = infoToDisplay 
+    const { mode, pos:{ x, y }, id, time, animation, log, history, edge } = infoToDisplay 
     infoCard.innerHTML = `
       <div class="top_part">
         <div>
@@ -74,7 +69,7 @@ function init() {
         </div>  
       </div>
       <div class="log_bar"><p>log:</p>${log.map(l => `<div class="${l}"></div>`).join('')}</div>
-      ${history ? `<p>${history.join('>')}</p>` : ''}
+      ${history ? `<p>${history.join(' > ')}</p>` : ''}
     `
   }
   
@@ -108,6 +103,7 @@ function init() {
     if (data.time < 30) data.time = 30
     data.bot = bot
     data.xy = { x, y }
+    // data.edge = { x: null, y: null }
     data.id = `x-${count}`
     data.log = []
     bot.setAttribute('index', count)
@@ -139,7 +135,7 @@ function init() {
   }
   const botNo = () => Math.round((body.clientWidth * body.clientHeight) / (200 * 200))
   // const botNo = () => 5 
-　　
+
   const changeAnimation = (animation, data) => {
     data.frame = 0
     data.animation = animation
@@ -151,18 +147,38 @@ function init() {
     data.bot.className = 'bot_wrapper'
     clearTimeout(data.frameTimer)
   }
+
+  // const checkPosition = data => {
+  //   const buffer = 50
+  //   data.edge.x = data.xy.x > body.clientWidth - buffer
+  //     ? 'veryRight'
+  //     : data.xy.x < buffer
+  //       ? 'veryLeft'
+  //       : null 
+  //   data.edge.y = data.xy.y > body.clientHeight - buffer
+  //     ? 'veryBottom'
+  //     : data.xy.y < buffer
+  //       ? 'veryUp'
+  //       : null     
+  // }
+
+  const randomShift = () => {
+    const variation = [0, 20, 50, 70]
+    return variation[Math.floor(Math.random() * 4)]
+  }
   
   const checkBoundaryAndUpdatePos = (x, y, data) => {
     const buffer = 50
     const checkBoundaryAndUpdate = (p, n, elem) => {
       data.xy[p] = n > (body[elem] - buffer)
-        ? body[elem] - buffer
-        : n < 0
-          ? 0
+        ? body[elem] - randomShift()
+        : n < buffer
+          ? randomShift()
           : n
     }      
     checkBoundaryAndUpdate('x', x, 'clientWidth')
     checkBoundaryAndUpdate('y', y, 'clientHeight')
+    
     setMargin(data.bot, data.xy.x, data.xy.y)
   }
 
@@ -295,7 +311,7 @@ function init() {
         } else if (b.mode === 'hunter' && closestBotData.distance < 24) {
           huntAndDestroy(b, closestBot, logs)
         } else {
-          b.log.push(b.mode.slice(0,4))
+          b.log.push(b.mode.slice(0, 4))
           moveAbout(b, closestBot, closestBotData)
         }
       }
@@ -310,7 +326,7 @@ function init() {
       {x: -d, y: d},
       {x: d, y: d},
     ]
-    pos.forEach(p =>{
+    pos.forEach(p => {
       createBot({ x, y, x2: x + p.x, y2: y + p.y, time: time / 4, history: [...history]})
     })
   }
@@ -351,7 +367,7 @@ function init() {
       setTimeout(()=> {
         newLog.style.height = `${indicator.clientHeight * logs.length}px`
       }, 100)
-      log.childNodes.forEach((node, i) =>{
+      log.childNodes.forEach((node, i) => {
         if (i < (log.childNodes.length - 1)) node.classList.add('light_fade')
       })
     }
