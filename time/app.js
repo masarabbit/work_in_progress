@@ -362,7 +362,7 @@ function init() {
       newLog.innerHTML = logs.map(l => `<p>${l}</p>`).join('')
       log.append(newLog)
       setTimeout(()=> {
-        newLog.style.height = `${indicator.clientHeight * logs.length}px`
+        newLog.style.height = `${11 * logs.length}px`
       }, 100)
       log.childNodes.forEach((node, i) => {
         if (i < (log.childNodes.length - 1)) node.classList.add('light_fade')

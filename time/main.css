@@ -304,6 +304,7 @@ body {
 
 .log > div > p {
   animation: fade_in forwards 1s;
+  line-height: 11px;
 }
 
 .light_fade {
