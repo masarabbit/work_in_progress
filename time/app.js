@@ -1,5 +1,9 @@
 function init() {  
 
+  let windowActive = true
+  window.addEventListener('focus', ()=> windowActive = true)
+  window.addEventListener('blur', ()=> windowActive = false)
+
   const body = document.querySelector('.wrapper')
   const indicator = document.querySelector('.indicator')
   const log = document.querySelector('.log')
@@ -37,6 +41,8 @@ function init() {
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
   const withinBuffer = (a, b) => Math.abs(a, b) < 50
   const activeBotsNo = () => bots.filter(bot => !bot.stop).length
+  const botNo = () => Math.round((body.clientWidth * body.clientHeight) / (200 * 200))
+  const maxBotNo = () => botNo() * 2
 
   const setMargin = (target, x, y) => {
     target.style.transform = `translate(${x}px, ${y}px)`
@@ -55,7 +61,7 @@ function init() {
 
   const populateInfo = () => {
     if (!infoToDisplay.mode) return
-    const { mode, pos:{ x, y }, id, time, animation, log, history, edge } = infoToDisplay 
+    const { mode, pos:{ x, y }, id, time, animation, log, history } = infoToDisplay 
     infoCard.innerHTML = `
       <div class="top_part">
         <div>
@@ -65,11 +71,11 @@ function init() {
         </div>  
         <div>
           <p>time: ${time}</p>
-          <p>animation: ${animation}</p>
+          <p>motion: ${animation}</p>
         </div>  
       </div>
       <div class="log_bar"><p>log:</p>${log.map(l => `<div class="${l}"></div>`).join('')}</div>
-      ${history ? `<p>${history.join(' > ')}</p>` : ''}
+      ${history ? `<p>history: ${[...history].reverse().join(' > ')}</p>` : ''}
     `
   }
   
@@ -103,10 +109,8 @@ function init() {
     if (data.time < 30) data.time = 30
     data.bot = bot
     data.xy = { x, y }
-    // data.edge = { x: null, y: null }
     data.id = `x-${count}`
     data.log = []
-    bot.setAttribute('index', count)
     bot.setAttribute('time', data.time)
     setMargin(bot, x, y)
     if (time) {
@@ -133,8 +137,6 @@ function init() {
       createBot({ x:pos[0], y: pos[1] })
     })
   }
-  const botNo = () => Math.round((body.clientWidth * body.clientHeight) / (200 * 200))
-  // const botNo = () => 5 
 
   const changeAnimation = (animation, data) => {
     data.frame = 0
@@ -147,20 +149,6 @@ function init() {
     data.bot.className = 'bot_wrapper'
     clearTimeout(data.frameTimer)
   }
-
-  // const checkPosition = data => {
-  //   const buffer = 50
-  //   data.edge.x = data.xy.x > body.clientWidth - buffer
-  //     ? 'veryRight'
-  //     : data.xy.x < buffer
-  //       ? 'veryLeft'
-  //       : null 
-  //   data.edge.y = data.xy.y > body.clientHeight - buffer
-  //     ? 'veryBottom'
-  //     : data.xy.y < buffer
-  //       ? 'veryUp'
-  //       : null     
-  // }
 
   const randomShift = () => {
     const variation = [0, 20, 30, 50]
@@ -240,7 +228,7 @@ function init() {
     bot.frameSpeed = 100
     setTimeout(()=> {
       bot.mode = 'destroyed'
-      bot.log = 'destroyed'
+      bot.log.push('destroyed')
       stopBot('stop', bot)
       bot.bot.classList.add('fade_away')
     }, bot.frameSpeed * 3)
@@ -274,11 +262,17 @@ function init() {
   }
 
   const decideHuntOrFlee = (bot, closestBot) => {
-
     bot.mode = ['multiply', 'sleep'].includes(closestBot.mode)
       ? 'hunter'
       : bot.time > closestBot.time ? 'hunter' : 'flee'
     if (bot.animation !== 'load') bot.frameSpeed = 200
+  }
+
+  const multiplyMode = (bot, logs) =>{
+    logs.push(`${bot.id} is in multiply mode`)
+    changeAnimation(bot.mode === 'sleep' ? 'multiply' : 'transform', bot)
+    bot.mode = 'multiply'
+    bot.frameSpeed = 200
   }
 
   const moveBots = logs => {
@@ -288,12 +282,9 @@ function init() {
         const closestBot = closestBotData && bots[closestBotData.index]
         if (!closestBot) {
           logs.push(`${b.id} survived`)
-          // createBots(botNo())
           return
-        } else if ((b.time > 180 && activeBotsNo() < 40 && b.animation !== 'break')) {
-          logs.push(`${b.id} is in multiply mode`)
-          changeAnimation(b.mode === 'sleep' ? 'multiply' : 'transform', b)
-          b.mode = 'multiply'
+        } else if ((b.time > 180 && activeBotsNo() < maxBotNo() && b.animation !== 'break')) {
+          multiplyMode(b, logs)
         } else if (!['sleep', 'multiply'].includes(b.mode)) {
           decideHuntOrFlee(b, closestBot)
         }
@@ -305,7 +296,7 @@ function init() {
           }
         } else if (
           (b.mode === 'flee' && closestBotData.distance > 100)  
-          || (b.time > 200 && activeBotsNo() > 40)
+          || (b.time > 200 && activeBotsNo() > maxBotNo())
           ) {
           charge(b, logs)
         } else if (b.mode === 'hunter' && closestBotData.distance < 24) {
@@ -327,7 +318,10 @@ function init() {
       {x: d, y: d},
     ]
     pos.forEach(p => {
-      createBot({ x, y, x2: x + p.x, y2: y + p.y, time: time / 4, history: [...history]})
+      createBot({ 
+        x, y, x2: x + p.x, y2: y + p.y, 
+        time: time / 4, history: [...history.slice(0, 6)] 
+      })
     })
   }
 
@@ -352,7 +346,10 @@ function init() {
   const multiply = (bot, logs) => {
     if (bot.time % 4 === 0 && (activeBotsNo() < 40)) {
       logs.push(`${bot.id} multiplied`)
-      createNewBots(bot.xy.x, bot.xy.y, bot.time, bot.history ? [...bot.history, bot.id] : [bot.id])
+      createNewBots(
+        bot.xy.x, bot.xy.y, 
+        bot.time, bot.history ? [bot.id, ...bot.history] : [bot.id]
+      )
       stopBot('stop', bot)
       bot.time = 0
       bot.mode = 'destroyed'
@@ -365,7 +362,7 @@ function init() {
       newLog.innerHTML = logs.map(l => `<p>${l}</p>`).join('')
       log.append(newLog)
       setTimeout(()=> {
-        newLog.style.height = `${indicator.clientHeight * logs.length - 1}px`
+        newLog.style.height = `${indicator.clientHeight * logs.length}px`
       }, 100)
       log.childNodes.forEach((node, i) => {
         if (i < (log.childNodes.length - 1)) node.classList.add('light_fade')
@@ -380,31 +377,32 @@ function init() {
   }
 
   setInterval(()=> {
-    const logs = []
-    bots.forEach(bot => {
-      if (bot.mode === 'multiply') {
-        bot.time--
-        multiply(bot, logs)
-      } else if (bot.mode === 'sleep' && !bot.stop) {
-        if (bot.time < 300) {
-          bot.time += 10
-        } else {
-          explodeBot(bot)
-          logs.push(`${bot.id} exploded due to overcharge`)
+    if (windowActive){
+      const logs = []
+      bots.forEach(bot => {
+        if (bot.mode === 'multiply') {
+          bot.time--
+          multiply(bot, logs)
+        } else if (bot.mode === 'sleep' && !bot.stop) {
+          if (bot.time < 300) {
+            bot.time += 10
+          } else {
+            explodeBot(bot)
+            logs.push(`${bot.id} exploded due to overcharge`)
+          }
+        } else if (!bot.stop) {
+          countdownTime(bot, logs)
         }
-      } else if (!bot.stop) {
-        countdownTime(bot, logs)
-      }
-      bot.bot.setAttribute('time', bot.time)
-    })
-    moveBots(logs)
-    removeDestroyedBots()
-    updateLog(logs)
-    indicator.innerText = `active bots: ${activeBotsNo()}`
-    populateInfo()
+        bot.bot.setAttribute('time', bot.time)
+      })
+      moveBots(logs)
+      removeDestroyedBots()
+      updateLog(logs)
+      indicator.innerText = `active bots: ${activeBotsNo()}`
+      populateInfo()
+    }
   }, 1000)
   
-  // info.addEventListener('click', displayInfo)
   infoCard.addEventListener('click', ()=> info.classList.remove('open'))
   createBots(botNo())
 }
