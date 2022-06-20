@@ -1,8 +1,15 @@
 function init() {  
-
+  
+  const overlay = document.querySelector('.overlay')
   let windowActive = true
-  window.addEventListener('focus', ()=> windowActive = true)
-  window.addEventListener('blur', ()=> windowActive = false)
+  window.addEventListener('focus', ()=> {
+    windowActive = true
+    overlay.classList.remove('paused')
+  })
+  window.addEventListener('blur', ()=> {
+    windowActive = false
+    overlay.classList.add('paused')
+  })
 
   const body = document.querySelector('.wrapper')
   const indicator = document.querySelector('.indicator')
@@ -41,8 +48,14 @@ function init() {
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
   const withinBuffer = (a, b) => Math.abs(a, b) < 50
   const activeBotsNo = () => bots.filter(bot => !bot.stop).length
-  const botNo = () => Math.round((body.clientWidth * body.clientHeight) / (200 * 200))
-  const maxBotNo = () => botNo() * 2
+  const botNo = () => {
+    const defaultNo = Math.round((body.clientWidth * body.clientHeight) / (180 * 180))
+    return defaultNo < 10 ? 10 : defaultNo
+  }
+  const maxBotNo = () => {
+    const defaultNo = botNo() * 2
+    return defaultNo < 16 ? 16 : defaultNo
+  }  
 
   const setMargin = (target, x, y) => {
     target.style.transform = `translate(${x}px, ${y}px)`
@@ -237,7 +250,12 @@ function init() {
   const huntAndDestroy = (bot, closestBot, logs) => {
     displayTimeChange(bot, closestBot, '+')
     displayTimeChange(closestBot, closestBot, '-')
-    logs.push(`${bot.id} destroyed ${closestBot.id} and gained ${closestBot.time} sec`)
+    const seconds = closestBot.time === 0
+      ? '' 
+      : closestBot.time === 1
+        ? ` and gained ${closestBot.time} second`
+        : ` and gained ${closestBot.time} seconds`
+    logs.push(`${bot.id} destroyed ${closestBot.id}${seconds}`)
     bot.log.push('destroy')
     updateBotTime(bot, closestBot)
     explodeBot(closestBot)
@@ -281,7 +299,8 @@ function init() {
         const closestBotData = [...distances(b, bots).filter(d => d.index !== i && !['load','destroyed'].includes(d.mode))].sort((a, b) => a.distance - b.distance )[0]
         const closestBot = closestBotData && bots[closestBotData.index]
         if (!closestBot) {
-          logs.push(`${b.id} survived`)
+          logs.push(`${b.id} is alone`)
+          multiplyMode(b, logs)
           return
         } else if ((b.time > 180 && activeBotsNo() < maxBotNo() && b.animation !== 'break')) {
           multiplyMode(b, logs)
@@ -398,7 +417,7 @@ function init() {
       moveBots(logs)
       removeDestroyedBots()
       updateLog(logs)
-      indicator.innerText = `active bots: ${activeBotsNo()}`
+      indicator.innerText = `active robots: ${activeBotsNo()}`
       populateInfo()
     }
   }, 1000)

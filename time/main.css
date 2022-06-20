@@ -24,6 +24,24 @@ body {
   text-transform: uppercase;
 }
 
+.overlay {
+  color: transparent;
+  z-index: 99999;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+}
+
+.overlay.paused {
+  background-color: rgba(5, 24, 50, 0.733);
+  color: white;
+}
+
 .outer_wrapper {
   position: absolute;
   width: 100%;
@@ -114,11 +132,11 @@ body {
 }
 
 .log_bar > .flee {
-  background-color: rgb(131, 1, 196);
+  background-color: rgb(128, 32, 177);
 }
 
 .log_bar > .hunt {
-  background-color: aquamarine;
+  background-color: rgb(80, 252, 195);
 }
 
 .log_bar > .charge {
@@ -153,12 +171,12 @@ body {
   image-rendering: pixelated;
   background-repeat: no-repeat !important;
   background-size: var(--bot_width) calc(16px * 2) !important; 
-  background-blend-mode: multiply;
+  /* background-blend-mode: multiply;
   mask-image: var(--bot_bg);
   -webkit-mask-image: var(--bot_bg);
   mask-size: 100%;
-  -webkit-mask-size: 100%;
-  transition: background-color 1s;
+  -webkit-mask-size: 100%; */
+  /* transition: background-color 1s; */
 }
 
 .bot:hover {
@@ -174,7 +192,7 @@ body {
   transition: filter 0.2s;
 }
 
-.bot_wrapper.multiply .bot,
+/* .bot_wrapper.multiply .bot,
 .bot_wrapper.hunter .bot {
   background-color: aquamarine;
 }
@@ -185,7 +203,7 @@ body {
 
 .bot_wrapper.stop .bot {
   background-color: rgb(80, 80, 80);
-}
+} */
 
 .bot_wrapper::after {
   position: absolute;
@@ -201,6 +219,19 @@ body {
   height: 24px;
   transition: 0.4s;
   pointer-events: none;
+}
+
+.bot_wrapper.multiply::after,
+.bot_wrapper.hunter::after {
+  color: aquamarine;
+}
+
+.bot_wrapper.flee::after {
+  color: rgb(172, 108, 246);
+}
+
+.bot_wrapper.stop::after {
+  color: rgb(80, 80, 80);
 }
 
 .bot_wrapper.multiply::after,
@@ -262,7 +293,7 @@ body {
 }
 
 .time.reduced {
-  color: rgb(217, 85, 151);
+  color: rgb(170, 100, 251);
 }
 
 @keyframes slow_fade {
