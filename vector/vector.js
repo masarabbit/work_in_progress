@@ -17,22 +17,6 @@ const vector = {
     this[elem] = n
   },
 
-	// setX: function(n) {
-	// 	this.x = n
-	// },
-
-	// getX: function() {
-	// 	return this.x
-	// },
-
-	// setY: function(n) {
-	// 	this.y = n
-	// },
-
-	// getY: function() {
-	// 	return this.y
-	// },
-
 	setAngle: function(angle) {
 		const length = this.magnitude()
 		this.x = Math.cos(angle) * length

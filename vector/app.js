@@ -3,7 +3,7 @@ import vector from './vector.js'
 function init() {  
   const canvas = document.querySelector('canvas')
   const ctx = canvas.getContext('2d')
-  console.log('experiment')
+  const indicator = document.querySelector('.indicator')
   
   const w = 800
   const h = 500
@@ -42,17 +42,25 @@ function init() {
     frames: [], 
     count: 0, 
     i: 0, 
-    s: { x: 3, y: 3 } 
+    s: { x: 0.5, y: 3 },
+    accelerate: function() {
+      //* this needs improvement. Too linear
+      //* need to add gravity
+      // this.s.x = this.s.x < 0 ? this.s.x - 0.001 : this.s.x + 0.001
+      // this.s.y = this.s.y < 0 ? this.s.y - 0.001 : this.s.y + 0.001
+      this.s.x *= 1.001
+      this.s.y *= 1.001
+    },
+    bounce: function({elem, key, axis}) {
+      if (elem < 0 || (elem + 32) > axis) {
+        // this.s[key] = this.s[key] < 0 ? -3 : 3
+        this.s[key] *= -0.95
+      }  
+    }, 
   }
   testSmile.forEach(f => storeImage(f, smily.frames))
   console.log(smily.get('x'))
 
-  // let x = 0
-  // let y = 0
-  // let i = 0
-  // let count = 0
-  // let xS = 3
-  // let yS = 3
 
 	const update = () => {
 		ctx.clearRect(0, 0, w, h)
@@ -61,27 +69,16 @@ function init() {
     smily.incrementFrame()
     const x = smily.get('x')
     const y = smily.get('y')
-    //* this could probably live inside the object too.
-    if (x < 0 || (x + 32) > w) smily.s.x *= -1
-    if (y < 0 || (y + 32) > h) smily.s.y *= -1
+
+    smily.bounce({ elem: x, key: 'x', axis: w})
+    smily.bounce({ elem: y, key: 'y', axis: h})
+    smily.accelerate()
     smily.set('x', x + smily.s.x)
     smily.set('y', y + smily.s.y) 
 
     ctx.drawImage(smily.frames[smily.i], smily.get('x'), smily.get('y'), 32, 32)
 
-
-    // count++
-		// i = count % 12 === 0 ? i + 1 : i
-    // if (i > 1) i = 0
-    
-    // if (x < 0 || (x + 32) > w) xS = xS * -1
-    // if (y < 0 || (y + 32) > h) yS = yS * -1
-
-    // x += xS
-    // y += yS
-  
-    // ctx.drawImage(frames[i], x, y, 32, 32)
-
+    // indicator.innerHTML = `s: ${smily.s.x} / ${smily.s.y}`
 		requestAnimationFrame(update)
 	}
 
