@@ -42,6 +42,16 @@ body {
   align-items: center;
 }
 
+.circle_wrapper::after {
+  position: absolute;
+  content: '';
+  /* border: hotpink 1px solid; */
+  height: 300px;
+  width: 600px;
+  bottom: 0px;
+  background-color: rgba(255, 105, 180, 0.728);
+}
+
 .circle {
   border-radius: 200px;
   width: 400px;
@@ -90,6 +100,12 @@ a:hover { text-decoration: underline; }
   height: 60px;
   color: hotpink;
   transition: 1s;
+  display: flex;
+  flex-direction: column;
+}
+
+.element.change {
+  color: black;
 }
 
 .bear {
@@ -116,4 +132,16 @@ a:hover { text-decoration: underline; }
 
 .right {
   transform: scale(-1, 1);
+}
+
+.color-0 {
+  background-color: navy !important;
+}
+
+.color-1 {
+  background-color: green !important;
+}
+
+.color-2 {
+  background-color: yellow !important;
 }
