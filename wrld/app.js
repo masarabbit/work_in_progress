@@ -1,6 +1,6 @@
 function init() {  
 
-  // TODO add control to test on mobile
+  // TODO make circle responsive ?
 
   const circleData = {
     angle: 270,
