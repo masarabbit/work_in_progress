@@ -179,3 +179,48 @@ a:hover { text-decoration: underline; }
   border: solid hotpink;
   border-right-width: 1px;
 }
+
+.control {
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.control > div:nth-child(2) {
+  width: 200px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.arrow {
+  background-repeat: no-repeat;
+  background-size: 50px !important; 
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAFZJREFUOE+90zEOACAIA8Dy/0drHJwotAzKSMzh0AbyLABB9nTFHh7gjIV0gIUoQCIO0CIuUCITgCJTICHfgXRw8gMaLBcoU+kAbaQVIPvwrEzy8u32Bm9nEBGWAQTiAAAAAElFTkSuQmCC);
+  width: 50px;
+  height: 50px;
+  image-rendering: pixelated;
+}
+
+.arrow.right {
+  transform: scale(1);
+}
+
+.left {
+  transform: scale(-1, 1);
+}
+
+.up {
+  transform: rotate(270deg);
+}
+
+.down {
+  transform: rotate(90deg);
+}
+
+.arrow:hover {
+  filter: invert(100%);
+  cursor: pointer;
+}

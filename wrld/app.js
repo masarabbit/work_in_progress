@@ -1,28 +1,34 @@
 function init() {  
 
+  // TODO add control to test on mobile
+
   const circleData = {
-    angle: -90,
+    angle: 270,
     interval: null,
-    key: null,
+    key: 'u',
     mapIndex: 0,
-    flipped: null
+    pos: 0,
   }
+  
   const config = {
     'l': 1,
     'r': -1,
     'u': 0,
     'd': 0,
   }
-  const indexConfig = {
-    'l': -1,
-    'r': 1
-  }
 
-  const elements = {
-    elements: null
-  }
+  
 
-  const indexs = {}
+  const addEvents = (target, event, action, array) =>{
+    array.forEach(a => event === 'remove' ? target.removeEventListener(a, action) : target.addEventListener(a, action))
+  }
+  const mouse = {
+    // up: (t, e, a) => addEvents(t, e, a, ['mouseup', 'touchend']),
+    // move: (t, e, a) => addEvents(t, e, a, ['mousemove', 'touchmove']),
+    // down: (t, e, a) => addEvents(t, e, a, ['mousedown', 'touchstart']),
+    enter: (t, e, a) => addEvents(t, e, a, ['mouseenter', 'touchstart']),
+    leave: (t, e, a) => addEvents(t, e, a, ['mouseleave', 'touchmove'])
+  }
   
 
   const bearData = {
@@ -47,18 +53,8 @@ function init() {
     }
   }
 
-  const mapItemsTwo = {
+  const mapItems = {
     0: [
-      {
-        element: 'line',
-        angle: 0,
-        name: ''
-      },
-      {
-        element: 'line',
-        angle: 180,
-        name: ''
-      },
       {
         element: 'tree',
         angle: 30,
@@ -83,17 +79,7 @@ function init() {
       //   name: ''
       // },
     ],
-    1: [
-      {
-        element: 'line',
-        angle: 0,
-        name: ''
-      },
-      {
-        element: 'line',
-        angle: 180,
-        name: ''
-      },      
+    1: [     
       {
         element: 'tree',
         angle: 10,
@@ -115,16 +101,6 @@ function init() {
     ],
     2: [
       {
-        element: 'line',
-        angle: 0,
-        name: ''
-      },
-      {
-        element: 'line',
-        angle: 180,
-        name: ''
-      },
-      {
         element: 'tree',
         angle: 10,
         name: 'g',
@@ -145,16 +121,6 @@ function init() {
     ],
     3: [
       {
-        element: 'line',
-        angle: 0,
-        name: ''
-      },
-      {
-        element: 'line',
-        angle: 180,
-        name: ''
-      },
-      {
         element: 'tree',
         angle: 10,
         name: 'g',
@@ -174,30 +140,27 @@ function init() {
       },
     ],
   }
-  Object.keys(mapItemsTwo).forEach(index =>{
-    mapItemsTwo[index].forEach(item => item.triggerAngle = item.angle - 90)
+  
+  const mapItemKeys = Object.keys(mapItems)
+
+  mapItemKeys.forEach(index => {
+    mapItems[index].forEach(item => item.triggerAngle = item.angle - 90)
   })
-  console.log(mapItemsTwo)
+
+
   
   const indicator = document.querySelector('.indicator')
   const cellD = 32
   const circle = document.querySelector('.circle')
   const circleWrapper = document.querySelector('.circle_wrapper')
-  const mapItems = ['navy', 'black', 'white','navy', 'black', 'white','navy', 'black', 'white','navy', 'black', 'white']
+  const arrows = document.querySelectorAll('.arrow')
 
-  const placeElements = (mapItems, index) =>{
-    mapItems.forEach(item =>{
-      placeElement(item, index)
-
-      // TODO offset and z-index could be specified per items
-    })
-    // elements.elements = document.querySelectorAll('.element')
-    // updateElements()
+  const placeElements = (mapItems, index) => {
+    mapItems.forEach(item => placeElement(item, index))
   }
 
-  const placeElement = (item, i) =>{
+  const placeElement = (item, i) => {
     const element = document.createElement('div')
-    // element.style.backgroundColor = ele
     const offset = i % 2 === 0 ? 0 : 180
     element.classList.add('element')
     element.classList.add(item.element)
@@ -205,16 +168,10 @@ function init() {
     circle.append(element)
     const { width, height } = items[item.element]
     element.style.transform = `translate(${200 - (width / 2)}px, -${height - 5}px) rotate(${item.angle + offset}deg)`
-    // setTimeout(()=>{
-    //   element.style.transform = `translate(${200 - (width / 2)}px, -${height - 5}px) rotate(${item.angle}deg)`
-    // }, 1000)
     element.innerHTML = item.element + item.color
     element.style.transformOrigin = `center ${200 + (height - 5)}px`
     item.placed = element
   }
-
-  // mapItems.forEach((_,i) => indexs[i] = i < 6 ? 0 : 2)
-  mapItems.forEach((_,i) => indexs[i] = 0)
 
 
   const setSpritePos = (num, actor, sprite) =>{
@@ -244,42 +201,55 @@ function init() {
   const returnNextOrPrev = current =>{
     return current === -1
     ? 3
-    : current === 4
+    : current === mapItemKeys.length
       ? 0
       : current
   }
 
+  // const returnPos = current => {
+  //   return current === 360
+  //   ? -360
+  //   : current === -540
+  //     ? 180
+  //     : current
+  // }
+
+  
+  // TODO make this dynamic
+  
+  const returnPos = current => {
+    return current === (90 * mapItemKeys.length)
+    ? -(90 * mapItemKeys.length)
+    : current === -540
+      ? 180
+      : current
+  }
+
   const updateElements = () =>{
-
-    const trigger ={ // TODO maybe this trigger needs to change
-      'l': [ 89, 269 ],
-      'r': [ 91, 271 ],
-    } 
-
+    const trigger = [ 89, 269, 91, 271 ]
     const { key } = circleData
-    const currentIndex = circleData.mapIndex
-    
-    if (trigger[key]?.includes(Math.abs(circleData.angle))) {
-
-      const indexToAdd = key === 'r' ? returnNextOrPrev(currentIndex + 1) : returnNextOrPrev(currentIndex - 1)
-      const indexToRemove = key === 'r' ? returnNextOrPrev(currentIndex - 1) : returnNextOrPrev(currentIndex + 1)
-      mapItemsTwo[indexToRemove].forEach(item => {
-        item.placed?.remove()
-      })
-      mapItemsTwo[indexToAdd].forEach(item => {
-        placeElement(item, indexToAdd)
-      })
-
-      if([0, -362, -453, 269].includes(circleData.flipped)) {
-        circleData.mapIndex = indexToAdd
-        if ([-453, 269].includes(circleData.flipped)) circleData.flipped = null
-      } 
-      circleData.flipped += circleData.angle
-      console.log(circleData.flipped)
+    const currentIndexs = {
+      '0': 0,
+      '-180': 1,
+      '-360': 2,
+      '180': 3
     }
 
+    circleData.pos += config[key]
+    circleData.pos = returnPos(circleData.pos)
+    circleData.mapIndex = [0, 3, 1, 2].includes(currentIndexs[`${circleData.pos}`]) ?  currentIndexs[`${circleData.pos}`] : circleData.mapIndex
 
-    indicator.innerHTML = `${circleData.angle} prev: ${returnNextOrPrev(currentIndex - 1)} current: ${currentIndex} next:${returnNextOrPrev(currentIndex + 1)}`
+    const { mapIndex } = circleData
+    
+    if (trigger.includes(Math.abs(circleData.angle))) {
+      const indexToAdd = key === 'r' ? returnNextOrPrev(mapIndex + 1) : returnNextOrPrev(mapIndex - 1)
+      mapItemKeys.forEach(index =>{
+        if (index !== `${mapIndex}`) mapItems[index].forEach(item => item.placed?.remove())
+      })
+      mapItems[indexToAdd].forEach(item => placeElement(item, indexToAdd))
+    }
+
+    indicator.innerHTML = `pos:${circleData.pos} ${circleData.angle} prev: ${returnNextOrPrev(mapIndex - 1)} current: ${mapIndex} next:${returnNextOrPrev(mapIndex + 1)}`
     if (Math.abs(circleData.angle) === 360) {
       circleData.angle = 0
     }
@@ -291,8 +261,8 @@ function init() {
     updateElements()
   }
 
-  const handleKey = e =>{
-    const key = e.key.replace('Arrow','').toLowerCase()[0]
+  const handleKey =({ e, letter })=>{
+    const key = e && e.key.replace('Arrow','').toLowerCase()[0] || letter
     if (!['l','r','u','d'].includes(key)) return
     if (circleData.key !== key){
       clearInterval(circleData.interval)
@@ -326,14 +296,24 @@ function init() {
 
 
   
-  placeElements(mapItemsTwo[0], 0)
+  placeElements(mapItems[0], 0)
   rotateCircle('u')
   placeBear()
 
-  window.addEventListener('keydown', e => handleKey(e))
+  window.addEventListener('keydown', e => handleKey({ e }))
   window.addEventListener('keyup', ()=> {
     turnSprite({ e:circleData.key, actor: bearData })
     circleData.key = null
+  })
+
+  arrows.forEach(arrow =>{
+    mouse.enter(arrow, 'add', e =>{
+      handleKey({ letter: e.target.dataset.d })
+    })
+    mouse.leave(arrow, 'add', () =>{
+      turnSprite({ e:circleData.key, actor: bearData })
+      circleData.key = null
+    })
   })
   
 
@@ -362,8 +342,8 @@ window.addEventListener('DOMContentLoaded', init)
   //   updateElements()
   // }
 
-    // Object.keys(mapItemsTwo).forEach(index =>{
-    //   mapItemsTwo[index].forEach(item => {
+    // Object.keys(mapItems).forEach(index =>{
+    //   mapItems[index].forEach(item => {
     //     if (
     //       (circleData.key === 'r' && checkAngle < item.triggerAngle) ||
     //       (circleData.key === 'l' && checkAngle > item.triggerAngle)
