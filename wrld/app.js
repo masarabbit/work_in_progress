@@ -23,11 +23,11 @@ function init() {
     array.forEach(a => event === 'remove' ? target.removeEventListener(a, action) : target.addEventListener(a, action))
   }
   const mouse = {
-    // up: (t, e, a) => addEvents(t, e, a, ['mouseup', 'touchend']),
+    up: (t, e, a) => addEvents(t, e, a, ['mouseup', 'touchend']),
     // move: (t, e, a) => addEvents(t, e, a, ['mousemove', 'touchmove']),
-    // down: (t, e, a) => addEvents(t, e, a, ['mousedown', 'touchstart']),
-    enter: (t, e, a) => addEvents(t, e, a, ['mouseenter', 'touchstart']),
-    leave: (t, e, a) => addEvents(t, e, a, ['mouseleave', 'touchmove'])
+    down: (t, e, a) => addEvents(t, e, a, ['mousedown', 'touchstart']),
+    // enter: (t, e, a) => addEvents(t, e, a, ['mouseenter', 'touchstart']),
+    // leave: (t, e, a) => addEvents(t, e, a, ['mouseleave', 'touchmove'])
   }
   
 
@@ -307,10 +307,10 @@ function init() {
   })
 
   arrows.forEach(arrow =>{
-    mouse.enter(arrow, 'add', e =>{
+    mouse.down(arrow, 'add', e =>{
       handleKey({ letter: e.target.dataset.d })
     })
-    mouse.leave(arrow, 'add', () =>{
+    mouse.up(arrow, 'add', () =>{
       turnSprite({ e:circleData.key, actor: bearData })
       circleData.key = null
     })
