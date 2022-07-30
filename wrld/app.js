@@ -1,6 +1,5 @@
 function init() {  
 
-  // TODO make circle responsive ?
 
   const circleData = {
     angle: 270,
@@ -199,24 +198,28 @@ function init() {
   mapItemKeys.forEach(index => {
     mapItems[index].forEach(item => item.triggerAngle = item.angle - 90)
   })
-  const isNum = x => x && x * 0 === 0
+  const isNum = x => typeof x === 'number'
 
   
   const indicator = document.querySelector('.indicator')
   const cellD = 32
   const circle = document.querySelector('.circle')
   const circleWrapper = document.querySelector('.circle_wrapper')
+  const pointer = document.querySelector('.pointer')
+  
 
   const placeElements = (mapItems, index) => {
     mapItems.forEach(item => placeElement(item, index))
   }
+  
+  document.querySelector('.location_mark').innerHTML = mapItemKeys.map(()=> `<div></div>`).join('')
+  
 
   const placeElement = (item, i) => {
     const element = document.createElement('div')
     const offset = i % 2 === 0 ? 0 : 180
     element.classList.add('element')
     element.classList.add(item.element)
-    element.classList.add(item.color)
     circle.append(element)
     const { width, height } = items[item.element]
     element.style.transform = `translate(${200 - (width / 2)}px, -${height - 5}px) rotate(${item.angle + offset}deg)`
@@ -259,43 +262,60 @@ function init() {
 
   const returnPos = current => {
     return current === mapItemKeys.length * 180
-    ? 0
+    ? mapItemKeys.length * -180 // 0 ?
     : current === mapItemKeys.length * -180
       ? 0
       : current
   }
 
+  const populateCircle = key =>{
+    const { mapIndex } = circleData
+    const indexToAdd = key === 'r' ? returnNextOrPrev(mapIndex + 1) : returnNextOrPrev(mapIndex - 1)
+    mapItemKeys.forEach(index =>{
+      if (index !== `${mapIndex}`) mapItems[index].forEach(item => item.placed?.remove())
+    })
+    // mapItems[indexToAdd].forEach(item => placeElement(item, indexToAdd))
+    placeElements(mapItems[indexToAdd], indexToAdd)
+  }
+
+  const currentPos = pos =>{
+    if (pos === 0) return 0
+
+    return pos > 0 
+      ? (pos / -180) + mapItemKeys.length
+      : pos / -180
+  }
+
+  const currentIndex = pos => {
+    const index = currentPos(pos)
+    return Number.isInteger(index) && index
+  }
+
+  const movePointer = pos =>{
+    console.log('pos', currentPos(pos))
+    const { width } = circleWrapper.getBoundingClientRect()
+    pointer.style.transform = `translateX(${((currentPos(pos -90) / mapItemKeys.length) * width) - 10}px)`
+  }
+
+  // movePointer(100)
+
+
   const updateElements = () =>{
     const trigger = [ 89, 269, 91, 271 ]
     const { key } = circleData
 
-    const currentIndexs = pos => {
-      const index = pos > 0 
-        ? (pos / -180) + mapItemKeys.length
-        : pos / -180
-      return index % 1 === 0 && index
-    }
-
     circleData.pos += config[key]
     circleData.pos = returnPos(circleData.pos)
-    const index = currentIndexs(circleData.pos)
+    const index = currentIndex(circleData.pos)
     circleData.mapIndex = isNum(index) ? index : circleData.mapIndex
-
     circleData.mapIndex = returnNextOrPrev(circleData.mapIndex)
 
-    const { mapIndex } = circleData
+    if (trigger.includes(Math.abs(circleData.angle))) populateCircle(key)
     
-    if (trigger.includes(Math.abs(circleData.angle))) {
-      const indexToAdd = key === 'r' ? returnNextOrPrev(mapIndex + 1) : returnNextOrPrev(mapIndex - 1)
-      mapItemKeys.forEach(index =>{
-        if (index !== `${mapIndex}`) mapItems[index].forEach(item => item.placed?.remove())
-      })
-      mapItems[indexToAdd].forEach(item => placeElement(item, indexToAdd))
-    }
-    
-    indicator.innerHTML = `${currentIndexs(circleData.pos)} pos:${circleData.pos} current: ${mapIndex}`
+    indicator.innerHTML = `pos:${circleData.pos} current: ${circleData.mapIndex}`
 
     // indicator.innerHTML = `pos:${circleData.pos} ${circleData.angle} prev: ${returnNextOrPrev(mapIndex - 1)} current: ${mapIndex} next:${returnNextOrPrev(mapIndex + 1)}`
+    movePointer(circleData.pos)
     if (Math.abs(circleData.angle) === 360) {
       circleData.angle = 0
     }
@@ -336,7 +356,8 @@ function init() {
     bear.classList.add('bear_wrapper')
     circleWrapper.append(bear)
     bear.innerHTML = '<div><div class="bear"></div></div>'
-    bear.style.transform = `translate(0, ${-200 - 10}px)`
+
+    bear.style.transform = `translate(0, ${40 - 10}px)`
     bearData.sprite = bear.childNodes[0].childNodes[0]
   }
 
@@ -409,6 +430,16 @@ const addTouchAction = (target, handleKeyAction) =>{
 
 const control = document.querySelector('.touch_circle')
 addTouchAction(control, handleKey)
+
+const resize = () => {
+  const { innerWidth } = window
+  const { width } = circleWrapper.getBoundingClientRect()
+  circleWrapper.style.transform = innerWidth < width ? `scale(${innerWidth / width})` : 'scale(1)'
+}
+
+resize()
+window.addEventListener('resize', resize)
+
 
 }
 
