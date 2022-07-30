@@ -48,7 +48,11 @@ function init() {
 
   const items = {
     tree: {
-      width: 50,
+      width: 48,
+      height: 60,
+    },
+    tree_white: {
+      width: 48,
       height: 60,
     },
     mountain: {
@@ -61,6 +65,7 @@ function init() {
     }
   }
 
+  // this needs to be even number to work
   const mapItems = {
     0: [
       {
@@ -70,7 +75,7 @@ function init() {
         color: 'color-0'
       },
       {
-        element: 'tree',
+        element: 'tree_white',
         angle: 60,
         name: 'b',
         color: 'color-0'
@@ -147,6 +152,46 @@ function init() {
         color: 'color-3'
       },
     ],
+    4: [
+      {
+        element: 'tree',
+        angle: 10,
+        name: 'g',
+        color: 'color-4'
+      },
+      {
+        element: 'tree',
+        angle: 60,
+        name: 'h',
+        color: 'color-4'
+      },
+      {
+        element: 'tree',
+        angle: 120,
+        name: 'i',
+        color: 'color-4'
+      },
+    ],
+    5: [
+      {
+        element: 'tree',
+        angle: 10,
+        name: 'g',
+        color: 'color-5'
+      },
+      {
+        element: 'tree',
+        angle: 60,
+        name: 'h',
+        color: 'color-5'
+      },
+      {
+        element: 'tree',
+        angle: 120,
+        name: 'i',
+        color: 'color-5'
+      },
+    ],
   }
   
   const mapItemKeys = Object.keys(mapItems)
@@ -154,14 +199,13 @@ function init() {
   mapItemKeys.forEach(index => {
     mapItems[index].forEach(item => item.triggerAngle = item.angle - 90)
   })
-
+  const isNum = x => x && x * 0 === 0
 
   
   const indicator = document.querySelector('.indicator')
   const cellD = 32
   const circle = document.querySelector('.circle')
   const circleWrapper = document.querySelector('.circle_wrapper')
-  const arrows = document.querySelectorAll('.arrow')
 
   const placeElements = (mapItems, index) => {
     mapItems.forEach(item => placeElement(item, index))
@@ -184,7 +228,6 @@ function init() {
 
   const setSpritePos = (num, actor, sprite) =>{
     actor.spritePos = num
-    // this can't be set with translate, because translate is used to flip sprites too.
     sprite.style.marginLeft = `${num}px`
   }
   
@@ -208,44 +251,37 @@ function init() {
   
   const returnNextOrPrev = current =>{
     return current === -1
-    ? 3
+    ? mapItemKeys.length - 1
     : current === mapItemKeys.length
       ? 0
       : current
   }
 
-  // const returnPos = current => {
-  //   return current === 360
-  //   ? -360
-  //   : current === -540
-  //     ? 180
-  //     : current
-  // }
-
-  
-  // TODO make this dynamic
-  
   const returnPos = current => {
-    return current === (90 * mapItemKeys.length)
-    ? -(90 * mapItemKeys.length)
-    : current === -540
-      ? 180
+    return current === mapItemKeys.length * 180
+    ? 0
+    : current === mapItemKeys.length * -180
+      ? 0
       : current
   }
 
   const updateElements = () =>{
     const trigger = [ 89, 269, 91, 271 ]
     const { key } = circleData
-    const currentIndexs = {
-      '0': 0,
-      '-180': 1,
-      '-360': 2,
-      '180': 3
+
+    const currentIndexs = pos => {
+      const index = pos > 0 
+        ? (pos / -180) + mapItemKeys.length
+        : pos / -180
+      return index % 1 === 0 && index
     }
 
     circleData.pos += config[key]
     circleData.pos = returnPos(circleData.pos)
-    circleData.mapIndex = [0, 3, 1, 2].includes(currentIndexs[`${circleData.pos}`]) ?  currentIndexs[`${circleData.pos}`] : circleData.mapIndex
+    const index = currentIndexs(circleData.pos)
+    circleData.mapIndex = isNum(index) ? index : circleData.mapIndex
+
+    circleData.mapIndex = returnNextOrPrev(circleData.mapIndex)
 
     const { mapIndex } = circleData
     
@@ -256,8 +292,10 @@ function init() {
       })
       mapItems[indexToAdd].forEach(item => placeElement(item, indexToAdd))
     }
+    
+    indicator.innerHTML = `${currentIndexs(circleData.pos)} pos:${circleData.pos} current: ${mapIndex}`
 
-    indicator.innerHTML = `pos:${circleData.pos} ${circleData.angle} prev: ${returnNextOrPrev(mapIndex - 1)} current: ${mapIndex} next:${returnNextOrPrev(mapIndex + 1)}`
+    // indicator.innerHTML = `pos:${circleData.pos} ${circleData.angle} prev: ${returnNextOrPrev(mapIndex - 1)} current: ${mapIndex} next:${returnNextOrPrev(mapIndex + 1)}`
     if (Math.abs(circleData.angle) === 360) {
       circleData.angle = 0
     }
@@ -362,7 +400,7 @@ const addTouchAction = (target, handleKeyAction) =>{
     }, 200)
     clearInterval(touchControl.timer)
     touchControl.active = false
-    
+
     turnSprite({ e:circleData.key, actor: bearData })
     circleData.key = null
   }
@@ -371,80 +409,9 @@ const addTouchAction = (target, handleKeyAction) =>{
 
 const control = document.querySelector('.touch_circle')
 addTouchAction(control, handleKey)
-  // arrows.forEach(arrow =>{
-  //   mouse.down(arrow, 'add', e =>{
-  //     handleKey({ letter: e.target.dataset.d })
-  //   })
-  //   mouse.up(arrow, 'add', () =>{
-  //     turnSprite({ e:circleData.key, actor: bearData })
-  //     circleData.key = null
-  //   })
-  // })
-  
-  
 
 }
 
 window.addEventListener('DOMContentLoaded', init)
 
 
-
-  // const placeElements = mapItems =>{
-  //   mapItems.forEach((ele, i)=>{
-  //     const element = document.createElement('div')
-  //     element.style.backgroundColor = ele
-  //     element.classList.add('element')
-  //     circle.append(element)
-
-  //     // element.style.transform = `translate(${200 - (50 / 2)}px, -${55}px) rotate(${i * 30}deg)`
-  //     setTimeout(()=>{
-  //       element.style.transform = `translate(${200 - (50 / 2)}px, -${55}px) rotate(${i * 30}deg)`
-  //     }, 1000)
-  //     element.innerHTML = i
-  //     element.style.transformOrigin = `center ${200 + 55}px`
-  //   })
-  //   elements.elements = document.querySelectorAll('.element')
-  //   updateElements()
-  // }
-
-    // Object.keys(mapItems).forEach(index =>{
-    //   mapItems[index].forEach(item => {
-    //     if (
-    //       (circleData.key === 'r' && checkAngle < item.triggerAngle) ||
-    //       (circleData.key === 'l' && checkAngle > item.triggerAngle)
-    //     ){
-    //       if (!item.placed) placeElement(item)
-    //     } else {
-    //       // console.log(item.placed)
-    //       if (item.placed) {
-    //         item.placed.remove()
-    //         item.placed = null
-    //       }
-    //     }
-    //   })
-    // })    
-
-        // elements.elements.forEach((element, i)=> {
-    //   const angle = i * 30 + circleData.angle
-    //   const newAngle = angle >= 360 
-    //     ? angle - (Math.floor(angle / 360) * 360)
-    //     : angle < 0
-    //       ? angle - (Math.floor(angle / 360) * 360)
-    //       : angle
-
-    //   if ((newAngle === 180) && ['l', 'r'].includes(circleData.key)) {
-    //     indexs[i] += indexConfig[circleData.key]
-    //   }
-      // indexs[i] + Math.floor(circleData.angle / -360)
-    //   indexs[i] = indexs[i] === -1 
-    //     ? 2
-    //     : indexs[i] === 3
-    //       ? 0
-    //       : indexs[i]
-
-    //   // TODO adjust index based on angle    
-
-    //   element.innerHTML = `<p>[${i}]</p><p>${newAngle}</p><p><${indexs[i]}></p>`
-    //   element.className = `element color-${indexs[i]}`
-    // })
-    // const checkAngle = circleData.angle < 0 ? (circleData.angle + (360 * 3)) : circleData.angle

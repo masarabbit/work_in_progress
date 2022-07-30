@@ -37,40 +37,43 @@ body {
   border: 1px solid black;
   width: 600px;
   height: 600px;
+  max-width: 100%;
   /* bottom: 0px; */
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.circle_wrapper::after {
+/* .circle_wrapper::after {
   position: absolute;
   content: '';
-  /* border: hotpink 1px solid; */
   height: 300px;
   width: 600px;
   bottom: 0px;
   background-color: rgba(255, 105, 180, 0.323);
-}
+} */
 
 .circle {
   border-radius: 200px;
   width: 400px;
   height: 400px;
-  background-color: gray;
+  background-color: white;
   /* transition: 0.1s; */
   transform-origin: center;
 }
 
 .circle::after {
   content: '';
-  background-color: rgba(0, 0, 0, 0.385);
+  /* background-color: rgb(0, 0, 0); */
   width: 200px;
   height: 400px;
   position: absolute; 
   right: 0px;
   border-top-right-radius: 200px;
   border-bottom-right-radius: 200px;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAAgCAYAAABXTzdxAAAAAXNSR0IArs4c6QAAAQ5JREFUeF7t3MsKg0AQBMD1/z9a8SCI+ACXvjSVa8jAVG+jEpJljLEOLwIEbgUWBXEyCDwLKIjTQeBFQEEcDwIfBTne9iziqBC4COxXEAVxLAg8CCiIo0HALZYzQOCfwPkK4lbrn6FPFQsoSHG4VpsXUJB5QxOKBRSkOFyrzQvcFcSzyLyrCSUCClISpDUyAgqScTW1REBBSoK0RkZAQTKuppYIKEhJkNbICChIxtXUEgEFKQnSGhkBXxRmXE0tEVCQkiCtkRFQkIyrqSUCClISpDUyAn5RmHE1tURAQUqCtEZGQEEyrqaWCChISZDWyAj447iMq6klAgpSEqQ1MgIKknE1tURAQUqCtEZGYAPWziABxVLSDwAAAABJRU5ErkJggg==);
+  background-size: 200px 32px;
+  background-repeat: repeat-y;
 }
 
 /* canvas {
@@ -92,7 +95,7 @@ body {
   bottom: 20px;
   left: 20px;
   color: black;
-  font-size: 10px;
+  font-size: 30px;
   opacity: 0.8;
   z-index: 999;
 }
@@ -164,8 +167,20 @@ a:hover { text-decoration: underline; }
 
 .tree {
   /* background-color: green; */
-  width: 50px;
+  width: 48px;
   height: 60px;
+  background-size: 48px 60px !important;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAA8CAYAAAAgwDn8AAAAAXNSR0IArs4c6QAAAT1JREFUaEPtl1kSwzAIQ5P7H7qdpss0bmPAAtvy0F8vlfQIIftG/tvJ9W+RBm5FOCH/FXLpSzitgVJ4WaWuobledpE8jQEp+RAjngRoDViFu5LwIEBrABXuQgIhQGvAWzhEooUArYFo4U0kLARoDfQWbiKhIUBrYLRwFYkaAVoDswmvkvhHgN6A9J0fbVDTWD4aTZuVX1xSANK6SZNlc3Tyqq7TtKlT8k3aNAR6J28ysrSB0cmrSOSbWOqJAeun0Jd6E89W8xK8I/xvAvQGJMfv9Wijmtaes5CWFrJPRUK1KWchhMO50fzcpCEQ/dBK9qoalxwlerVLKfnmYW50yUjGchaSEuq1vs4sNHvNV4k+MNAbQGsWDUDzMr3UCB12mpEgDdDhNPBMAAoROpwEkgBYf1lCWUJZQkcNDB0l7gg6OjuwyJttAAAAAElFTkSuQmCC);
+  background-color: transparent !important;
+}
+
+.tree_white {
+  /* background-color: green; */
+  width: 48px;
+  height: 60px;
+  background-size: 48px 60px !important;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAA8CAYAAAAgwDn8AAAAAXNSR0IArs4c6QAAAWZJREFUaEPtWu0OgyAMlPd/aJcZNYggLb1KznR/Zew+aHtsSwv5K5HjXzwJrIU4Lp/lsukOnJbABnxdr/hTOrWCigbdLFeekUBV+bJJoJ1AOkBLQATcywmEA7QEhoCjnbA4QEsAAhzlxIgDtARcgFud0DhAS+AV4KNOSBygJTAFuNaJJwdoCZQXkeqts4zL1qtpllJ7W11ErzlAT6CngMvRGr0nSLpQSYiWgAtwbde5re+dl+w5LYFXgI86IakBWgJTgGud+O4kRk9aRbOoLm3NieYkZiQgihCHPGiCiix0QNjEzx2gJyA9pi7dKbKQQH4X5bV9P7KQwCnIEmlNRBaCyP2wSc+JyELeDpxjt/Er5/eyEDrjoB0qa+KWhRgJqEJcS1Et8YH0Wb8n/P8VgLB5JgEr/qGM1OvvUlCSSdzbKwj0FHp6Hg4cTcBQxCYRTW/erY0aiBqwKBA1cP1uSq1lFPHsI/QDlnXiO2EU734AAAAASUVORK5CYII=);
+  background-color: transparent !important;
 }
 
 .mountain {
@@ -181,50 +196,6 @@ a:hover { text-decoration: underline; }
   border-right-width: 1px;
 }
 
-/* .control {
-  position: fixed;
-  bottom: 0px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.control > div:nth-child(2) {
-  width: 200px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.arrow {
-  background-repeat: no-repeat;
-  background-size: 50px !important; 
-  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAFZJREFUOE+90zEOACAIA8Dy/0drHJwotAzKSMzh0AbyLABB9nTFHh7gjIV0gIUoQCIO0CIuUCITgCJTICHfgXRw8gMaLBcoU+kAbaQVIPvwrEzy8u32Bm9nEBGWAQTiAAAAAElFTkSuQmCC);
-  width: 50px;
-  height: 50px;
-  image-rendering: pixelated;
-}
-
-.arrow.right {
-  transform: scale(1);
-}
-
-.left {
-  transform: scale(-1, 1);
-}
-
-.up {
-  transform: rotate(270deg);
-}
-
-.down {
-  transform: rotate(90deg);
-}
-
-.arrow:hover {
-  filter: invert(100%);
-  cursor: pointer;
-} */
 
 .touch_control {
   position: fixed;
@@ -252,4 +223,9 @@ a:hover { text-decoration: underline; }
   background-size: 96px !important; 
   transform: translate(27px, 27px);
   cursor: grab;
+}
+
+.element {
+  /* image-rendering: pixelated; */
+  background-repeat: no-repeat !important;
 }
