@@ -188,7 +188,7 @@ function init() {
   const circle = document.querySelector('.circle')
   const circleWrapper = document.querySelector('.circle_wrapper')
   const pointer = document.querySelector('.pointer')
-  const location = document.querySelector('.location')
+  const background = document.querySelector('.background')
   
 
   const placeElements = (mapItems, index) => {
@@ -206,7 +206,7 @@ function init() {
     circle.append(element)
     const { width, height } = items[item.element]
     element.style.transform = `translate(${200 - (width / 2)}px, -${height - 5}px) rotate(${item.angle + offset}deg)`
-    element.innerHTML = item.element + item.color
+    element.innerHTML = item.element + i
     element.style.transformOrigin = `center ${200 + (height - 5)}px`
     item.placed = element
   }
@@ -280,6 +280,11 @@ function init() {
     pointer.style.transform = `translateX(${(pointerPos > 600 ? pointerPos - 600 : pointerPos) - 10}px)`
   }
 
+  const changeBackground = pos =>{
+    background.classList[Math.floor(pos) % 2 === 0 ? 'add' : 'remove']('light')
+    circle.classList[Math.floor(pos) % 2 === 0 ? 'add' : 'remove']('light')
+  }
+
 
 
   const updateElements = () =>{
@@ -298,6 +303,7 @@ function init() {
 
     // indicator.innerHTML = `pos:${circleData.pos} ${circleData.angle} prev: ${returnNextOrPrev(mapIndex - 1)} current: ${mapIndex} next:${returnNextOrPrev(mapIndex + 1)}`
     movePointer(circleData.pos)
+    changeBackground(circleData.mapIndex)
     if (Math.abs(circleData.angle) === 360) {
       circleData.angle = 0
     }
