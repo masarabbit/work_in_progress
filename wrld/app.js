@@ -71,19 +71,16 @@ function init() {
         element: 'tree',
         angle: 30,
         name: 'a',
-        color: 'color-0'
       },
       {
         element: 'tree_white',
         angle: 60,
         name: 'b',
-        color: 'color-0'
       },
       {
         element: 'mountain',
         angle: 70,
         name: 'c',
-        color: 'color-0'
       },
       // {
       //   element: 'line',
@@ -96,19 +93,16 @@ function init() {
         element: 'tree',
         angle: 10,
         name: 'd',
-        color: 'color-1'
       },
       {
         element: 'tree',
         angle: 60,
         name: 'e',
-        color: 'color-1'
       },
       {
         element: 'tree',
         angle: 90,
         name: 'f',
-        color: 'color-1'
       },
     ],
     2: [
@@ -116,19 +110,16 @@ function init() {
         element: 'tree',
         angle: 10,
         name: 'g',
-        color: 'color-2'
       },
       {
         element: 'tree',
         angle: 60,
         name: 'h',
-        color: 'color-2'
       },
       {
         element: 'tree',
         angle: 120,
         name: 'i',
-        color: 'color-2'
       },
     ],
     3: [
@@ -136,19 +127,16 @@ function init() {
         element: 'tree',
         angle: 10,
         name: 'g',
-        color: 'color-3'
       },
       {
         element: 'tree',
         angle: 60,
         name: 'h',
-        color: 'color-3'
       },
       {
         element: 'tree',
         angle: 120,
         name: 'i',
-        color: 'color-3'
       },
     ],
     4: [
@@ -156,19 +144,16 @@ function init() {
         element: 'tree',
         angle: 10,
         name: 'g',
-        color: 'color-4'
       },
       {
         element: 'tree',
         angle: 60,
         name: 'h',
-        color: 'color-4'
       },
       {
         element: 'tree',
         angle: 120,
         name: 'i',
-        color: 'color-4'
       },
     ],
     5: [
@@ -176,19 +161,16 @@ function init() {
         element: 'tree',
         angle: 10,
         name: 'g',
-        color: 'color-5'
       },
       {
         element: 'tree',
         angle: 60,
         name: 'h',
-        color: 'color-5'
       },
       {
         element: 'tree',
         angle: 120,
         name: 'i',
-        color: 'color-5'
       },
     ],
   }
@@ -206,6 +188,7 @@ function init() {
   const circle = document.querySelector('.circle')
   const circleWrapper = document.querySelector('.circle_wrapper')
   const pointer = document.querySelector('.pointer')
+  const location = document.querySelector('.location')
   
 
   const placeElements = (mapItems, index) => {
@@ -292,7 +275,6 @@ function init() {
   }
 
   const movePointer = pos =>{
-    console.log('pos', currentPos(pos))
     const { width } = circleWrapper.getBoundingClientRect()
     const pointerPos = (currentPos(pos -90) / mapItemKeys.length) * width
     pointer.style.transform = `translateX(${(pointerPos > 600 ? pointerPos - 600 : pointerPos) - 10}px)`
@@ -357,7 +339,7 @@ function init() {
     circleWrapper.append(bear)
     bear.innerHTML = '<div><div class="bear"></div></div>'
 
-    // bear.style.transform = `translate(0, ${40 - 10}px)`
+    // bear.style.transform = `translate(0, ${20}px)`
     bearData.sprite = bear.childNodes[0].childNodes[0]
   }
 
@@ -433,11 +415,8 @@ addTouchAction(control, handleKey)
 
 const resize = () => {
   const { innerWidth } = window
-  const { width } = circleWrapper.getBoundingClientRect()
-  circleWrapper.style.transform = innerWidth < width ? `scale(${innerWidth / width})` : 'scale(1)'
-  
-  // TODO possibly move entire logic here rather than relying partially on css media query
-  document.querySelector('.bear_wrapper').style.transform = `translate(0, ${innerWidth < 600 ? 20 : 30}px)`
+  circleWrapper.style.transform = innerWidth < 400 ? `scale(${innerWidth / 400})` : 'scale(1)'
+  document.querySelector('.bear_wrapper').style.transform = `translate(0, ${innerWidth < 600 ? 20 : 24}px)`
 }
 
 resize()
