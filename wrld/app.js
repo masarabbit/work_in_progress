@@ -277,7 +277,7 @@ function init() {
   const movePointer = pos =>{
     const { width } = circleWrapper.getBoundingClientRect()
     const pointerPos = (currentPos(pos -90) / mapItemKeys.length) * width
-    pointer.style.transform = `translateX(${(pointerPos > 600 ? pointerPos - 600 : pointerPos) - 10}px)`
+    pointer.style.transform = `translateX(${(pointerPos > width ? pointerPos - width : pointerPos) - 10}px)`
   }
 
   const changeBackground = pos =>{
