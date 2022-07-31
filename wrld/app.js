@@ -294,10 +294,10 @@ function init() {
   const movePointer = pos =>{
     console.log('pos', currentPos(pos))
     const { width } = circleWrapper.getBoundingClientRect()
-    pointer.style.transform = `translateX(${((currentPos(pos -90) / mapItemKeys.length) * width) - 10}px)`
+    const pointerPos = (currentPos(pos -90) / mapItemKeys.length) * width
+    pointer.style.transform = `translateX(${(pointerPos > 600 ? pointerPos - 600 : pointerPos) - 10}px)`
   }
 
-  // movePointer(100)
 
 
   const updateElements = () =>{
@@ -357,7 +357,7 @@ function init() {
     circleWrapper.append(bear)
     bear.innerHTML = '<div><div class="bear"></div></div>'
 
-    bear.style.transform = `translate(0, ${40 - 10}px)`
+    // bear.style.transform = `translate(0, ${40 - 10}px)`
     bearData.sprite = bear.childNodes[0].childNodes[0]
   }
 
@@ -435,6 +435,9 @@ const resize = () => {
   const { innerWidth } = window
   const { width } = circleWrapper.getBoundingClientRect()
   circleWrapper.style.transform = innerWidth < width ? `scale(${innerWidth / width})` : 'scale(1)'
+  
+  // TODO possibly move entire logic here rather than relying partially on css media query
+  document.querySelector('.bear_wrapper').style.transform = `translate(0, ${innerWidth < 600 ? 20 : 30}px)`
 }
 
 resize()

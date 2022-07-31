@@ -41,7 +41,7 @@ body {
 }
 
 .location_mark > div {
-  width: 100%;
+  flex-grow: 1;
   height: 100%;
   background-color: #dddddd;
 }
@@ -75,21 +75,50 @@ body {
   /* transition: 1s; */
 }
 
+@media screen and (min-width:0px) {
+  .circle_wrapper {
+    width: 400px;
+    height: 300px;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
 
-
-.circle_wrapper {
-  position: absolute;
-  /* border: 1px solid black; */
-  /* background-color: white; */
-  width: 600px;
-  height: 400px;
-  /* max-width: 100%; */
-  /* bottom: 0px; */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
+  .circle {
+    border-radius: 200px;
+    width: 400px;
+    height: 400px;
+    background-color: white;
+    /* transition: 0.1s; */
+    transform-origin: center;
+    position: absolute;
+    bottom: -280px;
+  }
+  
 }
+
+@media screen and (min-width:500px) {
+  .circle_wrapper {
+    width: 100%;
+  }
+}  
+
+@media screen and (min-width:600px) {
+  .circle_wrapper {
+    width: 600px;
+    height: 400px;
+  }
+
+  .circle { 
+    bottom: -240px;
+  }
+}
+
+
+
+
 
 /* .circle_wrapper::after {
   position: absolute;
@@ -109,16 +138,6 @@ body {
   z-index: -1;
 } */
 
-.circle {
-  border-radius: 200px;
-  width: 400px;
-  height: 400px;
-  background-color: white;
-  /* transition: 0.1s; */
-  transform-origin: center;
-  position: absolute;
-  bottom: -240px;
-}
 
 
 
