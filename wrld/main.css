@@ -46,8 +46,15 @@ body {
   background-color: #dddddd;
 }
 
+
+
 .location_mark > div:nth-child(odd) {
   background-color: transparent;
+}
+
+.location_mark > div:hover {
+  background-color: hotpink;
+  cursor: pointer;
 }
 
 .pointer {
@@ -182,6 +189,7 @@ body {
   font-size: 30px;
   opacity: 0.8;
   z-index: 999;
+  pointer-events: none;
 }
 
 a {

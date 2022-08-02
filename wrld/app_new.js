@@ -1,5 +1,8 @@
 function init() {  
 
+  
+  // TODO changing map with pointer is buggy
+  // TODO maybe go to location by clicking the thing instead
 
   const circleData = {
     angle: 270,
@@ -20,9 +23,15 @@ function init() {
     active: false,
     timer: null,
     direction: null,
+    prevPointerPos: 0,
+    pointerPos: 0,
   }
   
-  
+
+  const setTargetPos = (target, x, y) => {
+    if (isNum(x)) target.style.left = `${x}px`
+    if (isNum(y)) target.style.top = `${y}px`
+  }
 
   const addEvents = (target, event, action, array) =>{
     array.forEach(a => event === 'remove' ? target.removeEventListener(a, action) : target.addEventListener(a, action))
@@ -193,9 +202,8 @@ function init() {
     mapItems.forEach(item => placeElement(item, index))
   }
   
-  document.querySelector('.location_mark').innerHTML = mapItemKeys.map(()=> `<div class="location_link"></div>`).join('')
+  document.querySelector('.location_mark').innerHTML = mapItemKeys.map(()=> `<div></div>`).join('')
   
-
 
   const placeElement = (item, i) => {
     const element = document.createElement('div')
@@ -209,14 +217,13 @@ function init() {
     element.style.transformOrigin = `center ${200 + (height - 5)}px`
     item.placed = element
   }
-  
-  const setTargetPos = (target, x, y) => Object.assign(target.style, { left: `${x}px`, top: `${y}px` })
-  
+
+
   const setSpritePos = (num, actor, sprite) =>{
     actor.spritePos = num
     sprite.style.marginLeft = `${num}px`
   }
-
+  
   const turnSprite = ({ e, actor, animate }) => {
     const dir = e
     const { sprite, frameOffset } = bearData
@@ -276,8 +283,8 @@ function init() {
 
   const movePointer = pos =>{
     const { width } = circleWrapper.getBoundingClientRect()
-    const pointerPos = (currentPos(pos -90) / mapItemKeys.length) * width
-    pointer.style.transform = `translateX(${(pointerPos > width ? pointerPos - width : pointerPos) - 10}px)`
+    const pointerPos = (currentPos(pos - 90) / mapItemKeys.length) * width
+    setTargetPos(pointer, (pointerPos > width ? pointerPos - width : pointerPos) - 10) 
   }
 
   const changeBackground = pos =>{
@@ -288,11 +295,11 @@ function init() {
 
 
   const updateElements = () =>{
-    // const trigger = [ 89, 269, 91, 271 ]
     const { key } = circleData
 
     circleData.pos += config[key]
     circleData.pos = returnPos(circleData.pos)
+    // console.log(circleData.pos)
     const index = currentIndex(circleData.pos)
     circleData.mapIndex = isNum(index) ? index : circleData.mapIndex
     circleData.mapIndex = returnNextOrPrev(circleData.mapIndex)
@@ -301,7 +308,6 @@ function init() {
     
     indicator.innerHTML = `pos:${circleData.pos} current: ${circleData.mapIndex}`
 
-    // indicator.innerHTML = `pos:${circleData.pos} ${circleData.angle} prev: ${returnNextOrPrev(mapIndex - 1)} current: ${mapIndex} next:${returnNextOrPrev(mapIndex + 1)}`
     movePointer(circleData.pos)
     changeBackground(circleData.mapIndex)
     if (Math.abs(circleData.angle) === 360) {
@@ -348,7 +354,11 @@ function init() {
     // bear.style.transform = `translate(0, ${20}px)`
     bearData.sprite = bear.childNodes[0].childNodes[0]
   }
-
+  
+  const stopBear = () =>{
+    turnSprite({ e:circleData.key, actor: bearData })
+    circleData.key = null
+  }
 
   
   placeElements(mapItems[0], 0)
@@ -356,30 +366,58 @@ function init() {
   placeBear()
 
   window.addEventListener('keydown', e => handleKey({ e }))
-  window.addEventListener('keyup', ()=> {
-    turnSprite({ e:circleData.key, actor: bearData })
-    circleData.key = null
-  })
+  window.addEventListener('keyup', stopBear)
 
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
 
-const drag = (target, pos, x, y) =>{
+const drag = ({ target, pos, x, y, control }) =>{
   pos.a = pos.c - x
   pos.b = pos.d - y
   const newX = target.offsetLeft - pos.a
   const newY = target.offsetTop - pos.b
-  if (distanceBetween({x: 0,y: 0}, {x: newX, y: newY}) < 35) {
-    setTargetPos(target, newX, newY)
+  if (control && distanceBetween({x: 0, y: 0}, {x: newX, y: newY}) < 35) {
     touchControl.direction = Math.abs(newX) < Math.abs(newY)
-      ? newY < 0 ? 'u' : 'd'
-      : newX < 0 ? 'l' : 'r'
-  }  
+    ? newY < 0 ? 'u' : 'd'
+    : newX < 0 ? 'l' : 'r'
+      setTargetPos(target, newX, newY)
+      console.log('newX', newX)
+      // TODO convert pointer position to circleData.pos
+  } else if (!control) {
+    handlePointer(newX)
+  }
+}
+
+const handlePointer = transformPos =>{
+  const { width } = circleWrapper.getBoundingClientRect()
+  const adjustedTransformPos = (transformPos + 10) < 0
+    ? width
+    : transformPos > width  
+      ? transformPos - width 
+      : transformPos
+  const pos = Math.floor((adjustedTransformPos + 10) / width * (-180 * mapItemKeys.length))
+  circleData.angle = pos - circleData.pos
+  circle.style.transform = `rotate(${circleData.angle}deg)`
+
+  setTargetPos(pointer, adjustedTransformPos, null)
+  touchControl.pointerPos = returnPos(pos + 90)
+  circleData.key = touchControl.prevPointerPos > touchControl.pointerPos ? 'r' : 'l'
+
+  circleData.mapIndex = returnNextOrPrev(Math.floor(pos / -180))
+  console.log(circleData.mapIndex, circleData.key)
+  populateCircle(circleData.key)
+  touchControl.prevPointerPos = touchControl.pointerPos
+
+  indicator.innerHTML = `pos:${touchControl.pointerPos} current: ${circleData.mapIndex}`
+
+  if (Math.abs(circleData.angle) === 360) {
+    circleData.angle = 0
+  }
 }
 
 const client = (e, type) => e.type[0] === 'm' ? e[`client${type}`] : e.touches[0][`client${type}`]
 const roundedClient = (e, type) => Math.round(client(e, type))
 
-const addTouchAction = (target, handleKeyAction) =>{
+const addTouchAction = ({ target, handleKey, control }) =>{
   const pos = { a: 0, b: 0, c: 0, d: 0 }
   
   const onGrab = e =>{
@@ -387,37 +425,46 @@ const addTouchAction = (target, handleKeyAction) =>{
     pos.d = roundedClient(e, 'Y')  
     mouse.up(document, 'add', onLetGo)
     mouse.move(document, 'add', onDrag)
+    if (control) {
     touchControl.active = true
     touchControl.timer = setInterval(()=> {
-      if (touchControl.active) handleKeyAction({ letter:touchControl.direction })
+      if (touchControl.active) handleKey({ letter:touchControl.direction })
     }, 200)
+    } else {
+      touchControl.direction = null
+      handleKey({ letter:touchControl.direction })
+    }
   }
   const onDrag = e =>{
     const x = roundedClient(e, 'X')
     const y = roundedClient(e, 'Y')
-    drag(target, pos, x, y)
+    drag({ target, pos, x, y, control })
     pos.c = x
     pos.d = y
   }
   const onLetGo = () => {
     mouse.up(document, 'remove', onLetGo)
     mouse.move(document,'remove', onDrag)
-    target.style.transition = '0.2s'
-    setTargetPos(target, 0 ,0)
-    setTimeout(()=>{
-      target.style.transition = '0s'
-    }, 200)
-    clearInterval(touchControl.timer)
-    touchControl.active = false
-
-    turnSprite({ e:circleData.key, actor: bearData })
-    circleData.key = null
+    if (control) {
+      target.style.transition = '0.2s'
+      setTimeout(()=>{
+        target.style.transition = '0s'
+      }, 200)
+      setTargetPos(target, 0, 0)
+      clearInterval(touchControl.timer)
+      touchControl.active = false
+    } else {
+      changeBackground(circleData.mapIndex)
+      circleData.pos = touchControl.pointerPos
+      populateCircle(circleData.key)
+    }
+    stopBear()
   }
   mouse.down(target,'add', onGrab)
 }
 
 const control = document.querySelector('.touch_circle')
-addTouchAction(control, handleKey)
+addTouchAction({ target:control, handleKey, control: true })
 
 const resize = () => {
   const { innerWidth } = window
@@ -428,19 +475,7 @@ const resize = () => {
 resize()
 window.addEventListener('resize', resize)
 
-// TODO doesn't work yet
-document.querySelectorAll('.location_link').forEach((link, i) => {
-  link.addEventListener('click', ()=>{
-
-    circleData.pos = i * -180
-    // circleData.key = 'r'
-    // circleData.angle += (i * -180)
-    console.log(circleData.angle)
-    updateElements()
-    // rotateCircle()
-    // updateElements() 
-  })
-})
+addTouchAction({ target:pointer, handleKey })
 
 }
 
