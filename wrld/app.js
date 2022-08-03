@@ -250,7 +250,7 @@ function init() {
 
   const returnPos = current => {
     return current === mapItemKeys.length * 180
-    ? mapItemKeys.length * -180 // 0 ?
+    ? mapItemKeys.length * -180
     : current === mapItemKeys.length * -180
       ? 0
       : current
@@ -426,7 +426,7 @@ addTouchAction(control, handleKey)
 const resize = () => {
   const { innerWidth } = window
   circleWrapper.style.transform = innerWidth < 400 ? `scale(${innerWidth / 400})` : 'scale(1)'
-  document.querySelector('.bear_wrapper').style.transform = `translate(0, ${innerWidth < 600 ? 24 : 28}px)`
+  document.querySelector('.bear_wrapper').style.transform = `translate(0, ${innerWidth < 600 ? 28 : 32}px)`
   movePointer(circleData.pos)
 }
 
@@ -443,12 +443,10 @@ document.querySelectorAll('.location_link').forEach((link, i) => {
         : i % 2 === 0
           ? -90
           : -270 
+    circle.style.transform = 'rotate(-270deg)'      
     circle.style.transition = '0.2s'
-    setTimeout(()=>{
-      circle.style.transition = '0s'
-    }, 200)
+    setTimeout(()=> circle.style.transition = '0s', 200)
     circle.style.transform = `rotate(${circleData.angle}deg)`
-    circleData.key = 'r'
     circleData.mapIndex = i
     mapItemKeys.forEach(i => mapItems[i].forEach(item => item.placed?.remove()))
     placeElements(i)
