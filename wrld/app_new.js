@@ -182,6 +182,8 @@ function init() {
     ],
   }
   
+  const trigger = [ 89, 269, 91, 271 ]
+
   const mapItemKeys = Object.keys(mapItems)
 
   mapItemKeys.forEach(index => {
@@ -388,6 +390,7 @@ const drag = ({ target, pos, x, y, control }) =>{
 }
 
 const handlePointer = transformPos =>{
+
   const { width } = circleWrapper.getBoundingClientRect()
   const adjustedTransformPos = (transformPos + 10) < 0
     ? width
@@ -399,12 +402,14 @@ const handlePointer = transformPos =>{
   circle.style.transform = `rotate(${circleData.angle}deg)`
 
   setTargetPos(pointer, adjustedTransformPos, null)
-  touchControl.pointerPos = returnPos(pos + 90)
-  circleData.key = touchControl.prevPointerPos > touchControl.pointerPos ? 'r' : 'l'
+  touchControl.pointerPos = returnPos(pos + 90)   // TODO goes out of sync, probably due to offset
+  circleData.key = touchControl.prevPointerPos >= touchControl.pointerPos ? 'r' : 'l'
 
   circleData.mapIndex = returnNextOrPrev(Math.floor(pos / -180))
   console.log(circleData.mapIndex, circleData.key)
+  // if (trigger.includes(Math.abs(circleData.angle))) populateCircle(circleData.key)
   populateCircle(circleData.key)
+
   touchControl.prevPointerPos = touchControl.pointerPos
 
   indicator.innerHTML = `pos:${touchControl.pointerPos} current: ${circleData.mapIndex}`

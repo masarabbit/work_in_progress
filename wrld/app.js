@@ -4,7 +4,7 @@ function init() {
   const circleData = {
     angle: 270,
     interval: null,
-    key: 'u',
+    key: 'd',
     mapIndex: 0,
     pos: 0,
   }
@@ -175,9 +175,9 @@ function init() {
   
   const mapItemKeys = Object.keys(mapItems)
 
-  mapItemKeys.forEach(index => {
-    mapItems[index].forEach(item => item.triggerAngle = item.angle - 90)
-  })
+  // mapItemKeys.forEach(index => {
+  //   mapItems[index].forEach(item => item.triggerAngle = item.angle - 90)
+  // })
   const isNum = x => typeof x === 'number'
 
   
@@ -189,8 +189,8 @@ function init() {
   const background = document.querySelector('.background')
   
 
-  const placeElements = (mapItems, index) => {
-    mapItems.forEach(item => placeElement(item, index))
+  const placeElements = index => {
+    mapItems[index].forEach(item => placeElement(item, index))
   }
   
   document.querySelector('.location_mark').innerHTML = mapItemKeys.map(()=> `<div class="location_link"></div>`).join('')
@@ -234,6 +234,11 @@ function init() {
     actor.animationTimer.forEach(timer=> clearTimeout(timer))
     setSpritePos(m, actor, sprite)
   }
+
+  const stopBear = () =>{
+    turnSprite({ e:circleData.key, actor: bearData })
+    circleData.key = null
+  }
   
   const returnNextOrPrev = current =>{
     return current === -1
@@ -257,8 +262,7 @@ function init() {
     mapItemKeys.forEach(index =>{
       if (index !== `${mapIndex}`) mapItems[index].forEach(item => item.placed?.remove())
     })
-    // mapItems[indexToAdd].forEach(item => placeElement(item, indexToAdd))
-    placeElements(mapItems[indexToAdd], indexToAdd)
+    placeElements(indexToAdd)
   }
 
   const currentPos = pos =>{
@@ -288,7 +292,7 @@ function init() {
 
 
   const updateElements = () =>{
-    // const trigger = [ 89, 269, 91, 271 ]
+    const trigger = [ 89, 269, 91, 271 ]
     const { key } = circleData
 
     circleData.pos += config[key]
@@ -297,9 +301,9 @@ function init() {
     circleData.mapIndex = isNum(index) ? index : circleData.mapIndex
     circleData.mapIndex = returnNextOrPrev(circleData.mapIndex)
 
-    if (isNum(index)) populateCircle(key)
+    if (trigger.includes(Math.abs(circleData.angle))) populateCircle(key)
     
-    indicator.innerHTML = `pos:${circleData.pos} current: ${circleData.mapIndex}`
+    indicator.innerHTML = `angle: ${circleData.angle} pos:${circleData.pos} current: ${circleData.mapIndex}`
 
     // indicator.innerHTML = `pos:${circleData.pos} ${circleData.angle} prev: ${returnNextOrPrev(mapIndex - 1)} current: ${mapIndex} next:${returnNextOrPrev(mapIndex + 1)}`
     movePointer(circleData.pos)
@@ -351,9 +355,10 @@ function init() {
 
 
   
-  placeElements(mapItems[0], 0)
+  placeElements(0)
   rotateCircle('u')
   placeBear()
+  stopBear()
 
   window.addEventListener('keydown', e => handleKey({ e }))
   window.addEventListener('keyup', ()=> {
@@ -410,8 +415,7 @@ const addTouchAction = (target, handleKeyAction) =>{
     clearInterval(touchControl.timer)
     touchControl.active = false
 
-    turnSprite({ e:circleData.key, actor: bearData })
-    circleData.key = null
+    stopBear()
   }
   mouse.down(target,'add', onGrab)
 }
@@ -422,23 +426,36 @@ addTouchAction(control, handleKey)
 const resize = () => {
   const { innerWidth } = window
   circleWrapper.style.transform = innerWidth < 400 ? `scale(${innerWidth / 400})` : 'scale(1)'
-  document.querySelector('.bear_wrapper').style.transform = `translate(0, ${innerWidth < 600 ? 20 : 24}px)`
+  document.querySelector('.bear_wrapper').style.transform = `translate(0, ${innerWidth < 600 ? 24 : 28}px)`
+  movePointer(circleData.pos)
 }
 
 resize()
 window.addEventListener('resize', resize)
 
-// TODO doesn't work yet
 document.querySelectorAll('.location_link').forEach((link, i) => {
   link.addEventListener('click', ()=>{
-
-    circleData.pos = i * -180
-    // circleData.key = 'r'
-    // circleData.angle += (i * -180)
-    console.log(circleData.angle)
-    updateElements()
-    // rotateCircle()
-    // updateElements() 
+    circleData.pos = i * -180 + 1
+    circleData.angle = i === 0 
+      ? 270
+      : i === 1
+        ? 90
+        : i % 2 === 0
+          ? -90
+          : -270 
+    circle.style.transition = '0.2s'
+    setTimeout(()=>{
+      circle.style.transition = '0s'
+    }, 200)
+    circle.style.transform = `rotate(${circleData.angle}deg)`
+    circleData.key = 'r'
+    circleData.mapIndex = i
+    mapItemKeys.forEach(i => mapItems[i].forEach(item => item.placed?.remove()))
+    placeElements(i)
+    movePointer(circleData.pos)
+    populateCircle('r')
+    changeBackground(circleData.mapIndex)
+    stopBear()
   })
 })
 
