@@ -1,6 +1,5 @@
 function init() {  
 
-
   const circleData = {
     angle: 270,
     interval: null,
@@ -22,8 +21,6 @@ function init() {
     direction: null,
   }
   
-  
-
   const addEvents = (target, event, action, array) =>{
     array.forEach(a => event === 'remove' ? target.removeEventListener(a, action) : target.addEventListener(a, action))
   }
@@ -35,7 +32,6 @@ function init() {
     leave: (t, e, a) => addEvents(t, e, a, ['mouseleave', 'touchmove'])
   }
   
-
   const bearData = {
     animationTimer: ['',''],
     sprite: null,
@@ -56,6 +52,16 @@ function init() {
       width: 80,
       height: 30,
     },
+    house1: {
+      width: 96,
+      height: 96,
+      offset: 20,
+    },
+    house2: {
+      width: 96,
+      height: 86,
+      offset: 20
+    },
     line: {
       width: 1,
       height: 100,
@@ -72,19 +78,20 @@ function init() {
       },
       {
         element: 'tree_white',
-        angle: 60,
+        angle: 40,
+        offset: 20,
         name: 'b',
       },
       {
-        element: 'mountain',
+        element: 'house1',
         angle: 70,
         name: 'c',
       },
-      // {
-      //   element: 'line',
-      //   angle: 180,
-      //   name: ''
-      // },
+      {
+        element: 'house2',
+        angle: 120,
+        name: 'c',
+      },
     ],
     1: [     
       {
@@ -174,28 +181,25 @@ function init() {
   }
   
   const mapItemKeys = Object.keys(mapItems)
-
-  // mapItemKeys.forEach(index => {
-  //   mapItems[index].forEach(item => item.triggerAngle = item.angle - 90)
-  // })
-  const isNum = x => typeof x === 'number'
-
-  
   const indicator = document.querySelector('.indicator')
   const cellD = 32
   const circle = document.querySelector('.circle')
   const circleWrapper = document.querySelector('.circle_wrapper')
   const pointer = document.querySelector('.pointer')
   const background = document.querySelector('.background')
-  
+  const control = document.querySelector('.touch_circle')
+  const isNum = x => typeof x === 'number'
 
-  const placeElements = index => {
-    mapItems[index].forEach(item => placeElement(item, index))
+  const setTargetParams = ({ target, x, y, w, h }) =>{
+    const { style } = target
+    if (isNum(x)) style.left = `${x}px`
+    if (isNum(w)) style.width = `${w}px`
+    if (isNum(y)) style.top = `${y}px`
+    if (isNum(h)) style.height = `${h}px`
   }
-  
-  document.querySelector('.location_mark').innerHTML = mapItemKeys.map(()=> `<div class="location_link"></div>`).join('')
-  
 
+  
+  const placeElements = index => mapItems[index].forEach(item => placeElement(item, index))
 
   const placeElement = (item, i) => {
     const element = document.createElement('div')
@@ -203,14 +207,16 @@ function init() {
     element.classList.add('element')
     element.classList.add(item.element)
     circle.append(element)
-    const { width, height } = items[item.element]
-    element.style.transform = `translate(${200 - (width / 2)}px, -${height - 5}px) rotate(${item.angle + offset}deg)`
+    const { width:w, height:h, offset:o } = items[item.element]
+    element.style.transform = `translate(${220 - (w / 2)}px, -${h - 5}px) rotate(${item.angle + offset}deg)`
+    setTargetParams({ target:element, w, h })
+    element.style.backgroundSize = `${w}px ${h}px !important`
     element.innerHTML = item.element + i
-    element.style.transformOrigin = `center ${200 + (height - 5)}px`
+    element.style.transformOrigin = `center ${220 + ( h - (item.offset || o || 5))}px`
     item.placed = element
   }
   
-  const setTargetPos = (target, x, y) => Object.assign(target.style, { left: `${x}px`, top: `${y}px` })
+  
   
   const setSpritePos = (num, actor, sprite) =>{
     actor.spritePos = num
@@ -266,11 +272,11 @@ function init() {
   }
 
   const currentPos = pos =>{
-    if (pos === 0) return 0
-
-    return pos > 0 
-      ? (pos / -180) + mapItemKeys.length
-      : pos / -180
+    return pos === 0 
+      ? 0
+      : pos > 0 
+        ? (pos / -180) + mapItemKeys.length
+        : pos / -180
   }
 
   const currentIndex = pos => {
@@ -289,8 +295,6 @@ function init() {
     circle.classList[Math.floor(pos) % 2 === 0 ? 'add' : 'remove']('light')
   }
 
-
-
   const updateElements = () =>{
     const trigger = [ 89, 269, 91, 271 ]
     const { key } = circleData
@@ -302,15 +306,11 @@ function init() {
     circleData.mapIndex = returnNextOrPrev(circleData.mapIndex)
 
     if (trigger.includes(Math.abs(circleData.angle))) populateCircle(key)
-    
-    indicator.innerHTML = `angle: ${circleData.angle} pos:${circleData.pos} current: ${circleData.mapIndex}`
-
-    // indicator.innerHTML = `pos:${circleData.pos} ${circleData.angle} prev: ${returnNextOrPrev(mapIndex - 1)} current: ${mapIndex} next:${returnNextOrPrev(mapIndex + 1)}`
     movePointer(circleData.pos)
     changeBackground(circleData.mapIndex)
-    if (Math.abs(circleData.angle) === 360) {
-      circleData.angle = 0
-    }
+    if (Math.abs(circleData.angle) === 360) circleData.angle = 0
+
+    indicator.innerHTML = `angle: ${circleData.angle} pos:${circleData.pos} current: ${circleData.mapIndex}`
   }
 
   const rotateCircle = key =>{
@@ -348,114 +348,107 @@ function init() {
     bear.classList.add('bear_wrapper')
     circleWrapper.append(bear)
     bear.innerHTML = '<div><div class="bear"></div></div>'
-
-    // bear.style.transform = `translate(0, ${20}px)`
     bearData.sprite = bear.childNodes[0].childNodes[0]
   }
 
+  const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
 
-  
-  placeElements(0)
-  rotateCircle('u')
-  placeBear()
-  stopBear()
+  const drag = (target, pos, x, y) =>{
+    pos.a = pos.c - x
+    pos.b = pos.d - y
+    const newX = target.offsetLeft - pos.a
+    const newY = target.offsetTop - pos.b
+    if (distanceBetween({x: 0, y: 0}, {x: newX, y: newY}) < 35) {
+      setTargetParams({ target, x:newX, y:newY })
+      touchControl.direction = Math.abs(newX) < Math.abs(newY)
+        ? newY < 0 ? 'u' : 'd'
+        : newX < 0 ? 'l' : 'r'
+    }  
+  }
+
+  const client = (e, type) => e.type[0] === 'm' ? e[`client${type}`] : e.touches[0][`client${type}`]
+  const roundedClient = (e, type) => Math.round(client(e, type))
+
+  const addTouchAction = (target, handleKeyAction) =>{
+    const pos = { a: 0, b: 0, c: 0, d: 0 }
+    
+    const onGrab = e =>{
+      pos.c = roundedClient(e, 'X')
+      pos.d = roundedClient(e, 'Y')  
+      mouse.up(document, 'add', onLetGo)
+      mouse.move(document, 'add', onDrag)
+      touchControl.active = true
+      touchControl.timer = setInterval(()=> {
+        if (touchControl.active) handleKeyAction({ letter:touchControl.direction })
+      }, 200)
+    }
+    const onDrag = e =>{
+      const x = roundedClient(e, 'X')
+      const y = roundedClient(e, 'Y')
+      drag(target, pos, x, y)
+      pos.c = x
+      pos.d = y
+    }
+    const onLetGo = () => {
+      mouse.up(document, 'remove', onLetGo)
+      mouse.move(document,'remove', onDrag)
+      target.style.transition = '0.2s'
+      setTargetParams({ target, x:0, y:0 })
+      setTimeout(()=>{
+        target.style.transition = '0s'
+      }, 200)
+      clearInterval(touchControl.timer)
+      touchControl.active = false
+      stopBear()
+    }
+    mouse.down(target,'add', onGrab)
+  }
+
+  const resize = () => {
+    const { innerWidth } = window
+    circleWrapper.style.transform = innerWidth < 400 ? `scale(${innerWidth / 400})` : 'scale(1)'
+    document.querySelector('.bear_wrapper').style.transform = `translate(0, ${innerWidth < 600 ? 16 : 20}px)`
+    movePointer(circleData.pos)
+  }
+
+  document.querySelector('.location_mark').innerHTML = mapItemKeys.map(()=> `<div class="location_link"></div>`).join('')
+
+  document.querySelectorAll('.location_link').forEach((link, i) => {
+    link.addEventListener('click', ()=>{
+      circleData.pos = i * -180 + 1
+      circleData.angle = i === 0 
+        ? 270
+        : i === 1
+          ? 90
+          : i % 2 === 0
+            ? -90
+            : -270     
+      circle.style.transition = '0.2s'
+      setTimeout(()=> circle.style.transition = '0s', 200)
+      circle.style.transform = `rotate(${circleData.angle}deg)`
+      circleData.mapIndex = i
+      mapItemKeys.forEach(i => mapItems[i].forEach(item => item.placed?.remove()))
+      placeElements(i)
+      movePointer(circleData.pos)
+      populateCircle('r')
+      changeBackground(i)
+      stopBear()
+    })
+  })
 
   window.addEventListener('keydown', e => handleKey({ e }))
   window.addEventListener('keyup', ()=> {
     turnSprite({ e:circleData.key, actor: bearData })
     circleData.key = null
   })
-
-  const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
-
-const drag = (target, pos, x, y) =>{
-  pos.a = pos.c - x
-  pos.b = pos.d - y
-  const newX = target.offsetLeft - pos.a
-  const newY = target.offsetTop - pos.b
-  if (distanceBetween({x: 0,y: 0}, {x: newX, y: newY}) < 35) {
-    setTargetPos(target, newX, newY)
-    touchControl.direction = Math.abs(newX) < Math.abs(newY)
-      ? newY < 0 ? 'u' : 'd'
-      : newX < 0 ? 'l' : 'r'
-  }  
-}
-
-const client = (e, type) => e.type[0] === 'm' ? e[`client${type}`] : e.touches[0][`client${type}`]
-const roundedClient = (e, type) => Math.round(client(e, type))
-
-const addTouchAction = (target, handleKeyAction) =>{
-  const pos = { a: 0, b: 0, c: 0, d: 0 }
   
-  const onGrab = e =>{
-    pos.c = roundedClient(e, 'X')
-    pos.d = roundedClient(e, 'Y')  
-    mouse.up(document, 'add', onLetGo)
-    mouse.move(document, 'add', onDrag)
-    touchControl.active = true
-    touchControl.timer = setInterval(()=> {
-      if (touchControl.active) handleKeyAction({ letter:touchControl.direction })
-    }, 200)
-  }
-  const onDrag = e =>{
-    const x = roundedClient(e, 'X')
-    const y = roundedClient(e, 'Y')
-    drag(target, pos, x, y)
-    pos.c = x
-    pos.d = y
-  }
-  const onLetGo = () => {
-    mouse.up(document, 'remove', onLetGo)
-    mouse.move(document,'remove', onDrag)
-    target.style.transition = '0.2s'
-    setTargetPos(target, 0 ,0)
-    setTimeout(()=>{
-      target.style.transition = '0s'
-    }, 200)
-    clearInterval(touchControl.timer)
-    touchControl.active = false
-
-    stopBear()
-  }
-  mouse.down(target,'add', onGrab)
-}
-
-const control = document.querySelector('.touch_circle')
-addTouchAction(control, handleKey)
-
-const resize = () => {
-  const { innerWidth } = window
-  circleWrapper.style.transform = innerWidth < 400 ? `scale(${innerWidth / 400})` : 'scale(1)'
-  document.querySelector('.bear_wrapper').style.transform = `translate(0, ${innerWidth < 600 ? 28 : 32}px)`
-  movePointer(circleData.pos)
-}
-
-resize()
-window.addEventListener('resize', resize)
-
-document.querySelectorAll('.location_link').forEach((link, i) => {
-  link.addEventListener('click', ()=>{
-    circleData.pos = i * -180 + 1
-    circleData.angle = i === 0 
-      ? 270
-      : i === 1
-        ? 90
-        : i % 2 === 0
-          ? -90
-          : -270 
-    circle.style.transform = 'rotate(-270deg)'      
-    circle.style.transition = '0.2s'
-    setTimeout(()=> circle.style.transition = '0s', 200)
-    circle.style.transform = `rotate(${circleData.angle}deg)`
-    circleData.mapIndex = i
-    mapItemKeys.forEach(i => mapItems[i].forEach(item => item.placed?.remove()))
-    placeElements(i)
-    movePointer(circleData.pos)
-    populateCircle('r')
-    changeBackground(circleData.mapIndex)
-    stopBear()
-  })
-})
+  window.addEventListener('resize', resize)
+  addTouchAction(control, handleKey)
+  placeElements(0)
+  rotateCircle('u')
+  placeBear()
+  stopBear()
+  resize()
 
 }
 
