@@ -58,8 +58,8 @@ function init() {
       offset: 20,
     },
     house2: {
-      width: 96,
-      height: 86,
+      width: 80,
+      height: 82,
       offset: 20
     },
     line: {
@@ -82,11 +82,11 @@ function init() {
         offset: 20,
         name: 'b',
       },
-      {
-        element: 'house1',
-        angle: 70,
-        name: 'c',
-      },
+      // {
+      //   element: 'house1',
+      //   angle: 70,
+      //   name: 'c',
+      // },
       {
         element: 'house2',
         angle: 120,
