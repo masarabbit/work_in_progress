@@ -14,8 +14,8 @@ function init() {
     'r': -1,
     'u': -2,
     'd': 2,
+    's': 0
   }
-  // TODO add up and down movement, tied to z-index
 
   const touchControl = {
     active: false,
@@ -472,7 +472,7 @@ function init() {
   window.addEventListener('resize', resize)
   addTouchAction(control, handleKey)
   placeElements(0)
-  rotateCircle('u')
+  rotateCircle('s')
   placeBear()
   stopBear()
   resize()
