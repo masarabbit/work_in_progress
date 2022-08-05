@@ -6,14 +6,16 @@ function init() {
     key: 'd',
     mapIndex: 0,
     pos: 0,
+
   }
   
   const config = {
     'l': 1,
     'r': -1,
-    'u': 0,
-    'd': 0,
+    'u': -2,
+    'd': 2,
   }
+  // TODO add up and down movement, tied to z-index
 
   const touchControl = {
     active: false,
@@ -37,6 +39,7 @@ function init() {
     sprite: null,
     frameOffset: 0,
     interval: null,
+    verticalPos: 0,
   }
 
   const items = {
@@ -208,11 +211,13 @@ function init() {
     element.classList.add(item.element)
     circle.append(element)
     const { width:w, height:h, offset:o } = items[item.element]
-    element.style.transform = `translate(${220 - (w / 2)}px, -${h - 5}px) rotate(${item.angle + offset}deg)`
+
     setTargetParams({ target:element, w, h })
-    element.style.backgroundSize = `${w}px ${h}px !important`
     element.innerHTML = item.element + i
-    element.style.transformOrigin = `center ${220 + ( h - (item.offset || o || 5))}px`
+    element.style.transform = `translate(${220 - (w / 2)}px, -${h - 5}px) rotate(${item.angle + offset}deg)`
+    element.style.zIndex =  h - (item.offset || o || 5) 
+    element.style.backgroundSize = `${w}px ${h}px !important`
+    element.style.transformOrigin = `center ${220 + (h - (item.offset || o || 5))}px`
     item.placed = element
   }
   
@@ -248,18 +253,26 @@ function init() {
   
   const returnNextOrPrev = current =>{
     return current === -1
-    ? mapItemKeys.length - 1
-    : current === mapItemKeys.length
-      ? 0
-      : current
+      ? mapItemKeys.length - 1
+      : current === mapItemKeys.length
+        ? 0
+        : current
   }
 
   const returnPos = current => {
     return current === mapItemKeys.length * 180
-    ? mapItemKeys.length * -180
-    : current === mapItemKeys.length * -180
+      ? mapItemKeys.length * -180
+      : current === mapItemKeys.length * -180
+        ? 0
+        : current
+  }
+
+  const returnVerticalPos = current =>{
+    return current < 0 
       ? 0
-      : current
+      : current > 120 
+        ? 120
+        : current
   }
 
   const populateCircle = key =>{
@@ -319,28 +332,42 @@ function init() {
     updateElements()
   }
 
+  const moveBearVertically = () => {
+    const vertPos = bearData.verticalPos + (window.innerWidth < 600 ? 16 : 20)
+    const bear = document.querySelector('.bear_wrapper').style
+    bear.transform = `translate(0, ${vertPos}px)`
+    bear.zIndex = vertPos
+  }
+
+
   const handleKey = ({ e, letter }) =>{
     const key = e?.key.replace('Arrow','').toLowerCase()[0] || letter
-    if (!['l','r','u','d'].includes(key)) return
+
     if (circleData.key !== key){
       clearInterval(circleData.interval)
       circleData.key = key
-      circleData.interval = setInterval(()=>{
+      circleData.interval = setInterval(()=> {
         if (!circleData.key) {
           clearInterval(circleData.interval)
         } else {
-          rotateCircle(key)
+          if (['l','r'].includes(key)) {
+            rotateCircle(key)
+          } else if (['u','d'].includes(key)) {
+            bearData.verticalPos += config[key]
+            bearData.verticalPos = returnVerticalPos(bearData.verticalPos)
+            moveBearVertically()
+          }
         }
       }, 1000 / 60)
       clearInterval(bearData.interval)
-      bearData.interval = setInterval(()=>{
+      bearData.interval = setInterval(()=> {
         if (!circleData.key) {
           clearInterval(bearData.interval)
         } else {
           turnSprite({ e:circleData.key, actor: bearData, animate: true})
         }
       }, 100)
-    }
+    } 
   }
 
   const placeBear = () =>{
@@ -407,7 +434,7 @@ function init() {
   const resize = () => {
     const { innerWidth } = window
     circleWrapper.style.transform = innerWidth < 400 ? `scale(${innerWidth / 400})` : 'scale(1)'
-    document.querySelector('.bear_wrapper').style.transform = `translate(0, ${innerWidth < 600 ? 16 : 20}px)`
+    moveBearVertically()
     movePointer(circleData.pos)
   }
 
