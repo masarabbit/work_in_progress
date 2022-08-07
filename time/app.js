@@ -74,7 +74,7 @@ function init() {
 
   const populateInfo = () => {
     if (!infoToDisplay.mode) return
-    const { mode, pos:{ x, y }, id, time, animation, log, history } = infoToDisplay 
+    const { mode, pos: { x, y }, id, time, animation, log, history } = infoToDisplay 
     infoCard.innerHTML = `
       <div class="top_part">
         <div>
@@ -93,7 +93,7 @@ function init() {
   }
   
   const animate = (bot, data) =>{
-    const { frame:i, animation, frameSpeed, mode } = data
+    const { frame: i, animation, frameSpeed, mode } = data
     const sprite = bot.childNodes[0].childNodes[0]
     const item = animationFrames[animation][i]
     const frame = !Number.isInteger(item) && item.split('-')
@@ -115,7 +115,7 @@ function init() {
     bot.classList.add('bot_wrapper')
     bot.innerHTML = '<div><div class="bot"></div></div>'
     body.appendChild(bot)
-    bots.push({...botData})
+    bots.push({ ...botData })
     count++
     const data = bots[bots.length - 1]
     data.time = time || randomN(defaultTime)
@@ -147,7 +147,7 @@ function init() {
     new Array(no).fill('').map(()=> {
       return [randomN(body.clientWidth), randomN(body.clientHeight)]
     }).forEach( pos => {
-      createBot({ x:pos[0], y: pos[1] })
+      createBot({ x: pos[0], y: pos[1] })
     })
   }
 
@@ -316,7 +316,7 @@ function init() {
         } else if (
           (b.mode === 'flee' && closestBotData.distance > 100)  
           || (b.time > 200 && activeBotsNo() > maxBotNo())
-          ) {
+        ) {
           charge(b, logs)
         } else if (b.mode === 'hunter' && closestBotData.distance < 24) {
           huntAndDestroy(b, closestBot, logs)
@@ -331,10 +331,10 @@ function init() {
   const createNewBots = (x, y, time, history) => {
     const d = 50
     const pos = [
-      {x: -d, y: -d},
-      {x: d, y: -d},
-      {x: -d, y: d},
-      {x: d, y: d},
+      { x: -d, y: -d },
+      { x: d, y: -d },
+      { x: -d, y: d },
+      { x: d, y: d },
     ]
     pos.forEach(p => {
       createBot({ 

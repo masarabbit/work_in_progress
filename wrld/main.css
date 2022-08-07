@@ -91,7 +91,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
+    /* overflow: hidden; */
   }
 
   .circle {
@@ -301,8 +301,11 @@ a:hover { text-decoration: underline; }
 }
 
 .element {
+  position: absolute;
   /* image-rendering: pixelated; */
   background-repeat: no-repeat !important;
+  /* border: 1px solid hotpink; */
+  /* transition: 3s; */
 }
 
 

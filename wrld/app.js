@@ -1,7 +1,7 @@
 function init() {  
 
   const circleData = {
-    angle: 270,
+    angle: 271,
     interval: null,
     key: 'd',
     mapIndex: 0,
@@ -14,7 +14,6 @@ function init() {
     'r': -1,
     'u': -2,
     'd': 2,
-    's': 0
   }
 
   const touchControl = {
@@ -77,7 +76,7 @@ function init() {
       {
         element: 'tree',
         angle: 30,
-        name: 'a',
+        offset: 100,
       },
       {
         element: 'tree_white',
@@ -204,20 +203,23 @@ function init() {
   
   const placeElements = index => mapItems[index].forEach(item => placeElement(item, index))
 
+
   const placeElement = (item, i) => {
     const element = document.createElement('div')
     const offset = i % 2 === 0 ? 0 : 180
     element.classList.add('element')
     element.classList.add(item.element)
     circle.append(element)
-    const { width:w, height:h, offset:o } = items[item.element]
+    const { width: w, height: h, offset: o } = items[item.element]
+    const vertOffset = h - (item.offset || o || 5)
 
-    setTargetParams({ target:element, w, h })
+    setTargetParams({ target: element, w, h })
     element.innerHTML = item.element + i
-    element.style.transform = `translate(${220 - (w / 2)}px, -${h - 5}px) rotate(${item.angle + offset}deg)`
-    element.style.zIndex =  h - (item.offset || o || 5) 
+    element.style.transform = `translate(${220 - (w / 2)}px, ${-vertOffset}px) rotate(${item.angle + offset}deg)`
+
+    element.style.zIndex = vertOffset < 0 ? item.offset : vertOffset
     element.style.backgroundSize = `${w}px ${h}px !important`
-    element.style.transformOrigin = `center ${220 + (h - (item.offset || o || 5))}px`
+    element.style.transformOrigin = `center ${220 + vertOffset}px`
     item.placed = element
   }
   
@@ -247,10 +249,10 @@ function init() {
   }
 
   const stopBear = () =>{
-    turnSprite({ e:circleData.key, actor: bearData })
+    turnSprite({ e: circleData.key, actor: bearData })
     circleData.key = null
   }
-  
+
   const returnNextOrPrev = current =>{
     return current === -1
       ? mapItemKeys.length - 1
@@ -299,14 +301,16 @@ function init() {
 
   const movePointer = pos =>{
     const { width } = circleWrapper.getBoundingClientRect()
-    const pointerPos = (currentPos(pos -90) / mapItemKeys.length) * width
+    const pointerPos = (currentPos(pos - 90) / mapItemKeys.length) * width
     pointer.style.transform = `translateX(${(pointerPos > width ? pointerPos - width : pointerPos) - 10}px)`
   }
 
   const changeBackground = pos =>{
     background.classList[Math.floor(pos) % 2 === 0 ? 'add' : 'remove']('light')
-    circle.classList[Math.floor(pos) % 2 === 0 ? 'add' : 'remove']('light')
+    // circle.classList[Math.floor(pos) % 2 === 0 ? 'add' : 'remove']('light') // TODO this makes bear blurry so maybe don't need
   }
+
+  // const withinBuffer = (a, b) => Math.abs(a, b) < 50
 
   const updateElements = () =>{
     const trigger = [ 89, 269, 91, 271 ]
@@ -317,6 +321,9 @@ function init() {
     const index = currentIndex(circleData.pos)
     circleData.mapIndex = isNum(index) ? index : circleData.mapIndex
     circleData.mapIndex = returnNextOrPrev(circleData.mapIndex)
+
+    const angleWithinCurrentMap = Math.round((currentPos(circleData.pos - 90) % 1) * 180)
+    console.log('posWith', angleWithinCurrentMap)
 
     if (trigger.includes(Math.abs(circleData.angle))) populateCircle(key)
     movePointer(circleData.pos)
@@ -330,15 +337,18 @@ function init() {
     if (['l','r'].includes(key)) {
       circleData.angle += config[key]
       circle.style.transform = `rotate(${circleData.angle}deg)`
+
+      // TODO break this out, and store param in bearData
+      document.querySelector('.bear_wrapper').style.transform = `translate(${220 - 16}px, ${10}px) rotate(${-circleData.angle}deg)`
       updateElements()
     }
   }
 
   const moveBearVertically = () => {
     const vertPos = bearData.verticalPos + (window.innerWidth < 600 ? 16 : 20)
-    const bear = document.querySelector('.bear_wrapper').style
-    bear.transform = `translate(0, ${vertPos}px)`
-    bear.zIndex = vertPos
+    const bear = document.querySelector('.bear_wrapper')
+    // bear.transform = `translate(0, ${vertPos}px)` // TODO this needs to get param from bearData, and need to adjust transform origin
+    bear.style.zIndex = vertPos + 100 // TODO needs to get correct zIndex
   }
 
 
@@ -366,7 +376,7 @@ function init() {
         if (!circleData.key) {
           clearInterval(bearData.interval)
         } else {
-          turnSprite({ e:circleData.key, actor: bearData, animate: true})
+          turnSprite({ e: circleData.key, actor: bearData, animate: true })
         }
       }, 100)
     } 
@@ -375,9 +385,12 @@ function init() {
   const placeBear = () =>{
     const bear = document.createElement('div')
     bear.classList.add('bear_wrapper')
-    circleWrapper.append(bear)
+    // circleWrapper.append(bear)
+    circle.append(bear)
     bear.innerHTML = '<div><div class="bear"></div></div>'
     bearData.sprite = bear.childNodes[0].childNodes[0]
+    bear.style.transform = `translate(${220 - 16}px, ${10}px) rotate(0deg)`
+    bear.style.transformOrigin = `center ${220 - 10}px` // TODO this needs 
   }
 
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
@@ -387,8 +400,8 @@ function init() {
     pos.b = pos.d - y
     const newX = target.offsetLeft - pos.a
     const newY = target.offsetTop - pos.b
-    if (distanceBetween({x: 0, y: 0}, {x: newX, y: newY}) < 35) {
-      setTargetParams({ target, x:newX, y:newY })
+    if (distanceBetween({ x: 0, y: 0 }, { x: newX, y: newY }) < 35) {
+      setTargetParams({ target, x: newX, y: newY })
       touchControl.direction = Math.abs(newX) < Math.abs(newY)
         ? newY < 0 ? 'u' : 'd'
         : newX < 0 ? 'l' : 'r'
@@ -408,7 +421,7 @@ function init() {
       mouse.move(document, 'add', onDrag)
       touchControl.active = true
       touchControl.timer = setInterval(()=> {
-        if (touchControl.active) handleKeyAction({ letter:touchControl.direction })
+        if (touchControl.active) handleKeyAction({ letter: touchControl.direction })
       }, 200)
     }
     const onDrag = e =>{
@@ -422,7 +435,7 @@ function init() {
       mouse.up(document, 'remove', onLetGo)
       mouse.move(document,'remove', onDrag)
       target.style.transition = '0.2s'
-      setTargetParams({ target, x:0, y:0 })
+      setTargetParams({ target, x: 0, y: 0 })
       setTimeout(()=>{
         target.style.transition = '0s'
       }, 200)
@@ -455,6 +468,7 @@ function init() {
       circle.style.transition = '0.2s'
       setTimeout(()=> circle.style.transition = '0s', 200)
       circle.style.transform = `rotate(${circleData.angle}deg)`
+      // TODO need to rotate bear here as well.
       circleData.mapIndex = i
       mapItemKeys.forEach(i => mapItems[i].forEach(item => item.placed?.remove()))
       placeElements(i)
@@ -467,15 +481,15 @@ function init() {
 
   window.addEventListener('keydown', e => handleKey({ e }))
   window.addEventListener('keyup', ()=> {
-    turnSprite({ e:circleData.key, actor: bearData })
+    turnSprite({ e: circleData.key, actor: bearData })
     circleData.key = null
   })
   
   window.addEventListener('resize', resize)
   addTouchAction(control, handleKey)
   placeElements(0)
-  rotateCircle('s')
   placeBear()
+  rotateCircle('r')
   stopBear()
   resize()
 
