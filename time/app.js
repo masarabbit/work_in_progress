@@ -46,7 +46,7 @@ function init() {
 
   const randomN = max => Math.ceil(Math.random() * max)
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
-  const withinBuffer = (a, b) => Math.abs(a, b) < 50
+  const withinBuffer = (a, b) => Math.abs(a - b) < 20
   const activeBotsNo = () => bots.filter(bot => !bot.stop).length
   const botNo = () => {
     const defaultNo = Math.round((body.clientWidth * body.clientHeight) / (180 * 180))

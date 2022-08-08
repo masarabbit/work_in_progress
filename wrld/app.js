@@ -85,7 +85,6 @@ function init() {
         element: 'tree_white',
         angle: 40,
         offset: 20,
-        name: 'b',
       },
       // {
       //   element: 'house1',
@@ -95,92 +94,76 @@ function init() {
       {
         element: 'house2',
         angle: 120,
-        name: 'c',
       },
     ],
     1: [     
       {
         element: 'tree',
         angle: 10,
-        name: 'd',
       },
       {
         element: 'tree',
         angle: 60,
-        name: 'e',
       },
       {
         element: 'tree',
         angle: 90,
-        name: 'f',
       },
     ],
     2: [
       {
         element: 'tree',
         angle: 10,
-        name: 'g',
       },
       {
         element: 'tree',
         angle: 60,
-        name: 'h',
       },
       {
         element: 'tree',
         angle: 120,
-        name: 'i',
       },
     ],
     3: [
       {
         element: 'tree',
         angle: 10,
-        name: 'g',
       },
       {
         element: 'tree',
         angle: 60,
-        name: 'h',
       },
       {
         element: 'tree',
         angle: 120,
-        name: 'i',
       },
     ],
     4: [
       {
         element: 'tree',
         angle: 10,
-        name: 'g',
       },
       {
         element: 'tree',
         angle: 60,
-        name: 'h',
       },
       {
         element: 'tree',
         angle: 120,
-        name: 'i',
       },
     ],
     5: [
       {
         element: 'tree',
         angle: 10,
-        name: 'g',
       },
       {
         element: 'tree',
         angle: 60,
-        name: 'h',
       },
       {
         element: 'tree',
         angle: 120,
-        name: 'i',
       },
     ],
   }
@@ -221,7 +204,7 @@ function init() {
     element.innerHTML = item.element + i
     element.style.transform = `translate(${220 - (w / 2)}px, ${-vertOffset}px) rotate(${item.angle + offset}deg)`
 
-    element.style.zIndex = vertOffset < 0 ? item.offset : vertOffset - h
+    element.style.zIndex = item.offset || o || 5
     element.style.backgroundSize = `${w}px ${h}px !important`
     element.style.transformOrigin = `center ${220 + vertOffset}px`
     item.placed = element
@@ -274,8 +257,8 @@ function init() {
   }
 
   const returnVerticalPos = current =>{
-    return current < 10
-      ? 10
+    return current < -5
+      ? -5
       : current > 120 
         ? 120
         : current
@@ -311,10 +294,9 @@ function init() {
 
   const changeBackground = pos =>{
     background.classList[Math.floor(pos) % 2 === 0 ? 'add' : 'remove']('light')
-    // circle.classList[Math.floor(pos) % 2 === 0 ? 'add' : 'remove']('light') // TODO this makes bear blurry so maybe don't need
   }
 
-  // const withinBuffer = (a, b) => Math.abs(a, b) < 50
+  const withinBuffer = (a, b, buffer) => Math.abs(a - b) < buffer
 
   const updateElements = () =>{
     const trigger = [ 89, 269, 91, 271 ] // TODO maybe this needs adjusting 
@@ -325,9 +307,6 @@ function init() {
     const index = currentIndex(circleData.pos)
     circleData.mapIndex = isNum(index) ? index : circleData.mapIndex
     circleData.mapIndex = returnNextOrPrev(circleData.mapIndex)
-
-    const angleWithinCurrentMap = Math.round((currentPos(circleData.pos - 90) % 1) * 180)
-    console.log('posWith', angleWithinCurrentMap, circleData.angle, key)
 
     if (trigger.includes(Math.abs(circleData.angle))) populateCircle(key)
 
@@ -357,7 +336,21 @@ function init() {
     bear.style.zIndex = bearData.vertPos + 32
     positionBear(-circleData.angle)
   }
+  
 
+  const hitItem = () => {
+    const angleWithinCurrentMap = Math.round((currentPos(circleData.pos - 90) % 1) * 180)
+    return mapItems[circleData.mapIndex].map(item => {
+      const { zIndex: itemPos } = item.placed.style
+      const { zIndex: bearPos } = bear.style
+      if (
+        withinBuffer(item.angle, angleWithinCurrentMap, 10) && 
+        withinBuffer(itemPos, bearPos, 15) && 
+        (circleData.key === 'u' && +itemPos < +bearPos || circleData.key === 'd' && +itemPos > +bearPos)
+      ) return item
+        return null
+    }).filter(item => item)[0]
+  }
 
   const handleKey = ({ e, letter }) =>{
     const key = e?.key.replace('Arrow','').toLowerCase()[0] || letter
@@ -372,9 +365,13 @@ function init() {
           if (['l','r'].includes(key)) {
             rotateCircle()
           } else if (['u','d'].includes(key)) {
-            bearData.vertPos += config[key]
-            bearData.vertPos = returnVerticalPos(bearData.vertPos)
-            moveBearVertically()
+            if (!hitItem()){
+              bearData.vertPos += config[key]
+              bearData.vertPos = returnVerticalPos(bearData.vertPos)
+              moveBearVertically()
+            } else {
+              console.log(hitItem()) // TODO this only needs to be triggered when clicking something, so can be taken somewhere else
+            }
           }
         }
       }, 1000 / 60)
@@ -472,6 +469,7 @@ function init() {
             ? -90
             : -270     
       positionBear(-circleData.angle)      
+      circle.style.transform = `rotate(${circleData.angle - 270}deg)`
       circle.style.transition = '0.2s'
       setTimeout(()=> circle.style.transition = '0s', 200)
       circle.style.transform = `rotate(${circleData.angle}deg)`
