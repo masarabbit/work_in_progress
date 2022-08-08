@@ -1,7 +1,11 @@
 function init() {  
 
+  // TODO may need to adjust z-index
+
+  // TODO trigger for switching map is not quite right
+
   const circleData = {
-    angle: 271,
+    angle: 270,
     interval: null,
     key: 'd',
     mapIndex: 0,
@@ -38,7 +42,7 @@ function init() {
     sprite: null,
     frameOffset: 0,
     interval: null,
-    verticalPos: 0,
+    vertPos: 10,
   }
 
   const items = {
@@ -191,6 +195,7 @@ function init() {
   const background = document.querySelector('.background')
   const control = document.querySelector('.touch_circle')
   const isNum = x => typeof x === 'number'
+  let bear
 
   const setTargetParams = ({ target, x, y, w, h }) =>{
     const { style } = target
@@ -199,7 +204,7 @@ function init() {
     if (isNum(y)) style.top = `${y}px`
     if (isNum(h)) style.height = `${h}px`
   }
-
+  
   
   const placeElements = index => mapItems[index].forEach(item => placeElement(item, index))
 
@@ -217,7 +222,7 @@ function init() {
     element.innerHTML = item.element + i
     element.style.transform = `translate(${220 - (w / 2)}px, ${-vertOffset}px) rotate(${item.angle + offset}deg)`
 
-    element.style.zIndex = vertOffset < 0 ? item.offset : vertOffset
+    element.style.zIndex = vertOffset < 0 ? item.offset : vertOffset - h
     element.style.backgroundSize = `${w}px ${h}px !important`
     element.style.transformOrigin = `center ${220 + vertOffset}px`
     item.placed = element
@@ -270,8 +275,8 @@ function init() {
   }
 
   const returnVerticalPos = current =>{
-    return current < 0 
-      ? 0
+    return current < 10
+      ? 10
       : current > 120 
         ? 120
         : current
@@ -313,7 +318,7 @@ function init() {
   // const withinBuffer = (a, b) => Math.abs(a, b) < 50
 
   const updateElements = () =>{
-    const trigger = [ 89, 269, 91, 271 ]
+    const trigger = [ 89, 269, 91, 271 ] // TODO maybe this needs adjusting 
     const { key } = circleData
 
     circleData.pos += config[key]
@@ -326,11 +331,17 @@ function init() {
     console.log('posWith', angleWithinCurrentMap)
 
     if (trigger.includes(Math.abs(circleData.angle))) populateCircle(key)
+    // populateCircle(key)
     movePointer(circleData.pos)
     changeBackground(circleData.mapIndex)
     if (Math.abs(circleData.angle) === 360) circleData.angle = 0
 
-    indicator.innerHTML = `angle: ${circleData.angle} pos:${circleData.pos} current: ${circleData.mapIndex}`
+    indicator.innerHTML = `angle: ${circleData.angle} pos:${circleData.pos} prev: ${returnNextOrPrev(circleData.mapIndex - 1)} current: ${circleData.mapIndex} next:${returnNextOrPrev(circleData.mapIndex + 1)}`
+  }
+  
+  const positionBear = angle => {
+    bear.style.transformOrigin = `center ${220 - (bearData.vertPos)}px`
+    bear.style.transform = `translate(${220 - 16}px, ${bearData.vertPos}px) rotate(${angle}deg)`
   }
 
   const rotateCircle = key =>{
@@ -338,17 +349,14 @@ function init() {
       circleData.angle += config[key]
       circle.style.transform = `rotate(${circleData.angle}deg)`
 
-      // TODO break this out, and store param in bearData
-      document.querySelector('.bear_wrapper').style.transform = `translate(${220 - 16}px, ${10}px) rotate(${-circleData.angle}deg)`
+      positionBear(-circleData.angle)
       updateElements()
     }
   }
 
   const moveBearVertically = () => {
-    const vertPos = bearData.verticalPos + (window.innerWidth < 600 ? 16 : 20)
-    const bear = document.querySelector('.bear_wrapper')
-    // bear.transform = `translate(0, ${vertPos}px)` // TODO this needs to get param from bearData, and need to adjust transform origin
-    bear.style.zIndex = vertPos + 100 // TODO needs to get correct zIndex
+    bear.style.zIndex = bearData.vertPos + 32
+    positionBear(-circleData.angle)
   }
 
 
@@ -365,8 +373,8 @@ function init() {
           if (['l','r'].includes(key)) {
             rotateCircle(key)
           } else if (['u','d'].includes(key)) {
-            bearData.verticalPos += config[key]
-            bearData.verticalPos = returnVerticalPos(bearData.verticalPos)
+            bearData.vertPos += config[key]
+            bearData.vertPos = returnVerticalPos(bearData.vertPos)
             moveBearVertically()
           }
         }
@@ -382,10 +390,9 @@ function init() {
     } 
   }
 
-  const placeBear = () =>{
-    const bear = document.createElement('div')
+  const addBear = () =>{
+    bear = document.createElement('div')
     bear.classList.add('bear_wrapper')
-    // circleWrapper.append(bear)
     circle.append(bear)
     bear.innerHTML = '<div><div class="bear"></div></div>'
     bearData.sprite = bear.childNodes[0].childNodes[0]
@@ -465,10 +472,10 @@ function init() {
           : i % 2 === 0
             ? -90
             : -270     
+      positionBear(-circleData.angle)      
       circle.style.transition = '0.2s'
       setTimeout(()=> circle.style.transition = '0s', 200)
       circle.style.transform = `rotate(${circleData.angle}deg)`
-      // TODO need to rotate bear here as well.
       circleData.mapIndex = i
       mapItemKeys.forEach(i => mapItems[i].forEach(item => item.placed?.remove()))
       placeElements(i)
@@ -488,7 +495,7 @@ function init() {
   window.addEventListener('resize', resize)
   addTouchAction(control, handleKey)
   placeElements(0)
-  placeBear()
+  addBear()
   rotateCircle('r')
   stopBear()
   resize()
