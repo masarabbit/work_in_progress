@@ -2,12 +2,11 @@ function init() {
 
   // TODO may need to adjust z-index
 
-  // TODO trigger for switching map is not quite right
 
   const circleData = {
-    angle: 270,
+    angle: 271,
     interval: null,
-    key: 'd',
+    key: 'r',
     mapIndex: 0,
     pos: 0,
 
@@ -328,10 +327,10 @@ function init() {
     circleData.mapIndex = returnNextOrPrev(circleData.mapIndex)
 
     const angleWithinCurrentMap = Math.round((currentPos(circleData.pos - 90) % 1) * 180)
-    console.log('posWith', angleWithinCurrentMap)
+    console.log('posWith', angleWithinCurrentMap, circleData.angle, key)
 
     if (trigger.includes(Math.abs(circleData.angle))) populateCircle(key)
-    // populateCircle(key)
+
     movePointer(circleData.pos)
     changeBackground(circleData.mapIndex)
     if (Math.abs(circleData.angle) === 360) circleData.angle = 0
@@ -344,9 +343,9 @@ function init() {
     bear.style.transform = `translate(${220 - 16}px, ${bearData.vertPos}px) rotate(${angle}deg)`
   }
 
-  const rotateCircle = key =>{
-    if (['l','r'].includes(key)) {
-      circleData.angle += config[key]
+  const rotateCircle = () =>{
+    if (['l','r'].includes(circleData.key)) {
+      circleData.angle += config[circleData.key]
       circle.style.transform = `rotate(${circleData.angle}deg)`
 
       positionBear(-circleData.angle)
@@ -371,7 +370,7 @@ function init() {
           clearInterval(circleData.interval)
         } else {
           if (['l','r'].includes(key)) {
-            rotateCircle(key)
+            rotateCircle()
           } else if (['u','d'].includes(key)) {
             bearData.vertPos += config[key]
             bearData.vertPos = returnVerticalPos(bearData.vertPos)
@@ -496,9 +495,11 @@ function init() {
   addTouchAction(control, handleKey)
   placeElements(0)
   addBear()
-  rotateCircle('r')
+  rotateCircle()
+  handleKey({ letter: 'd'})
   stopBear()
   resize()
+
 
 }
 
