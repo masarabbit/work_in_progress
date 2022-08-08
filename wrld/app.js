@@ -344,7 +344,7 @@ function init() {
       const { zIndex: itemPos } = item.placed.style
       const { zIndex: bearPos } = bear.style
       if (
-        withinBuffer(item.angle, angleWithinCurrentMap, 10) && 
+        withinBuffer(item.angle, angleWithinCurrentMap, items[item.element].width / 4) && // TODO this buffer needs adjusting
         withinBuffer(itemPos, bearPos, 15) && 
         (circleData.key === 'u' && +itemPos < +bearPos || circleData.key === 'd' && +itemPos > +bearPos)
       ) return item
