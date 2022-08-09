@@ -67,10 +67,6 @@ function init() {
       height: 82,
       offset: 20
     },
-    line: {
-      width: 1,
-      height: 100,
-    }
   }
 
   // this needs to be even number to work
@@ -94,6 +90,7 @@ function init() {
       {
         element: 'house2',
         angle: 120,
+        offset: 60
       },
     ],
     1: [     
@@ -176,8 +173,10 @@ function init() {
   const pointer = document.querySelector('.pointer')
   const background = document.querySelector('.background')
   const control = document.querySelector('.touch_circle')
+  const halfCircumference = r => Math.PI * r
   const isNum = x => typeof x === 'number'
   let bear
+
 
   const setTargetParams = ({ target, x, y, w, h }) =>{
     const { style } = target
@@ -299,7 +298,7 @@ function init() {
   const withinBuffer = (a, b, buffer) => Math.abs(a - b) < buffer
 
   const updateElements = () =>{
-    const trigger = [ 89, 269, 91, 271 ] // TODO maybe this needs adjusting 
+    const trigger = [ 89, 269, 91, 271 ]
     const { key } = circleData
 
     circleData.pos += config[key]
@@ -344,7 +343,7 @@ function init() {
       const { zIndex: itemPos } = item.placed.style
       const { zIndex: bearPos } = bear.style
       if (
-        withinBuffer(item.angle, angleWithinCurrentMap, items[item.element].width / 4) && // TODO this buffer needs adjusting
+        withinBuffer(item.angle, angleWithinCurrentMap, (items[item.element].width / halfCircumference(220 - itemPos)) * 90 ) && // TODO this buffer needs adjusting
         withinBuffer(itemPos, bearPos, 15) && 
         (circleData.key === 'u' && +itemPos < +bearPos || circleData.key === 'd' && +itemPos > +bearPos)
       ) return item
@@ -393,7 +392,7 @@ function init() {
     bear.innerHTML = '<div><div class="bear"></div></div>'
     bearData.sprite = bear.childNodes[0].childNodes[0]
     bear.style.transform = `translate(${220 - 16}px, ${10}px) rotate(0deg)`
-    bear.style.transformOrigin = `center ${220 - 10}px` // TODO this needs 
+    bear.style.transformOrigin = `center ${220 - 10}px`
   }
 
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
