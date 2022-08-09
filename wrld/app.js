@@ -1,7 +1,5 @@
 function init() {  
 
-  // TODO may need to adjust z-index
-
 
   const circleData = {
     angle: 271,
@@ -44,7 +42,7 @@ function init() {
     vertPos: 10,
   }
 
-  const items = {
+  const elements = {
     tree: {
       width: 48,
       height: 60,
@@ -70,7 +68,7 @@ function init() {
   }
 
   // this needs to be even number to work
-  const mapItems = {
+  const mapElements = {
     0: [
       {
         element: 'tree',
@@ -165,7 +163,7 @@ function init() {
     ],
   }
   
-  const mapItemKeys = Object.keys(mapItems)
+  const mapElementKeys = Object.keys(mapElements)
   const indicator = document.querySelector('.indicator')
   const cellD = 32
   const circle = document.querySelector('.circle')
@@ -187,26 +185,27 @@ function init() {
   }
   
   
-  const placeElements = index => mapItems[index].forEach(item => placeElement(item, index))
+  const placeElements = index => mapElements[index].forEach(element => placeElement(element, index))
 
 
-  const placeElement = (item, i) => {
-    const element = document.createElement('div')
+  const placeElement = (element, i) => {
+    const newElement = document.createElement('div')
     const offset = i % 2 === 0 ? 0 : 180
-    element.classList.add('element')
-    element.classList.add(item.element)
-    circle.append(element)
-    const { width: w, height: h, offset: o } = items[item.element]
-    const vertOffset = h - (item.offset || o || 5)
+    newElement.className = `element ${element.element}`
+    circle.append(newElement)
+    const { width: w, height: h, offset: o } = elements[element.element]
+    const vertOffset = h - (element.offset || o || 5)
 
-    setTargetParams({ target: element, w, h })
-    element.innerHTML = item.element + i
-    element.style.transform = `translate(${220 - (w / 2)}px, ${-vertOffset}px) rotate(${item.angle + offset}deg)`
-
-    element.style.zIndex = item.offset || o || 5
-    element.style.backgroundSize = `${w}px ${h}px !important`
-    element.style.transformOrigin = `center ${220 + vertOffset}px`
-    item.placed = element
+    setTargetParams({ target: newElement, w, h })
+    newElement.innerHTML = element.element + i
+    Object.assign(newElement.style, {
+      transform: `translate(${220 - (w / 2)}px, ${-vertOffset}px) rotate(${element.angle + offset}deg)`,
+      zIndex: element.offset || o || 5,
+      backgroundSize: `${w}px ${h}px !important`,
+      transformOrigin: `center ${220 + vertOffset}px`
+    })
+    
+    element.placed = newElement
   }
   
   
@@ -241,16 +240,16 @@ function init() {
 
   const returnNextOrPrev = current =>{
     return current === -1
-      ? mapItemKeys.length - 1
-      : current === mapItemKeys.length
+      ? mapElementKeys.length - 1
+      : current === mapElementKeys.length
         ? 0
         : current
   }
 
   const returnPos = current => {
-    return current === mapItemKeys.length * 180
-      ? mapItemKeys.length * -180
-      : current === mapItemKeys.length * -180
+    return current === mapElementKeys.length * 180
+      ? mapElementKeys.length * -180
+      : current === mapElementKeys.length * -180
         ? 0
         : current
   }
@@ -266,8 +265,8 @@ function init() {
   const populateCircle = key =>{
     const { mapIndex } = circleData
     const indexToAdd = key === 'r' ? returnNextOrPrev(mapIndex + 1) : returnNextOrPrev(mapIndex - 1)
-    mapItemKeys.forEach(index =>{
-      if (index !== `${mapIndex}`) mapItems[index].forEach(item => item.placed?.remove())
+    mapElementKeys.forEach(index =>{
+      if (index !== `${mapIndex}`) mapElements[index].forEach(element => element.placed?.remove())
     })
     placeElements(indexToAdd)
   }
@@ -276,7 +275,7 @@ function init() {
     return pos === 0 
       ? 0
       : pos > 0 
-        ? (pos / -180) + mapItemKeys.length
+        ? (pos / -180) + mapElementKeys.length
         : pos / -180
   }
 
@@ -287,7 +286,7 @@ function init() {
 
   const movePointer = pos =>{
     const { width } = circleWrapper.getBoundingClientRect()
-    const pointerPos = (currentPos(pos - 90) / mapItemKeys.length) * width
+    const pointerPos = (currentPos(pos - 90) / mapElementKeys.length) * width
     pointer.style.transform = `translateX(${(pointerPos > width ? pointerPos - width : pointerPos) - 10}px)`
   }
 
@@ -295,7 +294,7 @@ function init() {
     background.classList[Math.floor(pos) % 2 === 0 ? 'add' : 'remove']('light')
   }
 
-  const withinBuffer = (a, b, buffer) => Math.abs(a - b) < buffer
+  const withinBuffer = ({ a, b, buffer }) => Math.abs(a - b) < buffer
 
   const updateElements = () =>{
     const trigger = [ 89, 269, 91, 271 ]
@@ -337,18 +336,24 @@ function init() {
   }
   
 
-  const hitItem = () => {
+  const touchElement = () => {
     const angleWithinCurrentMap = Math.round((currentPos(circleData.pos - 90) % 1) * 180)
-    return mapItems[circleData.mapIndex].map(item => {
-      const { zIndex: itemPos } = item.placed.style
+    return mapElements[circleData.mapIndex].map(element => {
+      const { zIndex: elementPos } = element.placed.style
       const { zIndex: bearPos } = bear.style
       if (
-        withinBuffer(item.angle, angleWithinCurrentMap, (items[item.element].width / halfCircumference(220 - itemPos)) * 90 ) && // TODO this buffer needs adjusting
-        withinBuffer(itemPos, bearPos, 15) && 
-        (circleData.key === 'u' && +itemPos < +bearPos || circleData.key === 'd' && +itemPos > +bearPos)
-      ) return item
+        withinBuffer({ 
+          a:element.angle, b:angleWithinCurrentMap, 
+          buffer:(elements[element.element].width / halfCircumference(220 - elementPos)) * 90
+          }) &&
+        withinBuffer({
+          a:elementPos, b:bearPos, 
+          buffer: 15
+        }) && 
+        (circleData.key === 'u' && +elementPos < +bearPos || circleData.key === 'd' && +elementPos > +bearPos)
+      ) return element
         return null
-    }).filter(item => item)[0]
+    }).filter(element => element)[0]
   }
 
   const handleKey = ({ e, letter }) =>{
@@ -364,12 +369,12 @@ function init() {
           if (['l','r'].includes(key)) {
             rotateCircle()
           } else if (['u','d'].includes(key)) {
-            if (!hitItem()){
+            if (!touchElement()){
               bearData.vertPos += config[key]
               bearData.vertPos = returnVerticalPos(bearData.vertPos)
               moveBearVertically()
             } else {
-              console.log(hitItem()) // TODO this only needs to be triggered when clicking something, so can be taken somewhere else
+              console.log(touchElement()) // TODO this only needs to be triggered when clicking something, so can be taken somewhere else
             }
           }
         }
@@ -455,7 +460,7 @@ function init() {
     movePointer(circleData.pos)
   }
 
-  document.querySelector('.location_mark').innerHTML = mapItemKeys.map(()=> `<div class="location_link"></div>`).join('')
+  document.querySelector('.location_mark').innerHTML = mapElementKeys.map(()=> `<div class="location_link"></div>`).join('')
 
   document.querySelectorAll('.location_link').forEach((link, i) => {
     link.addEventListener('click', ()=>{
@@ -473,7 +478,7 @@ function init() {
       setTimeout(()=> circle.style.transition = '0s', 200)
       circle.style.transform = `rotate(${circleData.angle}deg)`
       circleData.mapIndex = i
-      mapItemKeys.forEach(i => mapItems[i].forEach(item => item.placed?.remove()))
+      mapElementKeys.forEach(i => mapElements[i].forEach(element => element.placed?.remove()))
       placeElements(i)
       movePointer(circleData.pos)
       populateCircle('r')
