@@ -1,5 +1,9 @@
 function init() {  
 
+  // TODO add star to background
+  // TODO add more assets
+  // TODO add something that trigger with touchedElement
+  // TODO adjust circle size and background
 
   const circleData = {
     angle: 271,
@@ -7,7 +11,6 @@ function init() {
     key: 'r',
     mapIndex: 0,
     pos: 0,
-
   }
   
   const config = {
@@ -51,6 +54,14 @@ function init() {
       width: 48,
       height: 60,
     },
+    round_tree: {
+      width: 36,
+      height: 58,
+    },
+    round_tree_white: {
+      width: 36,
+      height: 58,
+    },
     mountain: {
       width: 80,
       height: 30,
@@ -68,6 +79,7 @@ function init() {
   }
 
   // this needs to be even number to work
+  // join lines with shift cmd p, need to check unjoin
   const mapElements = {
     0: [
       {
@@ -80,15 +92,20 @@ function init() {
         angle: 40,
         offset: 20,
       },
-      // {
-      //   element: 'house1',
-      //   angle: 70,
-      //   name: 'c',
-      // },
       {
         element: 'house2',
         angle: 120,
         offset: 60
+      },
+      {
+        element: 'round_tree',
+        angle: 80,
+        offset: 40
+      },
+      {
+        element: 'round_tree_white',
+        angle: 60,
+        offset: 40
       },
     ],
     1: [     
@@ -197,7 +214,7 @@ function init() {
     const vertOffset = h - (element.offset || o || 5)
 
     setTargetParams({ target: newElement, w, h })
-    newElement.innerHTML = element.element + i
+    // newElement.innerHTML = element.element + i
     Object.assign(newElement.style, {
       transform: `translate(${220 - (w / 2)}px, ${-vertOffset}px) rotate(${element.angle + offset}deg)`,
       zIndex: element.offset || o || 5,
@@ -336,7 +353,7 @@ function init() {
   }
   
 
-  const touchElement = () => {
+  const touchedElement = () => {
     const angleWithinCurrentMap = Math.round((currentPos(circleData.pos - 90) % 1) * 180)
     return mapElements[circleData.mapIndex].map(element => {
       const { zIndex: elementPos } = element.placed.style
@@ -369,12 +386,12 @@ function init() {
           if (['l','r'].includes(key)) {
             rotateCircle()
           } else if (['u','d'].includes(key)) {
-            if (!touchElement()){
+            if (!touchedElement()){
               bearData.vertPos += config[key]
               bearData.vertPos = returnVerticalPos(bearData.vertPos)
               moveBearVertically()
             } else {
-              console.log(touchElement()) // TODO this only needs to be triggered when clicking something, so can be taken somewhere else
+              console.log(touchedElement()) // TODO this only needs to be triggered when clicking something, so can be taken somewhere else
             }
           }
         }
@@ -472,6 +489,7 @@ function init() {
           : i % 2 === 0
             ? -90
             : -270     
+      bearData.vertPos = 10 //? different default could be set per map    
       positionBear(-circleData.angle)      
       circle.style.transform = `rotate(${circleData.angle - 270}deg)`
       circle.style.transition = '0.2s'
