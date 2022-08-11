@@ -11,6 +11,7 @@ function init() {
     key: 'r',
     mapIndex: 0,
     pos: 0,
+    activeEvent: null,
   }
   
   const config = {
@@ -39,6 +40,7 @@ function init() {
   
   const bearData = {
     animationTimer: ['',''],
+    bear: null,
     sprite: null,
     frameOffset: 0,
     interval: null,
@@ -190,7 +192,6 @@ function init() {
   const control = document.querySelector('.touch_circle')
   const halfCircumference = r => Math.PI * r
   const isNum = x => typeof x === 'number'
-  let bear
 
 
   const setTargetParams = ({ target, x, y, w, h }) =>{
@@ -296,10 +297,10 @@ function init() {
         : pos / -180
   }
 
-  const currentIndex = pos => {
-    const index = currentPos(pos)
-    return Number.isInteger(index) && index
-  }
+  // const currentIndex = pos => {
+  //   const index = currentPos(pos)
+  //   return Number.isInteger(index) && index
+  // }
 
   const movePointer = pos =>{
     const { width } = circleWrapper.getBoundingClientRect()
@@ -319,8 +320,11 @@ function init() {
 
     circleData.pos += config[key]
     circleData.pos = returnPos(circleData.pos)
-    const index = currentIndex(circleData.pos)
-    circleData.mapIndex = isNum(index) ? index : circleData.mapIndex
+    // const index = currentIndex(circleData.pos)
+    // circleData.mapIndex = isNum(index) ? index : circleData.mapIndex
+    // circleData.mapIndex = returnNextOrPrev(circleData.mapIndex)
+
+    circleData.mapIndex = Math.round(currentPos(circleData.pos))
     circleData.mapIndex = returnNextOrPrev(circleData.mapIndex)
 
     if (trigger.includes(Math.abs(circleData.angle))) populateCircle(key)
@@ -333,8 +337,8 @@ function init() {
   }
   
   const positionBear = angle => {
-    bear.style.transformOrigin = `center ${220 - (bearData.vertPos)}px`
-    bear.style.transform = `translate(${220 - 16}px, ${bearData.vertPos}px) rotate(${angle}deg)`
+    bearData.bear.style.transformOrigin = `center ${220 - (bearData.vertPos)}px`
+    bearData.bear.style.transform = `translate(${220 - 16}px, ${bearData.vertPos}px) rotate(${angle}deg)`
   }
 
   const rotateCircle = () =>{
@@ -348,16 +352,19 @@ function init() {
   }
 
   const moveBearVertically = () => {
-    bear.style.zIndex = bearData.vertPos + 32
+    bearData.bear.style.zIndex = bearData.vertPos + 32
     positionBear(-circleData.angle)
   }
   
 
   const touchedElement = () => {
-    const angleWithinCurrentMap = Math.round((currentPos(circleData.pos - 90) % 1) * 180)
+    const angleWithinCurrentMap = Math.round((currentPos(circleData.pos - 90) % 1) * 180) 
+    // let currentMap = Math.round(currentPos(circleData.pos))
+    // currentMap = currentMap === mapElementKeys.length ? 0 : currentMap
+
     return mapElements[circleData.mapIndex].map(element => {
       const { zIndex: elementPos } = element.placed.style
-      const { zIndex: bearPos } = bear.style
+      const { zIndex: bearPos } = bearData.bear.style
       if (
         withinBuffer({ 
           a:element.angle, b:angleWithinCurrentMap, 
@@ -386,12 +393,13 @@ function init() {
           if (['l','r'].includes(key)) {
             rotateCircle()
           } else if (['u','d'].includes(key)) {
-            if (!touchedElement()){
+            circleData.activeEvent = touchedElement()
+            if (!circleData.activeEvent){
               bearData.vertPos += config[key]
               bearData.vertPos = returnVerticalPos(bearData.vertPos)
               moveBearVertically()
             } else {
-              console.log(touchedElement()) // TODO this only needs to be triggered when clicking something, so can be taken somewhere else
+              console.log(circleData.activeEvent) // TODO this only needs to be triggered when clicking something, so can be taken somewhere else
             }
           }
         }
@@ -408,9 +416,10 @@ function init() {
   }
 
   const addBear = () =>{
-    bear = document.createElement('div')
-    bear.classList.add('bear_wrapper')
+    bearData.bear = document.createElement('div')
+    const { bear } = bearData
     circle.append(bear)
+    bear.classList.add('bear_wrapper')
     bear.innerHTML = '<div><div class="bear"></div></div>'
     bearData.sprite = bear.childNodes[0].childNodes[0]
     bear.style.transform = `translate(${220 - 16}px, ${10}px) rotate(0deg)`
