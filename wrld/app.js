@@ -297,11 +297,6 @@ function init() {
         : pos / -180
   }
 
-  // const currentIndex = pos => {
-  //   const index = currentPos(pos)
-  //   return Number.isInteger(index) && index
-  // }
-
   const movePointer = pos =>{
     const { width } = circleWrapper.getBoundingClientRect()
     const pointerPos = (currentPos(pos - 90) / mapElementKeys.length) * width
@@ -320,9 +315,6 @@ function init() {
 
     circleData.pos += config[key]
     circleData.pos = returnPos(circleData.pos)
-    // const index = currentIndex(circleData.pos)
-    // circleData.mapIndex = isNum(index) ? index : circleData.mapIndex
-    // circleData.mapIndex = returnNextOrPrev(circleData.mapIndex)
 
     circleData.mapIndex = Math.round(currentPos(circleData.pos))
     circleData.mapIndex = returnNextOrPrev(circleData.mapIndex)
@@ -359,8 +351,6 @@ function init() {
 
   const touchedElement = () => {
     const angleWithinCurrentMap = Math.round((currentPos(circleData.pos - 90) % 1) * 180) 
-    // let currentMap = Math.round(currentPos(circleData.pos))
-    // currentMap = currentMap === mapElementKeys.length ? 0 : currentMap
 
     return mapElements[circleData.mapIndex].map(element => {
       const { zIndex: elementPos } = element.placed.style
