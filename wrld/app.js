@@ -2,7 +2,7 @@ function init() {
 
   // TODO add star to background
   // TODO add more assets
-  // TODO add something that trigger with touchedElement
+  // TODO add something that trigger with elementInContact
   // TODO adjust circle size and background
 
   const circleData = {
@@ -45,6 +45,15 @@ function init() {
     frameOffset: 0,
     interval: null,
     vertPos: 10,
+    pause: false,
+    direction: null,
+  }
+
+  const artData = {
+    bear_art: {
+      width: 200,
+      height: 200
+    }
   }
 
   const elements = {
@@ -77,6 +86,11 @@ function init() {
       width: 80,
       height: 82,
       offset: 20
+    },
+    art: {
+      width: 52,
+      height: 60,
+      offset: 60
     },
   }
 
@@ -130,7 +144,8 @@ function init() {
         angle: 10,
       },
       {
-        element: 'tree',
+        element: 'art',
+        art: 'bear_art',
         angle: 60,
       },
       {
@@ -190,6 +205,8 @@ function init() {
   const pointer = document.querySelector('.pointer')
   const background = document.querySelector('.background')
   const control = document.querySelector('.touch_circle')
+  const actionButton = document.querySelector('.action_button')
+  const artWrapper = document.querySelector('.art_wrapper')
   const halfCircumference = r => Math.PI * r
   const isNum = x => typeof x === 'number'
 
@@ -300,7 +317,7 @@ function init() {
   const movePointer = pos =>{
     const { width } = circleWrapper.getBoundingClientRect()
     const pointerPos = (currentPos(pos - 90) / mapElementKeys.length) * width
-    pointer.style.transform = `translateX(${(pointerPos > width ? pointerPos - width : pointerPos) - 10}px)`
+    pointer.style.transform = `translateX(${(pointerPos > width ? pointerPos - width : pointerPos) - 12}px)`
   }
 
   const changeBackground = pos =>{
@@ -349,7 +366,7 @@ function init() {
   }
   
 
-  const touchedElement = () => {
+  const elementInContact = () => {
     const angleWithinCurrentMap = Math.round((currentPos(circleData.pos - 90) % 1) * 180) 
 
     return mapElements[circleData.mapIndex].map(element => {
@@ -370,39 +387,55 @@ function init() {
     }).filter(element => element)[0]
   }
 
-  const handleKey = ({ e, letter }) =>{
-    const key = e?.key.replace('Arrow','').toLowerCase()[0] || letter
-
-    if (circleData.key !== key){
-      clearInterval(circleData.interval)
-      circleData.key = key
-      circleData.interval = setInterval(()=> {
-        if (!circleData.key) {
-          clearInterval(circleData.interval)
-        } else {
-          if (['l','r'].includes(key)) {
-            rotateCircle()
-          } else if (['u','d'].includes(key)) {
-            circleData.activeEvent = touchedElement()
-            if (!circleData.activeEvent){
-              bearData.vertPos += config[key]
-              bearData.vertPos = returnVerticalPos(bearData.vertPos)
-              moveBearVertically()
-            } else {
-              console.log(circleData.activeEvent) // TODO this only needs to be triggered when clicking something, so can be taken somewhere else
+  const handleKey = ({ e, letter, enter }) =>{
+    if ((e?.key === 'Enter' || enter) && circleData.activeEvent?.art && bearData.direction === 'u') { 
+      bearData.pause = !bearData.pause
+      artWrapper.classList.toggle('display')
+      const artDisplay = artWrapper.childNodes[1]
+      const { width: w, height: h } = artData[circleData.activeEvent.art]
+      artDisplay.style.transition = bearData.pause ? '0.3s' : '0s'
+      setTargetParams({ target: artDisplay, w, h })
+      artDisplay.style.backgroundSize = `${w}px ${h}px`
+      setTimeout(()=>{
+        artDisplay.classList.toggle(circleData.activeEvent.art)
+      }, bearData.pause ? 0 : 300)
+      artDisplay.style.transition = '0.3s'
+    } else if(!bearData.pause) {
+      const key = e?.key.replace('Arrow','').toLowerCase()[0] || letter
+      bearData.direction = key
+      if (circleData.key !== key){
+        clearInterval(circleData.interval)
+        circleData.key = key
+        circleData.interval = setInterval(()=> {
+          if (!circleData.key) {
+            clearInterval(circleData.interval)
+          } else {
+            circleData.activeEvent = elementInContact()
+            if (['l','r'].includes(key)) {
+              rotateCircle()
+            } else if (['u','d'].includes(key)) {
+              if (!circleData.activeEvent){
+                bearData.vertPos += config[key]
+                bearData.vertPos = returnVerticalPos(bearData.vertPos)
+                moveBearVertically()
+                actionButton.classList.add('display_none')
+              } else if(key === 'u') {
+                actionButton.classList.remove('display_none')
+                console.log(circleData.activeEvent) // TODO this only needs to be triggered when clicking something, so can be taken somewhere else
+              }
             }
           }
-        }
-      }, 1000 / 60)
-      clearInterval(bearData.interval)
-      bearData.interval = setInterval(()=> {
-        if (!circleData.key) {
-          clearInterval(bearData.interval)
-        } else {
-          turnSprite({ e: circleData.key, actor: bearData, animate: true })
-        }
-      }, 100)
-    } 
+        }, 1000 / 60)
+        clearInterval(bearData.interval)
+        bearData.interval = setInterval(()=> {
+          if (!circleData.key) {
+            clearInterval(bearData.interval)
+          } else {
+            turnSprite({ e: circleData.key, actor: bearData, animate: true })
+          }
+        }, 100)
+      } 
+    }
   }
 
   const addBear = () =>{
@@ -509,6 +542,7 @@ function init() {
     turnSprite({ e: circleData.key, actor: bearData })
     circleData.key = null
   })
+  actionButton.addEventListener('click', ()=> handleKey({ enter: true }))
   
   window.addEventListener('resize', resize)
   addTouchAction(control, handleKey)
