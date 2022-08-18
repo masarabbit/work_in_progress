@@ -50,97 +50,40 @@ function init() {
   }
 
   const elements = {
-    tree: {
-      w: 48,
-      h: 60,
-    },
-    tree_white: {
-      w: 48,
-      h: 60,
-    },
-    round_tree: {
-      w: 36,
-      h: 58,
-    },
-    round_tree_white: {
-      w: 36,
-      h: 58,
-    },
-    mountain: {
-      w: 80,
-      h: 30,
-    },
-    house1: {
-      w: 96,
-      h: 96,
-      offset: 20,
-    },
-    house2: {
-      w: 80,
-      h: 82,
-      offset: 20
-    },
-    art: {
-      w: 52,
-      h: 60,
-      offset: 60
-    },
+    tree: { w: 48, h: 60 },
+    tree_white: { w: 48, h: 60 },
+    round_tree: { w: 36, h: 58 },
+    round_tree_white: { w: 36, h: 58 },
+    mountain: { w: 80, h: 30 },
+    house1: { w: 96, h: 96, offset: 20 },
+    house2: { w: 80, h: 82, offset: 20 },
+    art: { w: 52, h: 60, offset: 60 },
   }
 
   // this needs to be even number to work
   // join lines with shift cmd p, need to check unjoin
   const mapElements = {
     0: [
+      { element: 'tree', angle: 30, offset: 100 },
+      { element: 'tree_white', angle: 40, offset: 20 },
+      { element: 'house2', angle: 120, offset: 60 },
+      { element: 'round_tree', angle: 80, offset: 40 },
       {
-        element: 'tree',
-        angle: 30,
-        offset: 100,
-      },
-      {
-        element: 'tree_white',
-        angle: 40,
-        offset: 20,
-      },
-      {
-        element: 'house2',
-        angle: 120,
-        offset: 60
-      },
-      {
-        element: 'round_tree',
-        angle: 80,
-        offset: 40
-      },
-      {
-        element: 'round_tree_white',
-        angle: 60,
-        offset: 40,
+        element: 'round_tree_white', angle: 60, offset: 40,
         display: {
           caption: 'test'
         }
       },
     ],
     1: [     
-      {
-        element: 'tree',
-        angle: 10,
-      },
-      {
-        element: 'tree',
-        angle: 60,
-      },
-      {
-        element: 'tree',
-        angle: 90,
-      },
+      { element: 'tree', angle: 10, },
+      { element: 'tree', angle: 60, },
+      { element: 'tree', angle: 90, },
     ],
     2: [
+      { element: 'tree', angle: 10, },
       {
-        element: 'tree',
-        angle: 10,
-      },
-      {
-        element: 'art',
+        element: 'art', angle: 60,
         display: {
           image: {
             image: 'bear_art',
@@ -149,54 +92,23 @@ function init() {
           },
           caption: 'test test bear'
         },
-        angle: 60,
       },
-      {
-        element: 'tree',
-        angle: 120,
-      },
+      { element: 'tree', angle: 120 },
     ],
     3: [
-      {
-        element: 'tree',
-        angle: 10,
-      },
-      {
-        element: 'tree',
-        angle: 60,
-      },
-      {
-        element: 'tree',
-        angle: 120,
-      },
+      { element: 'tree', angle: 10 },
+      { element: 'tree', angle: 60 },
+      { element: 'tree', angle: 120 },
     ],
     4: [
-      {
-        element: 'tree',
-        angle: 10,
-      },
-      {
-        element: 'tree',
-        angle: 60,
-      },
-      {
-        element: 'tree',
-        angle: 120,
-      },
+      { element: 'tree', angle: 10 },
+      { element: 'tree', angle: 60 },
+      { element: 'tree', angle: 120 },
     ],
     5: [
-      {
-        element: 'tree',
-        angle: 10,
-      },
-      {
-        element: 'tree',
-        angle: 60,
-      },
-      {
-        element: 'tree',
-        angle: 120,
-      },
+      { element: 'tree', angle: 10 },
+      { element: 'tree', angle: 60 },
+      { element: 'tree', angle: 120 },
     ],
   }
   
@@ -210,6 +122,8 @@ function init() {
   const control = document.querySelector('.touch_circle')
   const actionButton = document.querySelector('.action_button')
   const displayWrapper = document.querySelector('.display_wrapper')
+  const imgDisplay = document.querySelector('.img_display')
+  const captionDisplay = document.querySelector('.caption')
   const halfCircumference = r => Math.PI * r
   const isNum = x => typeof x === 'number'
 
@@ -232,17 +146,14 @@ function init() {
     const vertOffset = h - (element.offset || o || 5)
 
     setTargetParams({ target: newElement, w, h })
-    // newElement.innerHTML = element.element + i
     Object.assign(newElement.style, {
       transform: `translate(${220 - (w / 2)}px, ${-vertOffset}px) rotate(${element.angle + offset}deg)`,
       zIndex: element.offset || o || 5,
       backgroundSize: `${w}px ${h}px !important`,
       transformOrigin: `center ${220 + vertOffset}px`
     })
-    
     element.placed = newElement
   }
-  
   
   
   const setSpritePos = (num, actor, sprite) =>{
@@ -387,10 +298,8 @@ function init() {
   }
   
   const displayOrHideImage = () =>{
-    const imgDisplay = displayWrapper.childNodes[1].childNodes[1]
     if (circleData.activeEvent.display?.image) {
       const { w, h, image } = circleData.activeEvent.display.image
-      imgDisplay.style.transition = bearData.pause ? '0.3s' : '0s'
       setTargetParams({ target: imgDisplay, w, h })
       imgDisplay.style.backgroundSize = `${w}px ${h}px`
       clearTimeout(circleData.displayTimer)
@@ -398,7 +307,6 @@ function init() {
         imgDisplay.classList[bearData.pause ? 'add' : 'remove'](image)
         imgDisplay.style.marginBottom = bearData.pause ? '5px' : '0px'
       }, bearData.pause ? 0 : 300)
-      imgDisplay.style.transition = '0.3s'
     } else {
       setTargetParams({ target: imgDisplay, w:0, h:0 })
     }
@@ -442,7 +350,6 @@ function init() {
       bearData.pause = !bearData.pause
       displayWrapper.classList.toggle('display')
       displayOrHideImage()
-      const captionDisplay = displayWrapper.childNodes[1].childNodes[3]
       captionDisplay.innerHTML = circleData.activeEvent.display.caption || ''
     } else if(!bearData.pause) {
       const key = e?.key.replace('Arrow','').toLowerCase()[0] || letter
@@ -555,7 +462,7 @@ function init() {
     turnSprite({ e: circleData.key, actor: bearData })
     circleData.key = null
   })
-  ;[ actionButton, displayWrapper ].forEach(ele => ele.addEventListener('click', ()=> handleKey({ enter: true })))
+  ;[actionButton, displayWrapper].forEach(ele => ele.addEventListener('click', ()=> handleKey({ enter: true })))
 
   
   window.addEventListener('resize', resize)
