@@ -11,7 +11,6 @@ function init() {
     mapIndex: 0,
     pos: 0,
     activeEvent: null,
-    displayTimer: null
   }
   
   const config = {
@@ -54,7 +53,6 @@ function init() {
     tree_white: { w: 48, h: 60 },
     round_tree: { w: 36, h: 58 },
     round_tree_white: { w: 36, h: 58 },
-    mountain: { w: 80, h: 30 },
     house1: { w: 96, h: 96, offset: 20 },
     house2: { w: 80, h: 82, offset: 20 },
     art: { w: 52, h: 60, offset: 60 },
@@ -66,7 +64,12 @@ function init() {
     0: [
       { element: 'tree', angle: 30, offset: 100 },
       { element: 'tree_white', angle: 40, offset: 20 },
-      { element: 'house2', angle: 120, offset: 60 },
+      { 
+        element: 'house2', angle: 120, offset: 60,
+        display: {
+          caption: 'test house'
+        } 
+      },
       { element: 'round_tree', angle: 80, offset: 40 },
       {
         element: 'round_tree_white', angle: 60, offset: 40,
@@ -297,18 +300,17 @@ function init() {
     }).filter(element => element)[0]
   }
   
-  const displayOrHideImage = () =>{
+  const displayOrHideImage = () =>{ 
     if (circleData.activeEvent.display?.image) {
       const { w, h, image } = circleData.activeEvent.display.image
       setTargetParams({ target: imgDisplay, w, h })
       imgDisplay.style.backgroundSize = `${w}px ${h}px`
-      clearTimeout(circleData.displayTimer)
-      circleData.displayTimer = setTimeout(()=>{
-        imgDisplay.classList[bearData.pause ? 'add' : 'remove'](image)
-        imgDisplay.style.marginBottom = bearData.pause ? '5px' : '0px'
-      }, bearData.pause ? 0 : 300)
+      imgDisplay.classList.add(image)
+      imgDisplay.style.marginBottom = '5px'
     } else {
       setTargetParams({ target: imgDisplay, w:0, h:0 })
+      imgDisplay.className = 'img_display'
+      imgDisplay.style.marginBottom = '0px'
     }
   }
 
@@ -329,6 +331,7 @@ function init() {
             bearData.vertPos = returnVerticalPos(bearData.vertPos)
             moveBearVertically()
           } else if (key === 'u' && circleData.activeEvent.display) {
+            displayOrHideImage()
             actionButton.classList.remove('display_none')
           }
         }
@@ -349,7 +352,6 @@ function init() {
     if ((e?.key === 'Enter' || enter) && circleData.activeEvent?.display && bearData.direction === 'u') { 
       bearData.pause = !bearData.pause
       displayWrapper.classList.toggle('display')
-      displayOrHideImage()
       captionDisplay.innerHTML = circleData.activeEvent.display.caption || ''
     } else if(!bearData.pause) {
       const key = e?.key.replace('Arrow','').toLowerCase()[0] || letter
@@ -443,7 +445,7 @@ function init() {
             : -270     
       bearData.vertPos = 10 //? different default could be set per map    
       positionBear(-circleData.angle)      
-      circle.style.transform = `rotate(${circleData.angle - 270}deg)`
+      circle.style.transform = `rotate(${circleData.angle - 180}deg)`
       circle.style.transition = '0.2s'
       setTimeout(()=> circle.style.transition = '0s', 200)
       circle.style.transform = `rotate(${circleData.angle}deg)`
