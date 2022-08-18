@@ -2,7 +2,6 @@ function init() {
 
   // TODO add star to background
   // TODO add more assets
-  // TODO refactor to change artDisplay to display text too.
   // TODO adjust circle size and background
 
   const circleData = {
@@ -50,47 +49,40 @@ function init() {
     direction: null,
   }
 
-  const artData = {
-    bear_art: {
-      width: 200,
-      height: 200
-    }
-  }
-
   const elements = {
     tree: {
-      width: 48,
-      height: 60,
+      w: 48,
+      h: 60,
     },
     tree_white: {
-      width: 48,
-      height: 60,
+      w: 48,
+      h: 60,
     },
     round_tree: {
-      width: 36,
-      height: 58,
+      w: 36,
+      h: 58,
     },
     round_tree_white: {
-      width: 36,
-      height: 58,
+      w: 36,
+      h: 58,
     },
     mountain: {
-      width: 80,
-      height: 30,
+      w: 80,
+      h: 30,
     },
     house1: {
-      width: 96,
-      height: 96,
+      w: 96,
+      h: 96,
       offset: 20,
     },
     house2: {
-      width: 80,
-      height: 82,
+      w: 80,
+      h: 82,
       offset: 20
     },
     art: {
-      width: 52,
-      height: 60,
+      w: 52,
+      h: 60,
       offset: 60
     },
   }
@@ -122,7 +114,10 @@ function init() {
       {
         element: 'round_tree_white',
         angle: 60,
-        offset: 40
+        offset: 40,
+        display: {
+          caption: 'test'
+        }
       },
     ],
     1: [     
@@ -146,7 +141,14 @@ function init() {
       },
       {
         element: 'art',
-        art: 'bear_art',
+        display: {
+          image: {
+            image: 'bear_art',
+            w: 208,
+            h: 208,
+          },
+          caption: 'test test bear'
+        },
         angle: 60,
       },
       {
@@ -207,10 +209,9 @@ function init() {
   const background = document.querySelector('.background')
   const control = document.querySelector('.touch_circle')
   const actionButton = document.querySelector('.action_button')
-  const artWrapper = document.querySelector('.art_wrapper')
+  const displayWrapper = document.querySelector('.display_wrapper')
   const halfCircumference = r => Math.PI * r
   const isNum = x => typeof x === 'number'
-
 
   const setTargetParams = ({ target, x, y, w, h }) =>{
     const { style } = target
@@ -220,16 +221,14 @@ function init() {
     if (isNum(h)) style.height = `${h}px`
   }
   
-  
   const placeElements = index => mapElements[index].forEach(element => placeElement(element, index))
-
 
   const placeElement = (element, i) => {
     const newElement = document.createElement('div')
     const offset = i % 2 === 0 ? 0 : 180
     newElement.className = `element ${element.element}`
     circle.append(newElement)
-    const { width: w, height: h, offset: o } = elements[element.element]
+    const { w, h, offset: o } = elements[element.element]
     const vertOffset = h - (element.offset || o || 5)
 
     setTargetParams({ target: newElement, w, h })
@@ -375,7 +374,7 @@ function init() {
       if (
         withinBuffer({ 
           a:element.angle, b:angleWithinCurrentMap, 
-          buffer:(elements[element.element].width / halfCircumference(220 - elementPos)) * 90
+          buffer:(elements[element.element].w / halfCircumference(220 - elementPos)) * 90
           }) &&
         withinBuffer({
           a:elementPos, b:bearPos, 
@@ -386,61 +385,69 @@ function init() {
         return null
     }).filter(element => element)[0]
   }
-
-
-  // TODO break this function down to specific areas.
-
-  const handleKey = ({ e, letter, enter }) =>{
-    if ((e?.key === 'Enter' || enter) && circleData.activeEvent?.art && bearData.direction === 'u') { 
-      bearData.pause = !bearData.pause
-      artWrapper.classList.toggle('display')
-      const artDisplay = artWrapper.childNodes[1]
-      const { width: w, height: h } = artData[circleData.activeEvent.art]
-      artDisplay.style.transition = bearData.pause ? '0.3s' : '0s'
-      setTargetParams({ target: artDisplay, w, h })
-      artDisplay.style.backgroundSize = `${w}px ${h}px`
-
+  
+  const displayOrHideImage = () =>{
+    const imgDisplay = displayWrapper.childNodes[1].childNodes[1]
+    if (circleData.activeEvent.display?.image) {
+      const { w, h, image } = circleData.activeEvent.display.image
+      imgDisplay.style.transition = bearData.pause ? '0.3s' : '0s'
+      setTargetParams({ target: imgDisplay, w, h })
+      imgDisplay.style.backgroundSize = `${w}px ${h}px`
       clearTimeout(circleData.displayTimer)
       circleData.displayTimer = setTimeout(()=>{
-        artDisplay.classList[bearData.pause ? 'add' : 'remove'](circleData.activeEvent.art)
+        imgDisplay.classList[bearData.pause ? 'add' : 'remove'](image)
+        imgDisplay.style.marginBottom = bearData.pause ? '5px' : '0px'
       }, bearData.pause ? 0 : 300)
-      artDisplay.style.transition = '0.3s'
+      imgDisplay.style.transition = '0.3s'
+    } else {
+      setTargetParams({ target: imgDisplay, w:0, h:0 })
+    }
+  }
 
+  const moveBearAndCircle = key =>{
+    clearInterval(circleData.interval)
+    circleData.key = key
+    circleData.interval = setInterval(()=> {
+      if (!circleData.key) {
+        clearInterval(circleData.interval)
+      } else {
+        circleData.activeEvent = elementInContact()
+        if (!circleData.activeEvent) actionButton.classList.add('display_none')
+        if (['l','r'].includes(key)) {
+          rotateCircle()
+        } else if (['u','d'].includes(key)) {
+          if (!circleData.activeEvent){
+            bearData.vertPos += config[key]
+            bearData.vertPos = returnVerticalPos(bearData.vertPos)
+            moveBearVertically()
+          } else if (key === 'u' && circleData.activeEvent.display) {
+            actionButton.classList.remove('display_none')
+          }
+        }
+      }
+    }, 1000 / 60)
+    clearInterval(bearData.interval)
+    bearData.interval = setInterval(()=> {
+      if (!circleData.key) {
+        clearInterval(bearData.interval)
+      } else {
+        turnSprite({ e: circleData.key, actor: bearData, animate: true })
+      }
+    }, 100)
+  }
+
+
+  const handleKey = ({ e, letter, enter }) =>{
+    if ((e?.key === 'Enter' || enter) && circleData.activeEvent?.display && bearData.direction === 'u') { 
+      bearData.pause = !bearData.pause
+      displayWrapper.classList.toggle('display')
+      displayOrHideImage()
+      const captionDisplay = displayWrapper.childNodes[1].childNodes[3]
+      captionDisplay.innerHTML = circleData.activeEvent.display.caption || ''
     } else if(!bearData.pause) {
       const key = e?.key.replace('Arrow','').toLowerCase()[0] || letter
       bearData.direction = key
-      if (circleData.key !== key){
-        clearInterval(circleData.interval)
-        circleData.key = key
-        circleData.interval = setInterval(()=> {
-          if (!circleData.key) {
-            clearInterval(circleData.interval)
-          } else {
-            circleData.activeEvent = elementInContact()
-            if (!circleData.activeEvent) actionButton.classList.add('display_none')
-            if (['l','r'].includes(key)) {
-              rotateCircle()
-            } else if (['u','d'].includes(key)) {
-              if (!circleData.activeEvent){
-                bearData.vertPos += config[key]
-                bearData.vertPos = returnVerticalPos(bearData.vertPos)
-                moveBearVertically()
-              } else if (key === 'u') {
-                actionButton.classList.remove('display_none')
-                console.log(circleData.activeEvent) // TODO this only needs to be triggered when clicking something, so can be taken somewhere else
-              }
-            }
-          }
-        }, 1000 / 60)
-        clearInterval(bearData.interval)
-        bearData.interval = setInterval(()=> {
-          if (!circleData.key) {
-            clearInterval(bearData.interval)
-          } else {
-            turnSprite({ e: circleData.key, actor: bearData, animate: true })
-          }
-        }, 100)
-      } 
+      if (circleData.key !== key) moveBearAndCircle(key)
     }
   }
 
@@ -548,7 +555,8 @@ function init() {
     turnSprite({ e: circleData.key, actor: bearData })
     circleData.key = null
   })
-  actionButton.addEventListener('click', ()=> handleKey({ enter: true }))
+  ;[ actionButton, displayWrapper ].forEach(ele => ele.addEventListener('click', ()=> handleKey({ enter: true })))
+
   
   window.addEventListener('resize', resize)
   addTouchAction(control, handleKey)
