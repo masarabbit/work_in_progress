@@ -2,7 +2,7 @@ function init() {
 
   // TODO add star to background
   // TODO add more assets
-  // TODO add something that trigger with elementInContact
+  // TODO refactor to change artDisplay to display text too.
   // TODO adjust circle size and background
 
   const circleData = {
@@ -12,6 +12,7 @@ function init() {
     mapIndex: 0,
     pos: 0,
     activeEvent: null,
+    displayTimer: null
   }
   
   const config = {
@@ -332,7 +333,6 @@ function init() {
 
     circleData.pos += config[key]
     circleData.pos = returnPos(circleData.pos)
-
     circleData.mapIndex = Math.round(currentPos(circleData.pos))
     circleData.mapIndex = returnNextOrPrev(circleData.mapIndex)
 
@@ -387,6 +387,9 @@ function init() {
     }).filter(element => element)[0]
   }
 
+
+  // TODO break this function down to specific areas.
+
   const handleKey = ({ e, letter, enter }) =>{
     if ((e?.key === 'Enter' || enter) && circleData.activeEvent?.art && bearData.direction === 'u') { 
       bearData.pause = !bearData.pause
@@ -396,10 +399,13 @@ function init() {
       artDisplay.style.transition = bearData.pause ? '0.3s' : '0s'
       setTargetParams({ target: artDisplay, w, h })
       artDisplay.style.backgroundSize = `${w}px ${h}px`
-      setTimeout(()=>{
-        artDisplay.classList.toggle(circleData.activeEvent.art)
+
+      clearTimeout(circleData.displayTimer)
+      circleData.displayTimer = setTimeout(()=>{
+        artDisplay.classList[bearData.pause ? 'add' : 'remove'](circleData.activeEvent.art)
       }, bearData.pause ? 0 : 300)
       artDisplay.style.transition = '0.3s'
+
     } else if(!bearData.pause) {
       const key = e?.key.replace('Arrow','').toLowerCase()[0] || letter
       bearData.direction = key
@@ -411,6 +417,7 @@ function init() {
             clearInterval(circleData.interval)
           } else {
             circleData.activeEvent = elementInContact()
+            if (!circleData.activeEvent) actionButton.classList.add('display_none')
             if (['l','r'].includes(key)) {
               rotateCircle()
             } else if (['u','d'].includes(key)) {
@@ -418,8 +425,7 @@ function init() {
                 bearData.vertPos += config[key]
                 bearData.vertPos = returnVerticalPos(bearData.vertPos)
                 moveBearVertically()
-                actionButton.classList.add('display_none')
-              } else if(key === 'u') {
+              } else if (key === 'u') {
                 actionButton.classList.remove('display_none')
                 console.log(circleData.activeEvent) // TODO this only needs to be triggered when clicking something, so can be taken somewhere else
               }
