@@ -50,37 +50,60 @@ function init() {
 
   const elements = {
     tree: { w: 48, h: 60 },
+    talking_tree: { w: 48, h: 60 },
+    talking_white_tree: { w: 48, h: 60 },
     tree_white: { w: 48, h: 60 },
-    round_tree: { w: 36, h: 58 },
-    round_tree_white: { w: 36, h: 58 },
+    // round_tree: { w: 36, h: 58 },
+    // round_tree_white: { w: 36, h: 58 },
     house1: { w: 96, h: 96, offset: 20 },
-    house2: { w: 80, h: 82, offset: 20 },
+    house2: { w: 80, h: 80, offset: 20 },
+    cactus: { w: 32, h: 68 },
     art: { w: 52, h: 60, offset: 60 },
+    npc: { w: 56, h: 64, offset: 60 },
+    crystal: { w: 30, h:56 },
+    crystal_large: { w: 42, h:78 },
+    talking_crystal: { w: 54, h:88 },
+    talking_crystal_soul: { w: 54, h:10 }
   }
 
   // this needs to be even number to work
   // join lines with shift cmd p, need to check unjoin
   const mapElements = {
-    0: [
-      { element: 'tree', angle: 30, offset: 100 },
-      { element: 'tree_white', angle: 40, offset: 20 },
+    // 0: [
+    //   { element: 'cactus', angle: 30, offset: 100 },
+    //   { element: 'tree_white', angle: 40, offset: 20 },
+    //   { 
+    //     element: 'house2', angle: 120, offset: 60,
+    //     display: {
+    //       caption: 'test house'
+    //     } 
+    //   },
+    //   // { element: 'round_tree', angle: 80, offset: 40 },
+    //   {
+    //     element: 'talking_tree', angle: 60, offset: 40,
+    //     display: {
+    //       caption: 'test'
+    //     }
+    //   },
+    // ],
+    1: [
+      { element: 'crystal', angle: 30, offset: 100 },
+      { element: 'crystal', angle: 40, offset: 20 },
+      { element: 'crystal_large', angle: 120, offset: 60 },
+      { element: 'talking_crystal', angle: 90, offset: -30 },
       { 
-        element: 'house2', angle: 120, offset: 60,
-        display: {
-          caption: 'test house'
-        } 
+        element: 'talking_crystal_soul', angle: 90, offset: 10,
+        display: { caption: 'hello' },
       },
-      { element: 'round_tree', angle: 80, offset: 40 },
-      {
-        element: 'round_tree_white', angle: 60, offset: 40,
-        display: {
-          caption: 'test'
-        }
-      },
+      { element: 'crystal', angle: 60, offset: 40 },
     ],
-    1: [     
-      { element: 'tree', angle: 10, },
+    0: [     
+      { element: 'talking_white_tree', angle: 30, offset: 30 },
       { element: 'tree', angle: 60, },
+      { 
+        element: 'npc', angle: 80,
+        display: { caption: 'hello' }
+      },
       { element: 'tree', angle: 90, },
     ],
     2: [
@@ -204,8 +227,8 @@ function init() {
   }
 
   const returnVerticalPos = current =>{
-    return current < -5
-      ? -5
+    return current < -15
+      ? -15
       : current > 120 
         ? 120
         : current
