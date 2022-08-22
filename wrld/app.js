@@ -1,8 +1,5 @@
 function init() {  
 
-  // TODO add star to background
-  // TODO add more assets
-  // TODO adjust circle size and background
 
   const circleData = {
     angle: 271,
@@ -52,12 +49,11 @@ function init() {
     tree: { w: 48, h: 60 },
     talking_tree: { w: 48, h: 60 },
     talking_white_tree: { w: 48, h: 60 },
-    tree_white: { w: 48, h: 60 },
-    // round_tree: { w: 36, h: 58 },
-    // round_tree_white: { w: 36, h: 58 },
-    house1: { w: 96, h: 96, offset: 20 },
+    white_tree: { w: 48, h: 60 },
+    house1: { w: 80, h: 80, offset: 20 },
     house2: { w: 80, h: 80, offset: 20 },
     cactus: { w: 32, h: 68 },
+    talking_cactus: { w: 32, h: 68 },
     art: { w: 52, h: 60, offset: 60 },
     npc: { w: 56, h: 64, offset: 60 },
     crystal: { w: 30, h:56 },
@@ -68,48 +64,46 @@ function init() {
 
   // this needs to be even number to work
   // join lines with shift cmd p, need to check unjoin
-  const mapElements = {
-    // 0: [
-    //   { element: 'cactus', angle: 30, offset: 100 },
-    //   { element: 'tree_white', angle: 40, offset: 20 },
-    //   { 
-    //     element: 'house2', angle: 120, offset: 60,
-    //     display: {
-    //       caption: 'test house'
-    //     } 
-    //   },
-    //   // { element: 'round_tree', angle: 80, offset: 40 },
-    //   {
-    //     element: 'talking_tree', angle: 60, offset: 40,
-    //     display: {
-    //       caption: 'test'
-    //     }
-    //   },
-    // ],
-    1: [
-      { element: 'crystal', angle: 30, offset: 100 },
-      { element: 'crystal', angle: 40, offset: 20 },
-      { element: 'crystal_large', angle: 120, offset: 60 },
-      { element: 'talking_crystal', angle: 90, offset: -30 },
-      { 
-        element: 'talking_crystal_soul', angle: 90, offset: 10,
-        display: { caption: 'hello' },
-      },
-      { element: 'crystal', angle: 60, offset: 40 },
-    ],
-    0: [     
-      { element: 'talking_white_tree', angle: 30, offset: 30 },
-      { element: 'tree', angle: 60, },
-      { 
-        element: 'npc', angle: 80,
-        display: { caption: 'hello' }
-      },
-      { element: 'tree', angle: 90, },
-    ],
-    2: [
-      { element: 'tree', angle: 10, },
+  const mapData = {
+    0: [
+      { element: 'tree', angle: 20, offset: 40 },
+      { element: 'white_tree', angle: 40, offset: 20 },
+      { element: 'tree', angle: 70, offset: 20 },
       {
-        element: 'art', angle: 60,
+        element: 'talking_tree', angle: 60, offset: 100,
+        display: {
+          caption: 'test'
+        }
+      },
+      { 
+        element: 'house2', angle: 110, offset: 30,
+        display: {
+          caption: 'test house'
+        } 
+      },
+      { element: 'tree', angle: 130, offset: 80 },
+      { 
+        element: 'art', angle: 140, offset: 20,
+        display: {
+          image: {
+            image: 'bear_art',
+            w: 208,
+            h: 208,
+          },
+          caption: 'test test bear'
+        }, 
+      },
+      { element: 'tree', angle: 160, offset: 20 },
+  
+    ],
+    1: [
+      { element: 'tree', angle: 30 },
+      { element: 'tree', angle: 20, offset: 90 },
+      { element: 'house1', angle: 50, offset: 60 },
+      { element: 'tree', angle: 65, offset: 100 },
+      { element: 'tree', angle: 75, offset: 20 },
+      {
+        element: 'art', angle: 105, offset: 20,
         display: {
           image: {
             image: 'bear_art',
@@ -119,26 +113,97 @@ function init() {
           caption: 'test test bear'
         },
       },
-      { element: 'tree', angle: 120 },
+      {
+        element: 'art', angle: 130, offset: 20,
+        display: {
+          image: {
+            image: 'bear_art',
+            w: 208,
+            h: 208,
+          },
+          caption: 'test test bear'
+        },
+      },
+      { element: 'talking_tree', angle: 130, offset: 100 },
+      { element: 'tree', angle: 150, offset: 20 },
+    ],
+    2: [
+      { element: 'white_tree', angle: 30, offset: 20 },
+      { element: 'white_tree', angle: 50, offset: 70 },
+      { element: 'tree', angle: 60, offset: 0 },
+      { element: 'white_tree', angle: 80, offset: 20 },
+      { element: 'talking_white_tree', angle: 110, offset: 80 },
+      { element: 'tree', angle: 130, offset: 0 },
+      { element: 'white_tree', angle: 150, offset: 20 },
     ],
     3: [
-      { element: 'tree', angle: 10 },
-      { element: 'tree', angle: 60 },
-      { element: 'tree', angle: 120 },
+      { element: 'crystal', angle: 30, offset: 70 },
+      { element: 'crystal', angle: 40, offset: 20 },
+      { element: 'crystal', angle: 50, offset: 70 },
+      { element: 'crystal_large', angle: 70, offset: 50 },
+      { element: 'talking_crystal', angle: 90, offset: -30 },
+      { 
+        element: 'talking_crystal_soul', angle: 90, offset: 10,
+        display: { caption: 'hello' },
+      },
+      { element: 'crystal', angle: 100, offset: 70 },
+      { element: 'crystal', angle: 105, offset: -5 },
+      { element: 'crystal', angle: 120, offset: 120 },
+      { element: 'crystal_large', angle: 130, offset: 60 },
+      { element: 'crystal', angle: 140, offset: 20 },
+      { element: 'crystal', angle: 160, offset: 40 },
     ],
     4: [
-      { element: 'tree', angle: 10 },
-      { element: 'tree', angle: 60 },
-      { element: 'tree', angle: 120 },
+      { element: 'cactus', angle: 30 },
+      { element: 'cactus', angle: 50, offset: 60 },
+      {
+        element: 'art', angle: 60, offset: 20,
+        display: {
+          image: {
+            image: 'bear_art',
+            w: 208,
+            h: 208,
+          },
+          caption: 'test test bear'
+        },
+      },
+      {
+        element: 'art', angle: 75, offset: 100,
+        display: {
+          image: {
+            image: 'bear_art',
+            w: 208,
+            h: 208,
+          },
+          caption: 'test test bear'
+        },
+      },
+      { element: 'talking_cactus', angle: 100, offset: 20 },
+      { element: 'cactus', angle: 120, offset: 30 },
+      { element: 'cactus', angle: 150, offset: 60 },
     ],
     5: [
-      { element: 'tree', angle: 10 },
-      { element: 'tree', angle: 60 },
-      { element: 'tree', angle: 120 },
+      { element: 'tree', angle: 30, offset: 50 },
+      { element: 'talking_tree', angle: 50, offset: 20 },
+      { element: 'tree', angle: 60, offset: 100 },
+      { element: 'tree', angle: 75, offset: 20 },
+      { element: 'tree', angle: 110, offset: 60 },
+      { 
+        element: 'art', angle: 130, offset: 20,
+        display: {
+          image: {
+            image: 'bear_art',
+            w: 208,
+            h: 208,
+          },
+          caption: 'test test bear'
+        }, 
+      },
+      { element: 'tree', angle: 150, offset: 40 },
     ],
   }
   
-  const mapElementKeys = Object.keys(mapElements)
+  const mapDataKeys = Object.keys(mapData)
   const indicator = document.querySelector('.indicator')
   const cellD = 32
   const circle = document.querySelector('.circle')
@@ -161,7 +226,7 @@ function init() {
     if (isNum(h)) style.height = `${h}px`
   }
   
-  const placeElements = index => mapElements[index].forEach(element => placeElement(element, index))
+  const placeElements = index => mapData[index].forEach(element => placeElement(element, index))
 
   const placeElement = (element, i) => {
     const newElement = document.createElement('div')
@@ -212,16 +277,16 @@ function init() {
 
   const returnNextOrPrev = current =>{
     return current === -1
-      ? mapElementKeys.length - 1
-      : current === mapElementKeys.length
+      ? mapDataKeys.length - 1
+      : current === mapDataKeys.length
         ? 0
         : current
   }
 
   const returnPos = current => {
-    return current === mapElementKeys.length * 180
-      ? mapElementKeys.length * -180
-      : current === mapElementKeys.length * -180
+    return current === mapDataKeys.length * 180
+      ? mapDataKeys.length * -180
+      : current === mapDataKeys.length * -180
         ? 0
         : current
   }
@@ -237,8 +302,8 @@ function init() {
   const populateCircle = key =>{
     const { mapIndex } = circleData
     const indexToAdd = key === 'r' ? returnNextOrPrev(mapIndex + 1) : returnNextOrPrev(mapIndex - 1)
-    mapElementKeys.forEach(index =>{
-      if (index !== `${mapIndex}`) mapElements[index].forEach(element => element.placed?.remove())
+    mapDataKeys.forEach(index =>{
+      if (index !== `${mapIndex}`) mapData[index].forEach(element => element.placed?.remove())
     })
     placeElements(indexToAdd)
   }
@@ -247,13 +312,13 @@ function init() {
     return pos === 0 
       ? 0
       : pos > 0 
-        ? (pos / -180) + mapElementKeys.length
+        ? (pos / -180) + mapDataKeys.length
         : pos / -180
   }
 
   const movePointer = pos =>{
     const { width } = circleWrapper.getBoundingClientRect()
-    const pointerPos = (currentPos(pos - 90) / mapElementKeys.length) * width
+    const pointerPos = (currentPos(pos - 90) / mapDataKeys.length) * width
     pointer.style.transform = `translateX(${(pointerPos > width ? pointerPos - width : pointerPos) - 12}px)`
   }
 
@@ -305,7 +370,7 @@ function init() {
   const elementInContact = () => {
     const angleWithinCurrentMap = Math.round((currentPos(circleData.pos - 90) % 1) * 180) 
 
-    return mapElements[circleData.mapIndex].map(element => {
+    return mapData[circleData.mapIndex].map(element => {
       const { zIndex: elementPos } = element.placed.style
       const { zIndex: bearPos } = bearData.bear.style
       if (
@@ -454,7 +519,7 @@ function init() {
     movePointer(circleData.pos)
   }
 
-  document.querySelector('.location_mark').innerHTML = mapElementKeys.map(()=> `<div class="location_link"></div>`).join('')
+  document.querySelector('.location_mark').innerHTML = mapDataKeys.map(()=> `<div class="location_link"></div>`).join('')
 
   document.querySelectorAll('.location_link').forEach((link, i) => {
     link.addEventListener('click', ()=>{
@@ -473,7 +538,7 @@ function init() {
       setTimeout(()=> circle.style.transition = '0s', 200)
       circle.style.transform = `rotate(${circleData.angle}deg)`
       circleData.mapIndex = i
-      mapElementKeys.forEach(i => mapElements[i].forEach(element => element.placed?.remove()))
+      mapDataKeys.forEach(i => mapData[i].forEach(element => element.placed?.remove()))
       placeElements(i)
       movePointer(circleData.pos)
       populateCircle('r')
@@ -499,7 +564,7 @@ function init() {
   stopBear()
   resize()
 
-
+  document.querySelectorAll('.location_link')[5].click()
 }
 
 window.addEventListener('DOMContentLoaded', init)
