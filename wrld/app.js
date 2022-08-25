@@ -564,7 +564,7 @@ function init() {
   stopBear()
   resize()
 
-  document.querySelectorAll('.location_link')[5].click()
+  // document.querySelectorAll('.location_link')[5].click()
 }
 
 window.addEventListener('DOMContentLoaded', init)

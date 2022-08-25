@@ -49,12 +49,18 @@ function init() {
       // this.s.x = this.s.x < 0 ? this.s.x - 0.001 : this.s.x + 0.001
       // this.s.y = this.s.y < 0 ? this.s.y - 0.001 : this.s.y + 0.001
       this.s.x *= 1.001
+      // const factor = this.s.y < 0 ? 1.001 : 0.999
+      // this.s.y *= factor
       this.s.y *= 1.001
     },
     bounce: function({elem, key, axis}) {
       if (elem < 0 || (elem + 32) > axis) {
-        // this.s[key] = this.s[key] < 0 ? -3 : 3
+        // this.s[key] = this.s[key] < 0 
+        //   ? this.s[key] + 0.005 
+        //   : this.s[key] - 0.005 
         this.s[key] *= -0.95
+        // if (Math.abs(this.s[key]) < 0.02) this.s[key] = 0
+        console.log('this.s', this.s[key])
       }  
     }, 
   }
@@ -78,7 +84,7 @@ function init() {
 
     ctx.drawImage(smily.frames[smily.i], smily.get('x'), smily.get('y'), 32, 32)
 
-    // indicator.innerHTML = `s: ${smily.s.x} / ${smily.s.y}`
+    indicator.innerHTML = `s: ${smily.s.x} / ${smily.s.y}`
 		requestAnimationFrame(update)
 	}
 
