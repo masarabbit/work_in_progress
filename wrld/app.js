@@ -48,8 +48,6 @@ function init() {
   const elements = {
     tree: { w: 48, h: 60 },
     talking_tree: { w: 48, h: 60 },
-    talking_white_tree: { w: 48, h: 60 },
-    white_tree: { w: 48, h: 60 },
     house1: { w: 80, h: 80, offset: 20 },
     house2: { w: 80, h: 80, offset: 20 },
     cactus: { w: 32, h: 68 },
@@ -66,11 +64,12 @@ function init() {
   // join lines with shift cmd p, need to check unjoin
   const mapData = {
     0: [
-      { element: 'tree', angle: 20, offset: 40 },
-      { element: 'white_tree', angle: 40, offset: 20 },
-      { element: 'tree', angle: 70, offset: 20 },
+      { element: 'tree', angle: 20, offset: 40, color: 'gold' },
+      { element: 'tree', angle: 40, offset: 20, color: 'white' },
+      { element: 'tree', angle: 70, offset: 20, color: 'navy' },
       {
         element: 'talking_tree', angle: 60, offset: 100,
+        color: 'gold',
         display: {
           caption: 'test'
         }
@@ -81,7 +80,7 @@ function init() {
           caption: 'test house'
         } 
       },
-      { element: 'tree', angle: 130, offset: 80 },
+      { element: 'tree', angle: 130, offset: 80, color: 'navy' },
       { 
         element: 'art', angle: 140, offset: 20,
         display: {
@@ -93,17 +92,18 @@ function init() {
           caption: 'test test bear'
         }, 
       },
-      { element: 'tree', angle: 160, offset: 20 },
+      { element: 'tree', angle: 160, offset: 20, color: 'gold' },
   
     ],
     1: [
       { element: 'tree', angle: 30 },
       { element: 'tree', angle: 20, offset: 90 },
       { element: 'house1', angle: 50, offset: 60 },
-      { element: 'tree', angle: 65, offset: 100 },
+      { element: 'tree', angle: 65, offset: 100, color: 'white' },
       { element: 'tree', angle: 75, offset: 20 },
       {
         element: 'art', angle: 105, offset: 20,
+        color: 'blue',
         display: {
           image: {
             image: 'bear_art',
@@ -124,17 +124,17 @@ function init() {
           caption: 'test test bear'
         },
       },
-      { element: 'talking_tree', angle: 130, offset: 100 },
-      { element: 'tree', angle: 150, offset: 20 },
+      { element: 'talking_tree', angle: 130, offset: 100, },
+      { element: 'tree', angle: 150, offset: 20, color: 'white' },
     ],
     2: [
-      { element: 'white_tree', angle: 30, offset: 20 },
-      { element: 'white_tree', angle: 50, offset: 70 },
-      { element: 'tree', angle: 60, offset: 0 },
-      { element: 'white_tree', angle: 80, offset: 20 },
-      { element: 'talking_white_tree', angle: 110, offset: 80 },
-      { element: 'tree', angle: 130, offset: 0 },
-      { element: 'white_tree', angle: 150, offset: 20 },
+      { element: 'tree', angle: 30, offset: 20, color: 'white' },
+      { element: 'tree', angle: 50, offset: 70, color: 'gold' },
+      { element: 'tree', angle: 60, offset: 0, color: 'gold' },
+      { element: 'tree', angle: 80, offset: 20, color: 'white' },
+      { element: 'talking_tree', angle: 110, offset: 80, color: 'white' },
+      { element: 'tree', angle: 130, offset: 0, color: 'white' },
+      { element: 'tree', angle: 150, offset: 20, color: 'gold' },
     ],
     3: [
       { element: 'crystal', angle: 30, offset: 70 },
@@ -154,8 +154,8 @@ function init() {
       { element: 'crystal', angle: 160, offset: 40 },
     ],
     4: [
-      { element: 'cactus', angle: 30 },
-      { element: 'cactus', angle: 50, offset: 60 },
+      { element: 'cactus', angle: 30, color: 'navy' },
+      { element: 'cactus', angle: 50, offset: 60, color: 'navy' },
       {
         element: 'art', angle: 60, offset: 20,
         display: {
@@ -169,6 +169,7 @@ function init() {
       },
       {
         element: 'art', angle: 75, offset: 100,
+        color: 'blue',
         display: {
           image: {
             image: 'bear_art',
@@ -178,9 +179,9 @@ function init() {
           caption: 'test test bear'
         },
       },
-      { element: 'talking_cactus', angle: 100, offset: 20 },
-      { element: 'cactus', angle: 120, offset: 30 },
-      { element: 'cactus', angle: 150, offset: 60 },
+      { element: 'talking_cactus', angle: 100, offset: 20, color: 'gold' },
+      { element: 'cactus', angle: 120, offset: 30, color: 'navy' },
+      { element: 'cactus', angle: 150, offset: 60, color: 'gold' },
     ],
     5: [
       { element: 'tree', angle: 30, offset: 50 },
@@ -231,7 +232,7 @@ function init() {
   const placeElement = (element, i) => {
     const newElement = document.createElement('div')
     const offset = i % 2 === 0 ? 0 : 180
-    newElement.className = `element ${element.element}`
+    newElement.className = `element ${element.element} ${element.color}`
     circle.append(newElement)
     const { w, h, offset: o } = elements[element.element]
     const vertOffset = h - (element.offset || o || 5)
