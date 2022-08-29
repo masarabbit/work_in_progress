@@ -232,7 +232,7 @@ function init() {
   const placeElement = (element, i) => {
     const newElement = document.createElement('div')
     const offset = i % 2 === 0 ? 0 : 180
-    newElement.className = `element ${element.element} ${element.color}`
+    newElement.className = `element ${element.element} ${element.color || ''}`
     circle.append(newElement)
     const { w, h, offset: o } = elements[element.element]
     const vertOffset = h - (element.offset || o || 5)
