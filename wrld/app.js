@@ -1,5 +1,7 @@
 function init() {  
 
+  // TODO maybe sun could be white
+
 
   const circleData = {
     angle: 271,
@@ -57,7 +59,9 @@ function init() {
     crystal: { w: 30, h:56 },
     crystal_large: { w: 42, h:78 },
     talking_crystal: { w: 54, h:88 },
-    talking_crystal_soul: { w: 54, h:10 }
+    talking_crystal_event: { w: 54, h:10 },
+    sun: { w: 76, h: 76 },
+    sun_event: { w: 76, h: 76 }
   }
 
   // this needs to be even number to work
@@ -132,6 +136,11 @@ function init() {
       { element: 'tree', angle: 50, offset: 70, color: 'gold' },
       { element: 'tree', angle: 60, offset: 0, color: 'gold' },
       { element: 'tree', angle: 80, offset: 20, color: 'white' },
+      { element: 'sun', angle: 105, offset: -70 },
+      { 
+        element: 'sun_event', angle: 105, offset: 10,
+        display: { caption: `hello, I'm the sun` },
+      },
       { element: 'talking_tree', angle: 110, offset: 80, color: 'white' },
       { element: 'tree', angle: 130, offset: 0, color: 'white' },
       { element: 'tree', angle: 150, offset: 20, color: 'gold' },
@@ -143,7 +152,7 @@ function init() {
       { element: 'crystal_large', angle: 70, offset: 50 },
       { element: 'talking_crystal', angle: 90, offset: -30 },
       { 
-        element: 'talking_crystal_soul', angle: 90, offset: 10,
+        element: 'talking_crystal_event', angle: 90, offset: 10,
         display: { caption: 'hello' },
       },
       { element: 'crystal', angle: 100, offset: 70 },
