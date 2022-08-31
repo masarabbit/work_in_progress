@@ -1,8 +1,5 @@
 function init() {  
 
-  // TODO maybe sun could be white
-
-
   const circleData = {
     angle: 271,
     interval: null,
