@@ -37,30 +37,42 @@ function init() {
   
   testSmile.forEach(f => storeImage(f, frames))
 
+  let xFactor = 0.995
+  let yFactor = -0.1
+
   const smily = {
     ...vector, 
     frames: [], 
     count: 0, 
     i: 0, 
-    s: { x: 0.5, y: 3 },
+    s: { x: 7, y: 4 },
     accelerate: function() {
       //* this needs improvement. Too linear
       //* need to add gravity
-      // this.s.x = this.s.x < 0 ? this.s.x - 0.001 : this.s.x + 0.001
-      // this.s.y = this.s.y < 0 ? this.s.y - 0.001 : this.s.y + 0.001
-      this.s.x *= 1.001
-      // const factor = this.s.y < 0 ? 1.001 : 0.999
-      // this.s.y *= factor
-      this.s.y *= 1.001
+
+
+      this.s.x *= xFactor
+      this.s.y += yFactor
     },
     bounce: function({elem, key, axis}) {
       if (elem < 0 || (elem + 32) > axis) {
         // this.s[key] = this.s[key] < 0 
         //   ? this.s[key] + 0.005 
         //   : this.s[key] - 0.005 
-        this.s[key] *= -0.95
+    
+        this.s[key] *= -0.75
+        // xFactor = this.s.x < 0 ? 0.995 : 1.001
+        console.log(Math.abs(yFactor))
+        if(key === 'y') {
+          yFactor = yFactor / 2
+          if (Math.abs(this.s.y) < 0.01) this.s.y = 0
+        }
+        if(key === 'x') {
+          xFactor = xFactor * 0.9
+          if (Math.abs(this.s.x) < 0.01) this.s.x = 0
+        }
         // if (Math.abs(this.s[key]) < 0.02) this.s[key] = 0
-        console.log('this.s', this.s[key])
+        console.log('this.s', this.s[key], yFactor, key)
       }  
     }, 
   }
@@ -75,10 +87,11 @@ function init() {
     smily.incrementFrame()
     const x = smily.get('x')
     const y = smily.get('y')
-
+    
     smily.bounce({ elem: x, key: 'x', axis: w})
     smily.bounce({ elem: y, key: 'y', axis: h})
     smily.accelerate()
+
     smily.set('x', x + smily.s.x)
     smily.set('y', y + smily.s.y) 
 

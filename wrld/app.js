@@ -6,7 +6,17 @@ function init() {
     key: 'r',
     mapIndex: 0,
     pos: 0,
-    activeEvent: null,
+    activeEvent:  { 
+      display: {
+        image: {
+          image: 'bear_art',
+          w: 208,
+          h: 208,
+        },
+        caption: 'walk around with arrow keys or by dragging the arrow control on the screen',
+      }, 
+    },
+    eventActivated: false,
   }
   
   const config = {
@@ -90,7 +100,8 @@ function init() {
             w: 208,
             h: 208,
           },
-          caption: 'test test bear'
+          caption: 'test test bear',
+          link: '<a href="https://www.masahito.co.uk/" target="blank"><button>masahito.co.uk</button></a>'
         }, 
       },
       { element: 'tree', angle: 160, offset: 20, color: 'gold' },
@@ -111,7 +122,7 @@ function init() {
             w: 208,
             h: 208,
           },
-          caption: 'test test bear'
+          caption: 'test test bear',
         },
       },
       {
@@ -220,8 +231,8 @@ function init() {
   const control = document.querySelector('.touch_circle')
   const actionButton = document.querySelector('.action_button')
   const displayWrapper = document.querySelector('.display_wrapper')
-  const imgDisplay = document.querySelector('.img_display')
-  const captionDisplay = document.querySelector('.caption')
+  const displayClose = document.querySelector('.close')
+  const displays = document.querySelectorAll('.display')
   const halfCircumference = r => Math.PI * r
   const isNum = x => typeof x === 'number'
 
@@ -396,16 +407,16 @@ function init() {
   }
   
   const displayOrHideImage = () =>{ 
-    if (circleData.activeEvent.display?.image) {
+    if (circleData.activeEvent?.display?.image) {
       const { w, h, image } = circleData.activeEvent.display.image
-      setTargetParams({ target: imgDisplay, w, h })
-      imgDisplay.style.backgroundSize = `${w}px ${h}px`
-      imgDisplay.classList.add(image)
-      imgDisplay.style.marginBottom = '5px'
+      setTargetParams({ target: displays[0], w, h })
+      displays[0].style.backgroundSize = `${w}px ${h}px`
+      displays[0].classList.add(image)
+      displays[0].style.marginBottom = '5px'
     } else {
-      setTargetParams({ target: imgDisplay, w:0, h:0 })
-      imgDisplay.className = 'img_display'
-      imgDisplay.style.marginBottom = '0px'
+      setTargetParams({ target: displays[0], w:0, h:0 })
+      displays[0].className = 'img_display display'
+      displays[0].style.marginBottom = '0px'
     }
   }
 
@@ -426,6 +437,7 @@ function init() {
             bearData.vertPos = returnVerticalPos(bearData.vertPos)
             moveBearVertically()
           } else if (key === 'u' && circleData.activeEvent.display) {
+            circleData.eventActivated = true
             displayOrHideImage()
             actionButton.classList.remove('display_none')
           }
@@ -447,7 +459,8 @@ function init() {
     if ((e?.key === 'Enter' || enter) && circleData.activeEvent?.display && bearData.direction === 'u') { 
       bearData.pause = !bearData.pause
       displayWrapper.classList.toggle('display')
-      captionDisplay.innerHTML = circleData.activeEvent.display.caption || ''
+      displays[1].innerHTML = circleData.activeEvent.display.caption || ''
+      displays[2].innerHTML = circleData.activeEvent.display.link || ''
     } else if(!bearData.pause) {
       const key = e?.key.replace('Arrow','').toLowerCase()[0] || letter
       bearData.direction = key
@@ -559,7 +572,7 @@ function init() {
     turnSprite({ e: circleData.key, actor: bearData })
     circleData.key = null
   })
-  ;[actionButton, displayWrapper].forEach(ele => ele.addEventListener('click', ()=> handleKey({ enter: true })))
+  ;[actionButton, displayClose].forEach(ele => ele.addEventListener('click', ()=> handleKey({ enter: true })))
 
   
   window.addEventListener('resize', resize)
@@ -570,6 +583,15 @@ function init() {
   handleKey({ letter: 'd'})
   stopBear()
   resize()
+  
+  setTimeout(()=>{
+    if (!circleData.eventActivated) {
+      bearData.direction = 'u'
+      displayOrHideImage()
+      handleKey({ enter: true })
+      // TODO enable closing by clicking anywhere
+    }
+  }, 2000)
 
   // document.querySelectorAll('.location_link')[5].click()
 }

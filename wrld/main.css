@@ -100,13 +100,39 @@ body {
   /* border: 1px solid pink; */
 }
 
+.close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  height: 48px;
+  width: 48px;
+  background-repeat: no-repeat !important;
+  background-size: 48px !important; 
+  image-rendering: pixelated;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAGhJREFUOE+1U9EKACEIa///0R4FHtZNDcb1EuG2dCqGeDD5ZmbzBrDe3Yn4TeBGxMmOfX88AywLhtlSrkSy2KdmBqyEqWmREEthJqeunyJZh/4RkEqQTJTaKA3SDdnbSUdZXqZu+6r4A81UYBGLc5clAAAAAElFTkSuQmCC);
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  transition: 0.1s;
+}
+
+.display_wrapper.display button,
+.display_wrapper.display .close {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.display_wrapper.display .close:hover {
+  opacity: 0.5;
+}
+
 .display_wrapper.display {
   pointer-events: auto;
-  /* background-color: #000000a4; */
   background-color: #032041d7;
 }
 
 .inner_wrapper {
+  pointer-events: none;
   top: 100%;
   transition: 0.3s;
   flex-direction: column;
@@ -118,6 +144,21 @@ body {
 
 .caption {
   color: white;
+  max-width: 100%;
+  padding: 0 10px;
+}
+
+.display_wrapper button {
+  padding: 10px 15px;
+  border: 0px;
+  background-color: #c3ac83;
+  border-radius: 50px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.display_wrapper button:hover {
+  background-color: #7ce6f0;
 }
 
 
@@ -422,13 +463,10 @@ a:hover { text-decoration: underline; }
   background-repeat: no-repeat !important;
 }
 
-
-/* change this to add starry background */
 .background {
   position: absolute;
   width: 100%;
   height: 100%;
-  /* background-color: rgb(64, 64, 64); */
   background-color: #09274e;
   transition: 2s;
 }
@@ -441,7 +479,6 @@ a:hover { text-decoration: underline; }
   width: 100%;
   height: 100%;
   animation: bg_scrolling infinite linear 10s;
-  /* transition: 2s; */
 }
 
 @keyframes bg_scrolling {

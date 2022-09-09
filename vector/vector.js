@@ -1,5 +1,5 @@
 const vector = {
-	x: 1,
+	x: 0,
 	y: 0,
 
 	create: function(x, y) {
