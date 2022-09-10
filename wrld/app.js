@@ -13,7 +13,8 @@ function init() {
           w: 208,
           h: 208,
         },
-        caption: 'walk around with arrow keys or by dragging the arrow control on the screen',
+        caption: 'Walk around with arrow keys or by dragging the arrow control on the screen. Press Enter or click on star button to investigate.',
+        button: 'ok!'
       }, 
     },
     eventActivated: false,
@@ -68,13 +69,20 @@ function init() {
     talking_crystal: { w: 54, h:88 },
     talking_crystal_event: { w: 54, h:10 },
     sun: { w: 76, h: 76 },
-    sun_event: { w: 76, h: 76 }
+    sun_event: { w: 76, h: 76 },
+    cloud: { w: 80, h: 46 }
   }
 
   // this needs to be even number to work
   // join lines with shift cmd p, need to check unjoin
   const mapData = {
     0: [
+      // { element: 'cloud', angle: 25, offset: -100, color: 'gold' },
+      { element: 'cloud', angle: 45, offset: -140, color: 'gold' },
+      { element: 'cloud', angle: 75, offset: -100, color: 'gold' },
+      { element: 'cloud', angle: 105, offset: -140, color: 'gold' },
+      { element: 'cloud', angle: 135, offset: -120, color: 'gold' },
+      // { element: 'cloud', angle: 165, offset: -100, color: 'gold' },
       { element: 'tree', angle: 20, offset: 40, color: 'gold' },
       { element: 'tree', angle: 40, offset: 20, color: 'white' },
       { element: 'tree', angle: 70, offset: 20, color: 'navy' },
@@ -102,6 +110,7 @@ function init() {
           },
           caption: 'test test bear',
           link: '<a href="https://www.masahito.co.uk/" target="blank"><button>masahito.co.uk</button></a>'
+          // TODO leave the button displayed, and apply the link differently
         }, 
       },
       { element: 'tree', angle: 160, offset: 20, color: 'gold' },
@@ -231,7 +240,6 @@ function init() {
   const control = document.querySelector('.touch_circle')
   const actionButton = document.querySelector('.action_button')
   const displayWrapper = document.querySelector('.display_wrapper')
-  const displayClose = document.querySelector('.close')
   const displays = document.querySelectorAll('.display')
   const halfCircumference = r => Math.PI * r
   const isNum = x => typeof x === 'number'
@@ -310,8 +318,8 @@ function init() {
   }
 
   const returnVerticalPos = current =>{
-    return current < -15
-      ? -15
+    return current < -47
+      ? -47
       : current > 120 
         ? 120
         : current
@@ -380,7 +388,7 @@ function init() {
   }
 
   const moveBearVertically = () => {
-    bearData.bear.style.zIndex = bearData.vertPos + 32
+    bearData.bear.style.zIndex = bearData.vertPos + 64
     positionBear(-circleData.angle)
   }
   
@@ -428,7 +436,7 @@ function init() {
         clearInterval(circleData.interval)
       } else {
         circleData.activeEvent = elementInContact()
-        if (!circleData.activeEvent) actionButton.classList.add('display_none')
+        if (!circleData.activeEvent) bearData.bear.classList.remove('alert')
         if (['l','r'].includes(key)) {
           rotateCircle()
         } else if (['u','d'].includes(key)) {
@@ -439,7 +447,7 @@ function init() {
           } else if (key === 'u' && circleData.activeEvent.display) {
             circleData.eventActivated = true
             displayOrHideImage()
-            actionButton.classList.remove('display_none')
+            bearData.bear.classList.add('alert')
           }
         }
       }
@@ -461,6 +469,7 @@ function init() {
       displayWrapper.classList.toggle('display')
       displays[1].innerHTML = circleData.activeEvent.display.caption || ''
       displays[2].innerHTML = circleData.activeEvent.display.link || ''
+      displays[3].innerHTML = circleData.activeEvent.display.button || 'close'
     } else if(!bearData.pause) {
       const key = e?.key.replace('Arrow','').toLowerCase()[0] || letter
       bearData.direction = key
@@ -486,7 +495,7 @@ function init() {
     pos.b = pos.d - y
     const newX = target.offsetLeft - pos.a
     const newY = target.offsetTop - pos.b
-    if (distanceBetween({ x: 0, y: 0 }, { x: newX, y: newY }) < 35) {
+    if (distanceBetween({ x: 0, y: 0 }, { x: newX, y: newY }) < 45) {
       setTargetParams({ target, x: newX, y: newY })
       touchControl.direction = Math.abs(newX) < Math.abs(newY)
         ? newY < 0 ? 'u' : 'd'
@@ -572,7 +581,7 @@ function init() {
     turnSprite({ e: circleData.key, actor: bearData })
     circleData.key = null
   })
-  ;[actionButton, displayClose].forEach(ele => ele.addEventListener('click', ()=> handleKey({ enter: true })))
+  ;[actionButton, displays[3]].forEach(ele => ele.addEventListener('click', ()=> handleKey({ enter: true })))
 
   
   window.addEventListener('resize', resize)
