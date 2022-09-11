@@ -70,19 +70,21 @@ function init() {
     talking_crystal_event: { w: 54, h:10 },
     sun: { w: 76, h: 76 },
     sun_event: { w: 76, h: 76 },
+    moon: { w: 44, h: 44 },
+    moon_event: { w: 44, h: 44 },
     cloud: { w: 80, h: 46 }
   }
-
+  
+  const linkButton = (url, text) => {
+    return `<a href="${url}" target="blank"><button>${text}</button></a>`
+  }
   // this needs to be even number to work
-  // join lines with shift cmd p, need to check unjoin
   const mapData = {
     0: [
-      // { element: 'cloud', angle: 25, offset: -100, color: 'gold' },
       { element: 'cloud', angle: 45, offset: -140, color: 'gold' },
       { element: 'cloud', angle: 75, offset: -100, color: 'gold' },
       { element: 'cloud', angle: 105, offset: -140, color: 'gold' },
       { element: 'cloud', angle: 135, offset: -120, color: 'gold' },
-      // { element: 'cloud', angle: 165, offset: -100, color: 'gold' },
       { element: 'tree', angle: 20, offset: 40, color: 'gold' },
       { element: 'tree', angle: 40, offset: 20, color: 'white' },
       { element: 'tree', angle: 70, offset: 20, color: 'navy' },
@@ -109,8 +111,7 @@ function init() {
             h: 208,
           },
           caption: 'test test bear',
-          link: '<a href="https://www.masahito.co.uk/" target="blank"><button>masahito.co.uk</button></a>'
-          // TODO leave the button displayed, and apply the link differently
+          link: linkButton('https://www.masahito.co.uk/', 'have a look')
         }, 
       },
       { element: 'tree', angle: 160, offset: 20, color: 'gold' },
@@ -227,6 +228,11 @@ function init() {
         }, 
       },
       { element: 'tree', angle: 150, offset: 40 },
+      { element: 'moon', angle: 95, offset: -90 },
+      { 
+        element: 'moon_event', angle: 95, offset: 10,
+        display: { caption: 'good evening!' },
+      },
     ],
   }
   
@@ -495,7 +501,7 @@ function init() {
     pos.b = pos.d - y
     const newX = target.offsetLeft - pos.a
     const newY = target.offsetTop - pos.b
-    if (distanceBetween({ x: 0, y: 0 }, { x: newX, y: newY }) < 45) {
+    if (distanceBetween({ x: 0, y: 0 }, { x: newX, y: newY }) < 40) {
       setTargetParams({ target, x: newX, y: newY })
       touchControl.direction = Math.abs(newX) < Math.abs(newY)
         ? newY < 0 ? 'u' : 'd'
