@@ -247,6 +247,8 @@ function init() {
   const actionButton = document.querySelector('.action_button')
   const displayWrapper = document.querySelector('.display_wrapper')
   const displays = document.querySelectorAll('.display')
+  const instructor = document.querySelector('.instructor')
+  const speechBubble = document.querySelector('.speech_bubble')
   const halfCircumference = r => Math.PI * r
   const isNum = x => typeof x === 'number'
 
@@ -554,6 +556,18 @@ function init() {
     movePointer(circleData.pos)
   }
 
+  const displayTextGradual = (t, i) =>{
+    speechBubble.innerHTML = t.slice(0, i)
+    if (i % 5 === 0) instructor.classList.toggle('talking')
+    if (i < t.length) {
+      setTimeout(()=>{
+        displayTextGradual(t, i + 1)
+      }, 20)
+    } else {
+      instructor.classList.remove('talking')
+    }
+  }
+
   document.querySelector('.location_mark').innerHTML = mapDataKeys.map(()=> `<div class="location_link"></div>`).join('')
 
   document.querySelectorAll('.location_link').forEach((link, i) => {
@@ -589,6 +603,15 @@ function init() {
   })
   ;[actionButton, displays[3]].forEach(ele => ele.addEventListener('click', ()=> handleKey({ enter: true })))
 
+
+  const instructions = {
+    intro: 'Walk around by dragging the circle on the bottom left, or using Arrow keys on your keyboard.',
+    investigate: `Investigate using the star button or Enter on your keyboard, when you see an '!' appear above your head`,
+    location: `If you're tired of walking, you can click or touch the bar above - you'll be transported instantly!`
+  }
+
+
+  // TODO add logic to change instructions
   
   window.addEventListener('resize', resize)
   addTouchAction(control, handleKey)
@@ -598,31 +621,8 @@ function init() {
   handleKey({ letter: 'd'})
   stopBear()
   resize()
+  displayTextGradual(instructions.intro, 0)
 
-  const instructor = document.querySelector('.instructor')
-  const speechBubble = document.querySelector('.speech_bubble')
-
-  const displayTextGradual = (t, i) =>{
-    speechBubble.innerHTML = t.slice(0, i)
-    if (i < t.length) {
-      setTimeout(()=>{
-        displayTextGradual(t, i + 1)
-      }, 20)
-    }
-  }
-
-  displayTextGradual('ipsum lorem Emi san nanishiteru no hello', 0)
-  
-  // setTimeout(()=>{
-  //   if (!circleData.eventActivated) {
-  //     bearData.direction = 'u'
-  //     displayOrHideImage()
-  //     handleKey({ enter: true })
-  //     // TODO enable closing by clicking anywhere
-  //   }
-  // }, 2000)
-
-  // document.querySelectorAll('.location_link')[5].click()
 }
 
 window.addEventListener('DOMContentLoaded', init)
