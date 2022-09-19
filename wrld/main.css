@@ -214,7 +214,7 @@ body {
 .sign {
   position: fixed;
   font-family: Arial, Helvetica, sans-serif;
-  color: black;
+  color: rgb(255, 255, 255);
   bottom: 10px;
   right: 10px;
   font-size: 10px;
@@ -225,7 +225,7 @@ body {
   position: absolute;
   top: 20px;
   right: 20px;
-  color: black;
+  color: rgb(255, 255, 255);
   font-size: 15px;
   opacity: 0.8;
   z-index: 999;
@@ -233,7 +233,7 @@ body {
 }
 
 a {
-  color: black;
+  color: rgb(255, 255, 255);
   text-decoration: none;
   text-transform: none;
 }
@@ -526,4 +526,59 @@ a:hover { text-decoration: underline; }
   opacity: 0;
 } */
 
+.instructor_wrapper {
+  /* border: 1px solid red; */
+  height: 48px;
+  position: absolute;
+  top: 90px;
+  width: 600px;
+  max-width: 100%;
+  display: flex;
+}
+
+
+.instructor {
+  /* border: 1px solid pink; */
+  width: 48px;
+  height: 48px;
+  /* background-color: #c3ac83; */
+  background-color: #0cb2c2;
+  border-radius: 50%;
+  background-position: center;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAHlJREFUOE/tUzkOwDAIM/9/NFVoiThi1KFjGQ0YYhNBDwUgB3xBLVcLVVUhYvCrXCyyZo9CQnM/QVY6CWU23G4gihvwZlUjILeQbHYXdvOaWidGaz3nNn9PwKYxHdoG8d1MxCgkvUQm4OSC/7ZRxId4D56+7WmJVn8BTKBrEfKj7O4AAAAASUVORK5CYII=);
+  background-size: 32px !important; 
+  image-rendering: pixelated;
+  background-repeat: no-repeat !important;
+}
+
+.instructor.talking {
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAHtJREFUOE/tk1ESgCAIROH+h6aRhIAVa5o+8xNwxX3AhEeIiBfxEYJcLRQRIWYNP8rFIr1sp4i0uV8gO52MUgwnDYrmhjigAoFmFhJmo+CXx6v1xYjWcob5e4EySP6LzgfooGv3TmCafY3yGwq2bVsTZ4e+Aru1XVGE+gNU324RwLxFzgAAAABJRU5ErkJggg==);
+}
+
+.speech_wrapper {
+  position: relative;
+  width: calc(100% - 48px);
+}
+
+.speech_bubble::before {
+  position: absolute;
+  left: -16px;
+  top: 15px;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAJCAYAAAAPU20uAAAAAXNSR0IArs4c6QAAADZJREFUKFNjZMAD/v///58RmzxIAiaOogBZAkUBNgm4AnySIEVgK/CagOxInG5A9wlOX2BTCADNSCPmzMMs6AAAAABJRU5ErkJggg==);
+  image-rendering: pixelated;
+  background-repeat: no-repeat !important;
+  width: 16px;
+  height: 18px;
+  background-size: 16px 18px !important; 
+  content: '';
+}
+
+.speech_bubble {
+  position: absolute;
+  right: 0px;
+  width: calc(100% - 25px);
+  height: 100%;
+  background: white;
+  padding: 5px 8px;
+}
 

@@ -598,15 +598,29 @@ function init() {
   handleKey({ letter: 'd'})
   stopBear()
   resize()
-  
-  setTimeout(()=>{
-    if (!circleData.eventActivated) {
-      bearData.direction = 'u'
-      displayOrHideImage()
-      handleKey({ enter: true })
-      // TODO enable closing by clicking anywhere
+
+  const instructor = document.querySelector('.instructor')
+  const speechBubble = document.querySelector('.speech_bubble')
+
+  const displayTextGradual = (t, i) =>{
+    speechBubble.innerHTML = t.slice(0, i)
+    if (i < t.length) {
+      setTimeout(()=>{
+        displayTextGradual(t, i + 1)
+      }, 20)
     }
-  }, 2000)
+  }
+
+  displayTextGradual('ipsum lorem Emi san nanishiteru no hello', 0)
+  
+  // setTimeout(()=>{
+  //   if (!circleData.eventActivated) {
+  //     bearData.direction = 'u'
+  //     displayOrHideImage()
+  //     handleKey({ enter: true })
+  //     // TODO enable closing by clicking anywhere
+  //   }
+  // }, 2000)
 
   // document.querySelectorAll('.location_link')[5].click()
 }
