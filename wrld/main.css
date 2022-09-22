@@ -141,7 +141,7 @@ body {
 
 
 @media screen and (min-width:0px) {
-  .instructor_wrapper {
+  .sensei_wrapper {
     margin-left: 10px;
   }
 
@@ -185,7 +185,7 @@ body {
 }  
 
 @media screen and (min-width:600px) {
-  .instructor_wrapper {
+  .sensei_wrapper {
     margin-left: 0px;
   }
 
@@ -535,17 +535,19 @@ a:hover { text-decoration: underline; }
   opacity: 0;
 } */
 
-.instructor_wrapper {
+.sensei_wrapper {
   height: 48px;
   position: absolute;
   top: 90px;
   width: 600px;
   max-width: calc(100% - 10px);
   display: flex;
+  justify-content: space-between;
+  transition: 0.3s ease;
 }
 
 
-.instructor {
+.sensei {
   /* border: 1px solid pink; */
   width: 48px;
   height: 48px;
@@ -559,13 +561,15 @@ a:hover { text-decoration: underline; }
   background-repeat: no-repeat !important;
 }
 
-.instructor.talking {
+.sensei.talking {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAHtJREFUOE/tk1ESgCAIROH+h6aRhIAVa5o+8xNwxX3AhEeIiBfxEYJcLRQRIWYNP8rFIr1sp4i0uV8gO52MUgwnDYrmhjigAoFmFhJmo+CXx6v1xYjWcob5e4EySP6LzgfooGv3TmCafY3yGwq2bVsTZ4e+Aru1XVGE+gNU324RwLxFzgAAAABJRU5ErkJggg==);
 }
 
 .speech_wrapper {
   position: relative;
   width: calc(100% - 48px);
+  transition: 0.3s ease;
+  pointer-events: none;
 }
 
 .speech_bubble::before {
@@ -587,6 +591,56 @@ a:hover { text-decoration: underline; }
   width: calc(100% - 25px);
   min-height: 100%;
   background: white;
-  padding: 5px 8px;
+  padding: 5px 20px 5px 8px;
+  transition: 0.3s ease;
 }
 
+.speech_wrapper::after {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAGtJREFUOE9jZKAQMIL0H17T/B9E24bUgvmEALJ6FAOIMQSmGaYWbiO6BDZXYFOD4mR8huCSw/AzNoX4DMYaaMgakL2CLZBxhjq6IbhiiDYGUOQFigKRomikKCERoxkWnViTMsWZiVDuwycPAJA1YBGXCWBtAAAAAElFTkSuQmCC);
+  image-rendering: pixelated;
+  background-size: 16px;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  content: '';
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.speech_wrapper:hover::after {
+  filter: invert(100%);
+}
+
+.sensei_wrapper.off .speech_wrapper {
+  position: absolute;
+  height: 48px;
+  right: 10px;
+  width: 0px;
+}
+
+.sensei_wrapper.off .speech_wrapper::after {
+  background: none;
+}
+
+.sensei_wrapper.off .speech_bubble {
+  padding: 0px;
+  /* opacity: 0; */
+}
+
+.sensei_wrapper.off .speech_bubble::before {
+  opacity: 0;
+}
+
+.sensei_wrapper.off {
+  right: 0px;
+  width: 58px;
+  justify-content: end;
+  padding-right: 10px;
+}
+
+.sensei_wrapper.off .sensei {
+  pointer-events: auto;
+  cursor: pointer;  
+}

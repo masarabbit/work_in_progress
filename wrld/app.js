@@ -247,7 +247,7 @@ function init() {
   const actionButton = document.querySelector('.action_button')
   const displayWrapper = document.querySelector('.display_wrapper')
   const displays = document.querySelectorAll('.display')
-  const instructor = document.querySelector('.instructor')
+  const sensei = document.querySelector('.sensei')
   const speechBubble = document.querySelector('.speech_bubble')
   const halfCircumference = r => Math.PI * r
   const isNum = x => typeof x === 'number'
@@ -558,13 +558,13 @@ function init() {
 
   const displayTextGradual = (t, i) =>{
     speechBubble.innerHTML = t.slice(0, i)
-    if (i % 5 === 0) instructor.classList.toggle('talking')
+    if (i % 5 === 0) sensei.classList.toggle('talking')
     if (i < t.length) {
-      setTimeout(()=>{
+      instructions.timer = setTimeout(()=>{
         displayTextGradual(t, i + 1)
       }, 20)
     } else {
-      instructor.classList.remove('talking')
+      sensei.classList.remove('talking')
     }
   }
 
@@ -607,11 +607,18 @@ function init() {
   const instructions = {
     intro: 'Walk around by dragging the circle on the bottom left, or using Arrow keys on your keyboard.',
     investigate: `Investigate using the star button or Enter on your keyboard, when you see an '!' appear above your head`,
-    location: `If you're tired of walking, you can click or touch the bar above - you'll be transported instantly!`
+    location: `If you're tired of walking, you can click or touch the bar above - you'll be transported instantly!`,
+    timer: null,
   }
+  
+  speechBubble.parentNode.addEventListener('click', ()=> {
+    clearTimeout(instructions.timer)
+    sensei.classList.remove('talking')
+    speechBubble.innerHTML = ''
+    speechBubble.parentNode.parentNode.classList.add('off') 
+  })
 
-
-  // TODO add logic to change instructions
+  sensei.addEventListener('click', ()=> speechBubble.parentNode.parentNode.classList.remove('off'))
   
   window.addEventListener('resize', resize)
   addTouchAction(control, handleKey)
