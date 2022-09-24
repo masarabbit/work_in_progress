@@ -57,20 +57,24 @@ function init() {
 
   const senseiData = {
     instructions: {
-      intro: 'Walk around by dragging the circle on the bottom left, or using Arrow keys on your keyboard',
+      walk: 'You can walk around by dragging the circle on the bottom left, or using Arrow keys on your keyboard',
       investigate: `Investigate using the star button or Enter on your keyboard, when you see an '!' appear above your head`,
-      location: `If you're tired of walking, you can click or touch the bar above - you'll be transported instantly!`
+      location: `If you're tired of walking, you can click or touch the bar above - you'll be transported instantly!`,
+      complete: `Looks like you already know what to do! Have fun!`
     },
+    intro: `Hi! I'm here to explain what you can do here`,
     greetings: 'Hi again',
     userProgress: {
-      intro: false,
+      walk: false,
       investigate: false,
       location: false,
+      complete: false,
     },
     testTimer: null,
     loopTimer: null,
     instruction: null,
     active: true,
+    complete: false,
   }
 
   const elements = {
@@ -490,7 +494,8 @@ function init() {
 
 
   const handleKey = ({ e, letter, enter }) =>{
-    if ((e?.key === 'Enter' || enter) && circleData.activeEvent?.display && bearData.direction === 'u') { 
+    if ((e?.key === 'Enter' || enter) && circleData.activeEvent?.display && bearData.direction === 'u') {
+      senseiData.userProgress.investigate = true 
       bearData.pause = !bearData.pause
       displayWrapper.classList.toggle('display')
       displays[1].innerHTML = circleData.activeEvent.display.caption || ''
@@ -498,6 +503,7 @@ function init() {
       displays[3].innerHTML = circleData.activeEvent.display.button || 'close'
     } else if(!bearData.pause) {
       const key = e?.key.replace('Arrow','').toLowerCase()[0] || letter
+      senseiData.userProgress.walk = true
       bearData.direction = key
       if (circleData.key !== key) moveBearAndCircle(key)
     }
@@ -574,6 +580,34 @@ function init() {
     movePointer(circleData.pos)
   }
 
+  const warpToLocation = i => {
+    setTimeout(()=> senseiData.userProgress.location = true, 1000)
+    circleData.pos = i * -180 + 1
+    circleData.angle = i === 0 
+      ? 270
+      : i === 1
+        ? 90
+        : i % 2 === 0
+          ? -90
+          : -270     
+    bearData.vertPos = 10 //? different default could be set per map    
+    positionBear(-circleData.angle)      
+    circle.style.transform = `rotate(${circleData.angle - 90}deg)`
+    circle.style.transition = '0.2s'
+    setTimeout(()=> circle.style.transform = `rotate(${circleData.angle}deg)`, 50) 
+    setTimeout(()=> circle.style.transition = '0s', 200)
+    circleData.mapIndex = i
+    mapDataKeys.forEach(i => mapData[i].forEach(element => element.placed?.remove()))
+    placeElements(i)
+    movePointer(circleData.pos)
+    populateCircle('r')
+    changeBackground(i)
+    stopBear()
+  }
+
+
+  // sensei +++
+
   const displayTextGradual = (t, i) =>{
     speechBubble.innerHTML = t.slice(0, i)
     if (i % 5 === 0) sensei.classList.toggle('talking')
@@ -586,22 +620,15 @@ function init() {
     }
   }
 
-  const closeSensei = () => {
-    clearTimeout(senseiData.textTimer)
-    clearTimeout(senseiData.loopTimer)
-    sensei.classList.remove('talking')
-    speechBubble.innerHTML = ''
-    speechBubble.parentNode.parentNode.classList.add('off') 
-    senseiData.active = false
-  }
+  const senseiTiming = (buffer, key) => senseiData[key || 'instruction'].length * 20 + buffer * 1000
 
   const displayInstruction = () =>{
     if (senseiData.active) {
       setInstruction()
       displayTextGradual(senseiData.instruction, 0)
-      senseiData.loopTimer = setTimeout(()=>{
-        displayInstruction()
-      }, senseiData.instruction.length * 20 + 5000)
+      senseiData.loopTimer = !senseiData.complete
+        ? setTimeout(()=> displayInstruction(), senseiTiming(10))
+        : setTimeout(()=> closeSensei(), senseiTiming(7))
     }
   }
 
@@ -609,62 +636,43 @@ function init() {
     speechBubble.parentNode.parentNode.classList.remove('off')
     senseiData.active = true
     senseiData.textTimer = setTimeout(()=> {
-      senseiData.active = true
       displayTextGradual(senseiData.greetings, 0)
-      senseiData.loopTimer = setTimeout(()=> {
-        displayInstruction()
-      }, senseiData.greetings.length * 20 + 2000)
-    }, 300)
+      senseiData.loopTimer = setTimeout(()=> displayInstruction(), senseiTiming(3, 'greetings'))
+    }, 400)
   }
 
+  const closeSensei = () => {
+    ;['textTimer', 'loopTimer'].forEach(k => clearTimeout(senseiData[k]))
+    sensei.classList.remove('talking')
+    speechBubble.innerHTML = ''
+    speechBubble.parentNode.parentNode.classList.add('off') 
+    senseiData.active = false
+  }
+
+  const setInstruction = () =>{
+    const { userProgress: p } = senseiData
+    const instructionKey = Object.keys(p).map(k => !p[k] && k).filter(k => k)[0]
+    senseiData.instruction = senseiData.instructions[instructionKey]
+    if (instructionKey === 'complete') senseiData.complete = true
+  }
+  
+  // +++
+
+
   document.querySelector('.location_mark').innerHTML = mapDataKeys.map(()=> `<div class="location_link"></div>`).join('')
-
   document.querySelectorAll('.location_link').forEach((link, i) => {
-    link.addEventListener('click', ()=>{
-      circleData.pos = i * -180 + 1
-      circleData.angle = i === 0 
-        ? 270
-        : i === 1
-          ? 90
-          : i % 2 === 0
-            ? -90
-            : -270     
-      bearData.vertPos = 10 //? different default could be set per map    
-      positionBear(-circleData.angle)      
-      circle.style.transform = `rotate(${circleData.angle - 180}deg)`
-      circle.style.transition = '0.2s'
-      setTimeout(()=> circle.style.transition = '0s', 200)
-      circle.style.transform = `rotate(${circleData.angle}deg)`
-      circleData.mapIndex = i
-      mapDataKeys.forEach(i => mapData[i].forEach(element => element.placed?.remove()))
-      placeElements(i)
-      movePointer(circleData.pos)
-      populateCircle('r')
-      changeBackground(i)
-      stopBear()
-    })
+    link.addEventListener('click', ()=> warpToLocation(i))
   })
-
   window.addEventListener('keydown', e => handleKey({ e }))
   window.addEventListener('keyup', ()=> {
     turnSprite({ e: circleData.key, actor: bearData })
     circleData.key = null
   })
   ;[actionButton, displays[3]].forEach(ele => ele.addEventListener('click', ()=> handleKey({ enter: true })))
-
-
-
-  const setInstruction = () =>{
-    const { userProgress: p } = senseiData
-    const instructionKey = Object.keys(p).map(i => !p[i] && i).filter(i => i)[0]
-    senseiData.instruction = senseiData.instructions[instructionKey]
-  }
-
-  
   speechBubble.parentNode.addEventListener('click', closeSensei)
   sensei.addEventListener('click', activateSensei )
-  
   window.addEventListener('resize', resize)
+
   addTouchAction(control, handleKey)
   placeElements(0)
   addBear()
@@ -672,7 +680,9 @@ function init() {
   handleKey({ letter: 'd'})
   stopBear()
   resize()
-  displayInstruction()
+  Object.keys(senseiData.userProgress).forEach(k => senseiData.userProgress[k] = false)
+  displayTextGradual(senseiData.intro, 0)
+  senseiData.loopTimer = setTimeout(()=> displayInstruction(), senseiTiming(3, 'intro'))
 
 }
 
