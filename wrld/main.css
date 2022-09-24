@@ -522,6 +522,7 @@ a:hover { text-decoration: underline; }
   display: flex;
   justify-content: space-between;
   transition: 0.3s ease;
+  pointer-events: none;
 }
 
 
@@ -535,7 +536,7 @@ a:hover { text-decoration: underline; }
   background-size: 32px !important; 
   image-rendering: pixelated;
   background-repeat: no-repeat !important;
-  transition: 0.3s;
+  transition: transform 0.3s;
 }
 
 .sensei.talking {

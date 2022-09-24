@@ -55,6 +55,24 @@ function init() {
     direction: null,
   }
 
+  const senseiData = {
+    instructions: {
+      intro: 'Walk around by dragging the circle on the bottom left, or using Arrow keys on your keyboard',
+      investigate: `Investigate using the star button or Enter on your keyboard, when you see an '!' appear above your head`,
+      location: `If you're tired of walking, you can click or touch the bar above - you'll be transported instantly!`
+    },
+    greetings: 'Hi again',
+    userProgress: {
+      intro: false,
+      investigate: false,
+      location: false,
+    },
+    testTimer: null,
+    loopTimer: null,
+    instruction: null,
+    active: true,
+  }
+
   const elements = {
     tree: { w: 48, h: 60 },
     talking_tree: { w: 48, h: 60 },
@@ -560,12 +578,43 @@ function init() {
     speechBubble.innerHTML = t.slice(0, i)
     if (i % 5 === 0) sensei.classList.toggle('talking')
     if (i < t.length) {
-      instructions.timer = setTimeout(()=>{
+      senseiData.textTimer = setTimeout(()=>{
         displayTextGradual(t, i + 1)
       }, 20)
     } else {
       sensei.classList.remove('talking')
     }
+  }
+
+  const closeSensei = () => {
+    clearTimeout(senseiData.textTimer)
+    clearTimeout(senseiData.loopTimer)
+    sensei.classList.remove('talking')
+    speechBubble.innerHTML = ''
+    speechBubble.parentNode.parentNode.classList.add('off') 
+    senseiData.active = false
+  }
+
+  const displayInstruction = () =>{
+    if (senseiData.active) {
+      setInstruction()
+      displayTextGradual(senseiData.instruction, 0)
+      senseiData.loopTimer = setTimeout(()=>{
+        displayInstruction()
+      }, senseiData.instruction.length * 20 + 5000)
+    }
+  }
+
+  const activateSensei = () =>{
+    speechBubble.parentNode.parentNode.classList.remove('off')
+    senseiData.active = true
+    senseiData.textTimer = setTimeout(()=> {
+      senseiData.active = true
+      displayTextGradual(senseiData.greetings, 0)
+      senseiData.loopTimer = setTimeout(()=> {
+        displayInstruction()
+      }, senseiData.greetings.length * 20 + 2000)
+    }, 300)
   }
 
   document.querySelector('.location_mark').innerHTML = mapDataKeys.map(()=> `<div class="location_link"></div>`).join('')
@@ -604,21 +653,16 @@ function init() {
   ;[actionButton, displays[3]].forEach(ele => ele.addEventListener('click', ()=> handleKey({ enter: true })))
 
 
-  const instructions = {
-    intro: 'Walk around by dragging the circle on the bottom left, or using Arrow keys on your keyboard.',
-    investigate: `Investigate using the star button or Enter on your keyboard, when you see an '!' appear above your head`,
-    location: `If you're tired of walking, you can click or touch the bar above - you'll be transported instantly!`,
-    timer: null,
-  }
-  
-  speechBubble.parentNode.addEventListener('click', ()=> {
-    clearTimeout(instructions.timer)
-    sensei.classList.remove('talking')
-    speechBubble.innerHTML = ''
-    speechBubble.parentNode.parentNode.classList.add('off') 
-  })
 
-  sensei.addEventListener('click', ()=> speechBubble.parentNode.parentNode.classList.remove('off'))
+  const setInstruction = () =>{
+    const { userProgress: p } = senseiData
+    const instructionKey = Object.keys(p).map(i => !p[i] && i).filter(i => i)[0]
+    senseiData.instruction = senseiData.instructions[instructionKey]
+  }
+
+  
+  speechBubble.parentNode.addEventListener('click', closeSensei)
+  sensei.addEventListener('click', activateSensei )
   
   window.addEventListener('resize', resize)
   addTouchAction(control, handleKey)
@@ -628,7 +672,7 @@ function init() {
   handleKey({ letter: 'd'})
   stopBear()
   resize()
-  displayTextGradual(instructions.intro, 0)
+  displayInstruction()
 
 }
 
