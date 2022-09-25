@@ -20,20 +20,10 @@ function init() {
     eventActivated: false,
   }
   
-  const config = {
-    'l': 1,
-    'r': -1,
-    'u': -2,
-    'd': 2,
-  }
-
-  const touchControl = {
-    active: false,
-    timer: null,
-    direction: null,
-  }
+  const config = { 'l': 1, 'r': -1, 'u': -2, 'd': 2, }
+  const touchControl = { active: false, timer: null, direction: null, }
   
-  const addEvents = (target, event, action, array) =>{
+  const addEvents = (target, event, action, array) => {
     array.forEach(a => event === 'remove' ? target.removeEventListener(a, action) : target.addEventListener(a, action))
   }
   const mouse = {
@@ -150,22 +140,24 @@ function init() {
         color: 'blue',
         display: {
           image: {
-            image: 'bear_art',
-            w: 208,
-            h: 208,
+            image: 'panda_art',
+            w: 140,
+            h: 140,
           },
-          caption: 'test test bear',
+          caption: 'want to see some pandas bumping into each other?',
+          link: linkButton('https://codepen.io/Ma5a/full/WNEBqPO', `yup, I'll have a look`)
         },
       },
       {
         element: 'art', angle: 130, offset: 20,
         display: {
           image: {
-            image: 'bear_art',
-            w: 208,
-            h: 208,
+            image: 'penguin_art',
+            w: 160,
+            h: 150,
           },
-          caption: 'test test bear'
+          caption: 'come and play with the point and click penguin',
+          link: linkButton('https://codepen.io/Ma5a/full/MWrZPOP', `ok!`)
         },
       },
       { element: 'talking_tree', angle: 130, offset: 100, },
@@ -242,11 +234,12 @@ function init() {
         element: 'art', angle: 130, offset: 20,
         display: {
           image: {
-            image: 'bear_art',
-            w: 208,
-            h: 208,
+            image: 'kitten_art',
+            w: 120,
+            h: 130,
           },
-          caption: 'test test bear'
+          caption: 'want to play with an interactive kitten?',
+          link: linkButton('https://codepen.io/Ma5a/full/BapbQam', `of course!`)
         }, 
       },
       { element: 'tree', angle: 150, offset: 40 },
@@ -259,7 +252,7 @@ function init() {
   }
   
   const mapDataKeys = Object.keys(mapData)
-  const indicator = document.querySelector('.indicator')
+  // const indicator = document.querySelector('.indicator')
   const cellD = 32
   const circle = document.querySelector('.circle')
   const circleWrapper = document.querySelector('.circle_wrapper')
@@ -399,7 +392,8 @@ function init() {
     changeBackground(circleData.mapIndex)
     if (Math.abs(circleData.angle) === 360) circleData.angle = 0
 
-    indicator.innerHTML = `angle: ${circleData.angle} pos:${circleData.pos} prev: ${returnNextOrPrev(circleData.mapIndex - 1)} current: ${circleData.mapIndex} next:${returnNextOrPrev(circleData.mapIndex + 1)}`
+    // for development
+    // indicator.innerHTML = `angle: ${circleData.angle} pos:${circleData.pos} prev: ${returnNextOrPrev(circleData.mapIndex - 1)} current: ${circleData.mapIndex} next:${returnNextOrPrev(circleData.mapIndex + 1)}`
   }
   
   const positionBear = angle => {
@@ -522,7 +516,7 @@ function init() {
 
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
 
-  const drag = (target, pos, x, y) =>{
+  const drag = (target, pos, x, y) => {
     pos.a = pos.c - x
     pos.b = pos.d - y
     const newX = target.offsetLeft - pos.a
@@ -627,8 +621,8 @@ function init() {
       setInstruction()
       displayTextGradual(senseiData.instruction, 0)
       senseiData.loopTimer = !senseiData.complete
-        ? setTimeout(()=> displayInstruction(), senseiTiming(10))
-        : setTimeout(()=> closeSensei(), senseiTiming(7))
+        ? setTimeout(()=> displayInstruction(), senseiTiming(8))
+        : setTimeout(()=> closeSensei(), senseiTiming(6))
     }
   }
 

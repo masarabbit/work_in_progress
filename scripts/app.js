@@ -341,6 +341,13 @@ function init() {
     }
   })
 
+  // convert to svg
+  // console.log( svgWrapper({
+  //   content: decode(penguinSvg['dDown']), 
+  //   w: 240, h: 48, 
+  //   frameWidth: (100 / 8) * 5, 
+  //   spriteNo
+  // }))
 }
 
 window.addEventListener('DOMContentLoaded', init)
