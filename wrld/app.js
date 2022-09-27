@@ -443,7 +443,7 @@ function init() {
       const { w, h, image } = circleData.activeEvent.display.image
       setTargetParams({ target: displays[0], w, h })
       displays[0].style.backgroundSize = `${w}px ${h}px`
-      displays[0].classList.add(image)
+      displays[0].className = `img_display display ${image}`
       displays[0].style.marginBottom = '5px'
     } else {
       setTargetParams({ target: displays[0], w:0, h:0 })
