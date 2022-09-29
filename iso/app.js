@@ -1,5 +1,10 @@
 
   function init() { 
+
+    // const elements = {
+    //   tree: { w: 48, h: 60 },
+    // }
+
     const gridData = {
       w: 9,
       h: 9,
@@ -10,8 +15,26 @@
       delay: 10,
       displayTimer: null,
       searchMemory: null,
+      route: [],
     }
 
+    const bearData = {
+      bear: null,
+      speed: 250,
+      motionrTimer: null,
+    }
+
+    const cubePositions = [27, 15, 47, 60, 61, 70]
+
+    const spriteContainer = document.querySelector('.sprite_container')
+    const indicator = document.querySelector('.indicator')
+    const grid = document.querySelector('.grid')
+    const gridContainer = document.querySelector('.grid_container')
+
+    const x = i => i % gridData.w
+    const y = i => Math.floor(i / gridData.w)
+    const distance = (a, b) => Math.abs(x(a) - x(b)) + Math.abs(y(a) - y(b))
+    const gridToMap = (w, h) => new Array(w * h).fill('')
     const isNum = x => x * 0 === 0
 
     const styleTarget = ({ target, w, h, x, y }) =>{
@@ -23,20 +46,6 @@
       if (isNum(y)) t.top = `${y}px`
     }
 
-    // const elements = {
-    //   tree: { w: 48, h: 60 },
-    // }
-
-    const x = i => i % gridData.w
-    const y = i => Math.floor(i / gridData.w)
-    const distance = (a, b) => Math.abs(x(a) - x(b)) + Math.abs(y(a) - y(b))
-    const gridToMap = (w, h) => new Array(w * h).fill('')
-
-    // const body = document.querySelector('body')
-    const spriteContainer = document.querySelector('.sprite_container')
-    const indicator = document.querySelector('.indicator')
-    const grid = document.querySelector('.grid')
-    const gridContainer = document.querySelector('.grid_container')
     // TODO maybe change grid to array of array instead of just one array
     const createGrid = () =>{
       const { w, h, c } = gridData
@@ -44,19 +53,15 @@
       styleTarget({ target:grid, w: w * c, h: h * c })
     }
     indicator.innerHTML = 'test'
-    const cubePositions = [27, 15, 47, 60, 61, 70]
-    // const cubePositions = [0, 15, 47]
-
- 
 
     // const isWall = i => mapData.mapTiles[i].classList.contains('wall')
     const isWall = i => {
-      cubePositions.includes(i) 
-      // &&
-      // y(i + 1) <= gridData.h &&
-      // x(i + 1) <= gridData.w &&
-      // y(i - 1) >= 0 &&
-      // x(i - 1) >= 0
+      return cubePositions.includes(i) 
+      &&
+      y(i + 1) <= gridData.h &&
+      x(i + 1) <= gridData.w &&
+      y(i - 1) >= 0 &&
+      x(i - 1) >= 0
     }
     
 
@@ -67,29 +72,69 @@
         prev: null
       }
     })
-  
 
+    const updateZindex = (target, i) =>{
+      target.style.zIndex = 32 + (x(i) * 18) + (y(i) * 18)
+    }
+
+    const moveBear = i => {
+      const { width } = gridContainer.getBoundingClientRect()
+      styleTarget({ 
+        target: bearData.bear, 
+        x: width / 2 - 36 + (x(i) * 36) - (y(i) * 36),
+        y: 32 + (x(i) * 18) + (y(i) * 18),
+      })
+      updateZindex(bearData.bear, i)
+      gridData.start = i
+    }
+  
+    const chainMotion = (instruction, index) => {
+      if (index >= instruction.length) return
+      
+      moveBear(instruction[index])
+      bearData.motionTimer = setTimeout(()=>{
+        chainMotion(instruction, index + 1)
+      }, bearData.speed)
+    }
 
     const displayPath = (current, data) =>{
-      const { goal } = data
+      indicator.innerHTML = data.route
+      const { prev } = data.searchMemory[current]
       data.searchMemory[current].path = 'path'
-      // console.log('current', current, grid.childNodes[current])
       grid.childNodes[current].classList.add('path')
 
-      data.searchMemory[current].prev
-        ? data.displayTimer = setTimeout(()=> displayPath(data.searchMemory[current].prev, data), data.delay)
-        : data.start = goal
+      if (prev) {
+        data.route.push(prev)
+        data.displayTimer = setTimeout(()=> displayPath(prev, data), data.delay)
+      }
+
+      // data.searchMemory[current].prev
+      //   ? data.displayTimer = setTimeout(()=> displayPath(prev, data), data.delay)
+      //   : data.start = goal
       // if(!data.searchMemory[current].prev) console.log('goal', data)
+
+      if (prev === data.start) {
+        chainMotion(data.route.reverse(), 0)
+        return
+      }
+    }
+
+    const possibleDestination = i => {
+      const { w, h } = gridData
+      return [1, -1, -w, w].map(d => d + i).filter(c => {
+        return y(c) >= 0 && y(c) <= h
+            && x(c) >= 0 && x(c) <= w
+            && (x(i) === x(c) || y(i) === y(c))
+      })
+      // TODO only caters for straight line, need refactor for diagonal
     }
 
     const decideNextMove = (current, count, data) =>{
       const { start, goal, w, h, searchMemory } = data
       if (!data.carryOn) return
-      const possibleDestination = [1, -1, -w, w].map(d => d + current) // TODO need to be edited to include diagonal
-      if (!possibleDestination.some(c => c === goal)) {
+      if (!possibleDestination(current).some(c => c === goal)) {
         const mapInfo = []
-        // TODO need to check wall / edge of map
-        possibleDestination.forEach(cell =>{  
+        possibleDestination(current).forEach(cell =>{  
           if (
             !isWall(cell) && !searchMemory[cell]?.searched && cell !== start
             && y(cell) >= 0 && y(cell) <= h
@@ -113,9 +158,9 @@
           }
         })
       } else {
-        // console.log('else')
         data.carryOn = false
         data.searchMemory[goal].prev = current
+        data.route.push(goal)
         displayPath(goal, data)
       }  
     }
@@ -133,7 +178,7 @@
         y: 67 + (x(i) * 18) + (y(i) * 18),
       })
             // TODO what is 67? (31 + 36)
-      tile.style.zIndex = 32 + (x(i) * 18) + (y(i) * 18)
+      updateZindex(tile, i)
 
       styleTarget({ 
         target: spriteContainer, 
@@ -145,8 +190,9 @@
 
 
     const createBear = () =>{
-      const bear = document.createElement('div')
-      bear.classList.add('tile')
+      bearData.bear = document.createElement('div')
+      const { bear } = bearData
+      bear.classList.add('bear_tile')
       bear.innerHTML = '<div class="bear"><div class="bear_sprite"></div></div>'
       const { width } = spriteContainer.getBoundingClientRect()
       styleTarget({ 
@@ -163,9 +209,13 @@
       grid.childNodes.forEach(tile => tile.className = 'cell')
       data.searchMemory = defaultMemory(w, h)
       data.carryOn = true
+      data.route.length = 0
     }
 
     createBear()
+
+
+
     grid.childNodes.forEach((cell, i) => {
       cell.addEventListener('click', ()=> {
         resetMotion(gridData)
@@ -174,8 +224,8 @@
         decideNextMove(gridData.start, 0, gridData)
       })
     })
-
-
+    
+    // setTimeout(()=> moveBear(33), 1000)
 
   }
   

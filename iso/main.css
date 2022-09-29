@@ -35,7 +35,7 @@ p, h1, h2, h3, h4 {
 
 .sprite_container {
   position: absolute;
-  border: red 1px solid;
+  border: rgb(255, 255, 255) 1px solid;
   pointer-events: none;
 }
 
@@ -96,6 +96,7 @@ p, h1, h2, h3, h4 {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAA8CAYAAAAgwDn8AAAAAXNSR0IArs4c6QAAAS1JREFUaEPtmOESgjAMg+H9H1pPlDv1gKZL2NZe/ctWm3xxK66L/vMwSq7Kr5QW+zQWVoDV+L/xEvMkRUDnpxXgdV4qREEgrAC2cQkJhkBYAerGKRItBMIKuLvxJhIeAmEF9G7cRQIhEFbA6MYhElcEwgqYrfFLEkcESoDyjeug1o/pKQmcGdg7WsgRv0CLGt+42CRBvSGLejsPnf/7otQCRjsPkaibmP2lNuzPew/MlnkLzkbiG0cJsCwTP89HwDKod8SQS7ZmIYua4vklCQRT7+hAIwQyzI1uHBJSs5Ai5M4aNQs5DbtteZ6beLbTxoXshaEEuCwTL05BYPckWpTynEJsKllyyEB52iO1WfSfKdUDtbkEvB2gTKQ2F4EiQOavIlQRqghtGRg6SjwBzME8OQGJzeQAAAAASUVORK5CYII=);
 }
 
+.bear_tile,
 .tile {
   width: 72px;
   height: 36px;
@@ -137,6 +138,10 @@ a:hover {
   height: 72px;
   overflow: hidden;
   z-index: 100;
+}
+
+.bear_tile {
+  transition: 0.5s;
 }
 
 .cell.node { background-color: rgb(196, 245, 250); }
