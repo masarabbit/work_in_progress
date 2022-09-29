@@ -20,8 +20,13 @@
 
     const bearData = {
       bear: null,
-      speed: 250,
+      speed: 200,
       motionrTimer: null,
+      frameOffset: 0,
+      size: 72,
+      animationTimer: ['', ''],
+      frame: 0,
+      walkCycle: [0, 1, 2, 1],
     }
 
     const cubePositions = [27, 15, 47, 60, 61, 70]
@@ -77,6 +82,40 @@
       target.style.zIndex = 32 + (x(i) * 18) + (y(i) * 18)
     }
 
+    const setSpritePos = (num, actor, sprite) =>{
+      actor.spritePos = num
+      sprite.style.marginLeft = `${num}px`
+    }
+
+    const turnSprite = ({ key, actor }) => {
+      const dir = key.toLowerCase().replace('arrow','')[0]
+
+      const { bear, frameOffset, size, frame } = bearData
+      console.log(frameOffset)
+      const frames = {
+        r: ['add', 'remove'],
+        l: ['remove' ,'add'],
+        u: ['add', 'add'],
+        d: ['remove' , 'remove']
+      }
+      bearData.frame = frame === 0 ? 2 : 0
+      if (!frames[dir]) return
+      bear.classList[frames[dir][0]]('right') 
+      bear.childNodes[0].childNodes[0].classList[frames[dir][1]]('up') 
+      setSpritePos(-size * bearData.frame, actor, bear.childNodes[0].childNodes[0])
+      actor.animationTimer = setTimeout(()=>setSpritePos(-size * 1, actor, bear.childNodes[0].childNodes[0]), 100)
+      // bearData.frame = frame + 1 === walkCycle.length
+      // ? 0
+      // : frame + 1
+    }
+    
+    window.addEventListener('keyup', e => {
+      const { key } = e
+      if (key) {
+        turnSprite({ key, actor: bearData, })
+      }
+    })
+
     const moveBear = i => {
       const { width } = gridContainer.getBoundingClientRect()
       styleTarget({ 
@@ -88,12 +127,21 @@
       gridData.start = i
     }
   
-    const chainMotion = (instruction, index) => {
-      if (index >= instruction.length) return
+    const chainMotion = (route, i) => {
+      if (i >= route.length) return
+      let dir
+      if (route[i] - route[i - 1] === -1) dir = 'l'
+      if (route[i] - route[i - 1] === 1) dir = 'r'
+      if (y(route[i]) > y(route[i - 1])) dir = 'd'
+      if (y(route[i]) < y(route[i - 1])) dir = 'u'
       
-      moveBear(instruction[index])
+      
+      if (dir) {
+        turnSprite({ key: dir, actor: bearData })
+      }
+      moveBear(route[i])
       bearData.motionTimer = setTimeout(()=>{
-        chainMotion(instruction, index + 1)
+        chainMotion(route, i + 1)
       }, bearData.speed)
     }
 
