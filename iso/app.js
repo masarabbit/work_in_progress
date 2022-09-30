@@ -123,26 +123,29 @@
         x: width / 2 - 36 + (x(i) * 36) - (y(i) * 36),
         y: 32 + (x(i) * 18) + (y(i) * 18),
       })
-      updateZindex(bearData.bear, i)
       gridData.start = i
     }
   
     const chainMotion = (route, i) => {
-      if (i >= route.length) return
-      let dir
-      if (route[i] - route[i - 1] === -1) dir = 'l'
-      if (route[i] - route[i - 1] === 1) dir = 'r'
-      if (y(route[i]) > y(route[i - 1])) dir = 'd'
-      if (y(route[i]) < y(route[i - 1])) dir = 'u'
-      
-      
-      if (dir) {
-        turnSprite({ key: dir, actor: bearData })
+      if (i < route.length) {
+        let dir
+        if (route[i] - route[i - 1] === -1) dir = 'l'
+        if (route[i] - route[i - 1] === 1) dir = 'r'
+        if (y(route[i]) > y(route[i - 1])) dir = 'd'
+        if (y(route[i]) < y(route[i - 1])) dir = 'u'
+        
+        
+        if (dir) { // TODO need to check if necessary
+          turnSprite({ key: dir, actor: bearData })
+        }
+        moveBear(route[i])
+        updateZindex(bearData.bear, route[i - 1])
+        bearData.motionTimer = setTimeout(()=>{
+          chainMotion(route, i + 1)
+        }, bearData.speed)
+      } else {
+        updateZindex(bearData.bear, route[i - 1])
       }
-      moveBear(route[i])
-      bearData.motionTimer = setTimeout(()=>{
-        chainMotion(route, i + 1)
-      }, bearData.speed)
     }
 
     const displayPath = (current, data) =>{
