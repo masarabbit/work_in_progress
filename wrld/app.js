@@ -110,7 +110,8 @@ function init() {
       { 
         element: 'house2', angle: 110, offset: 30,
         display: {
-          caption: 'test house'
+          caption: `Hi, I'm a house. Do you want to see Masa's website?`,
+          link: linkButton('https://www.ma5a.com/', `sure, why not`)
         } 
       },
       { element: 'tree', angle: 130, offset: 80, color: 'navy' },
@@ -119,11 +120,10 @@ function init() {
         display: {
           image: {
             image: 'bear_art',
-            w: 208,
-            h: 208,
+            w: 160,
+            h: 160,
           },
-          caption: 'test test bear',
-          link: linkButton('https://www.masahito.co.uk/', 'have a look')
+          caption: 'Hi there! Walk around and investigate! (Hint: look for things with faces)',
         }, 
       },
       { element: 'tree', angle: 160, offset: 20, color: 'gold' },
@@ -132,7 +132,13 @@ function init() {
     1: [
       { element: 'tree', angle: 30 },
       { element: 'tree', angle: 20, offset: 90 },
-      { element: 'house1', angle: 50, offset: 60 },
+      { 
+        element: 'house1', angle: 50, offset: 60,
+        display: {
+          caption: `Hey there, do you want to see Masa's website for illustration?`,
+          link: linkButton('https://masahito.co.uk/', `ok!`)
+        } 
+      },
       { element: 'tree', angle: 65, offset: 100, color: 'white' },
       { element: 'tree', angle: 75, offset: 20 },
       {
@@ -160,7 +166,10 @@ function init() {
           link: linkButton('https://codepen.io/Ma5a/full/MWrZPOP', `ok!`)
         },
       },
-      { element: 'talking_tree', angle: 130, offset: 100, },
+      { 
+        element: 'talking_tree', angle: 130, offset: 100, 
+        caption: 'blah blah blah',
+      },
       { element: 'tree', angle: 150, offset: 20, color: 'white' },
     ],
     2: [
@@ -171,9 +180,12 @@ function init() {
       { element: 'sun', angle: 105, offset: -70 },
       { 
         element: 'sun_event', angle: 105, offset: 10,
-        display: { caption: `hello, I'm the sun` },
+        display: { caption: `Hello, I'm the sun` },
       },
-      { element: 'talking_tree', angle: 110, offset: 80, color: 'white' },
+      { 
+        element: 'talking_tree', angle: 110, offset: 80, color: 'white',
+        caption: 'blah blah blah',
+      },
       { element: 'tree', angle: 130, offset: 0, color: 'white' },
       { element: 'tree', angle: 150, offset: 20, color: 'gold' },
     ],
@@ -185,7 +197,7 @@ function init() {
       { element: 'talking_crystal', angle: 90, offset: -30 },
       { 
         element: 'talking_crystal_event', angle: 90, offset: 10,
-        display: { caption: 'hello' },
+        display: { caption: `Konnichiwa, I'm a random crystal floating in space` },
       },
       { element: 'crystal', angle: 100, offset: 70 },
       { element: 'crystal', angle: 105, offset: -5 },
@@ -201,11 +213,12 @@ function init() {
         element: 'art', angle: 60, offset: 20,
         display: {
           image: {
-            image: 'bear_art',
-            w: 208,
-            h: 208,
+            image: 'twitter',
+            w: 72,
+            h: 72,
           },
-          caption: 'test test bear'
+          caption: `Here's Masa's twitter, if you're into that sort of thing`,
+          link: linkButton('https://twitter.com/masahitoart', `yeah, I'm into that sort of thing`)
         },
       },
       {
@@ -220,13 +233,19 @@ function init() {
           caption: 'test test bear'
         },
       },
-      { element: 'talking_cactus', angle: 100, offset: 20, color: 'gold' },
+      { 
+        element: 'talking_cactus', angle: 100, offset: 20, color: 'gold', 
+        caption: 'blah blah blah',
+      },
       { element: 'cactus', angle: 120, offset: 30, color: 'navy' },
       { element: 'cactus', angle: 150, offset: 60, color: 'gold' },
     ],
     5: [
       { element: 'tree', angle: 30, offset: 50 },
-      { element: 'talking_tree', angle: 50, offset: 20 },
+      { 
+        element: 'talking_tree', angle: 50, offset: 20,
+        caption: 'blah blah blah',
+      },
       { element: 'tree', angle: 60, offset: 100 },
       { element: 'tree', angle: 75, offset: 20 },
       { element: 'tree', angle: 110, offset: 60 },
@@ -246,7 +265,7 @@ function init() {
       { element: 'moon', angle: 95, offset: -90 },
       { 
         element: 'moon_event', angle: 95, offset: 10,
-        display: { caption: 'good evening!' },
+        display: { caption: `Hi there, did you notice that you're actually not walking side ways? The planet is moving!` },
       },
     ],
   }
@@ -584,7 +603,7 @@ function init() {
         : i % 2 === 0
           ? -90
           : -270     
-    bearData.vertPos = 10 //? different default could be set per map    
+    bearData.vertPos = 10 
     positionBear(-circleData.angle)      
     circle.style.transform = `rotate(${circleData.angle - 90}deg)`
     circle.style.transition = '0.2s'
