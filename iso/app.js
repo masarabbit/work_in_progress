@@ -40,7 +40,7 @@
     const y = i => Math.floor(i / gridData.w)
     const distance = (a, b) => Math.abs(x(a) - x(b)) + Math.abs(y(a) - y(b))
     const gridToMap = (w, h) => new Array(w * h).fill('')
-    const isNum = x => x * 0 === 0
+    const isNum = x => typeof x === 'number'
 
     const styleTarget = ({ target, w, h, x, y }) =>{
       const t = target.style
@@ -91,7 +91,6 @@
       const dir = key.toLowerCase().replace('arrow','')[0]
 
       const { bear, frameOffset, size, frame } = bearData
-      console.log(frameOffset)
       const frames = {
         r: ['add', 'remove'],
         l: ['remove' ,'add'],
@@ -103,10 +102,7 @@
       bear.classList[frames[dir][0]]('right') 
       bear.childNodes[0].childNodes[0].classList[frames[dir][1]]('up') 
       setSpritePos(-size * bearData.frame, actor, bear.childNodes[0].childNodes[0])
-      actor.animationTimer = setTimeout(()=>setSpritePos(-size * 1, actor, bear.childNodes[0].childNodes[0]), 100)
-      // bearData.frame = frame + 1 === walkCycle.length
-      // ? 0
-      // : frame + 1
+      // actor.animationTimer = setTimeout(()=>setSpritePos(-size * 1, actor, bear.childNodes[0].childNodes[0]), 100)
     }
     
     window.addEventListener('keyup', e => {
@@ -134,15 +130,24 @@
         if (y(route[i]) > y(route[i - 1])) dir = 'd'
         if (y(route[i]) < y(route[i - 1])) dir = 'u'
         
-        
-        if (dir) { // TODO need to check if necessary
+        if (dir) {
           turnSprite({ key: dir, actor: bearData })
+          // ? makes bear walk faster
+          // setTimeout(()=> {
+          //   turnSprite({ key: dir, actor: bearData })
+          // }, 100)
         }
         moveBear(route[i])
         updateZindex(bearData.bear, route[i - 1])
         bearData.motionTimer = setTimeout(()=>{
           chainMotion(route, i + 1)
         }, bearData.speed)
+        
+        if (!isNum(route[i + 1])) {
+          setTimeout(()=> {
+            setSpritePos(-bearData.size * 1, bearData, bearData.bear.childNodes[0].childNodes[0])
+          }, 300)
+        }
       } else {
         updateZindex(bearData.bear, route[i - 1])
       }
@@ -154,10 +159,11 @@
       data.searchMemory[current].path = 'path'
       grid.childNodes[current].classList.add('path')
 
-      if (prev) {
+      if (isNum(prev)) {
         data.route.push(prev)
         data.displayTimer = setTimeout(()=> displayPath(prev, data), data.delay)
       }
+  
 
       // data.searchMemory[current].prev
       //   ? data.displayTimer = setTimeout(()=> displayPath(prev, data), data.delay)
@@ -252,6 +258,7 @@
         y: 32,
       })
       spriteContainer.appendChild(bear)
+      setSpritePos(-bearData.size * 1, bearData, bearData.bear.childNodes[0].childNodes[0])
     }
 
     const resetMotion = data =>{
@@ -272,7 +279,7 @@
         resetMotion(gridData)
         indicator.innerHTML = `x:${x(i)} y:${y(i)}`
         gridData.goal = i
-        decideNextMove(gridData.start, 0, gridData)
+        if (i !== gridData.start) decideNextMove(gridData.start, 0, gridData)
       })
     })
     
