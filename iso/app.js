@@ -144,7 +144,7 @@
         }, bearData.speed)
         
         if (!isNum(route[i + 1])) {
-          setTimeout(()=> {
+          bearData.animationTimer = setTimeout(()=> {
             setSpritePos(-bearData.size * 1, bearData, bearData.bear.childNodes[0].childNodes[0])
           }, 300)
         }
@@ -171,6 +171,7 @@
       // if(!data.searchMemory[current].prev) console.log('goal', data)
 
       if (prev === data.start) {
+        clearTimeout(bearData.animationTimer)
         chainMotion(data.route.reverse(), 0)
         return
       }
@@ -264,6 +265,7 @@
     const resetMotion = data =>{
       const { w, h, displayTimer } = data
       clearTimeout(displayTimer)
+      clearTimeout(bearData.animationTimer)
       grid.childNodes.forEach(tile => tile.className = 'cell')
       data.searchMemory = defaultMemory(w, h)
       data.carryOn = true
