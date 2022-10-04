@@ -36,7 +36,6 @@ function init() {
   }
   
   testSmile.forEach(f => storeImage(f, frames))
-
   let xFactor = 0.995
   let yFactor = -0.1
 
@@ -45,33 +44,26 @@ function init() {
     frames: [], 
     count: 0, 
     i: 0, 
-    s: { x: 7, y: 4 },
+    s: { x: 6, y: 4 },
     accelerate: function() {
       //* this needs improvement. Too linear
       //* need to add gravity
-
-
       this.s.x *= xFactor
       this.s.y += yFactor
     },
     bounce: function({elem, key, axis}) {
+      // TODO add collision check with other smilies
       if (elem < 0 || (elem + 32) > axis) {
-        // this.s[key] = this.s[key] < 0 
-        //   ? this.s[key] + 0.005 
-        //   : this.s[key] - 0.005 
-    
-        this.s[key] *= -0.75
-        // xFactor = this.s.x < 0 ? 0.995 : 1.001
+        this.s[key] *= -0.6
         console.log(Math.abs(yFactor))
         if(key === 'y') {
-          yFactor = yFactor / 2
+          yFactor *= 0.6
           if (Math.abs(this.s.y) < 0.01) this.s.y = 0
         }
         if(key === 'x') {
-          xFactor = xFactor * 0.9
+          xFactor *= 1.00005
           if (Math.abs(this.s.x) < 0.01) this.s.x = 0
         }
-        // if (Math.abs(this.s[key]) < 0.02) this.s[key] = 0
         console.log('this.s', this.s[key], yFactor, key)
       }  
     }, 

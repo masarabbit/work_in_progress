@@ -150,7 +150,7 @@ function init() {
             w: 140,
             h: 140,
           },
-          caption: 'want to see some pandas bumping into each other?',
+          caption: 'Want to see some pandas bumping into each other?',
           link: linkButton('https://codepen.io/Ma5a/full/WNEBqPO', `yup, I'll have a look`)
         },
       },
@@ -162,13 +162,13 @@ function init() {
             w: 160,
             h: 150,
           },
-          caption: 'come and play with the point and click penguin',
+          caption: 'Come and play with the point and click penguin',
           link: linkButton('https://codepen.io/Ma5a/full/MWrZPOP', `ok!`)
         },
       },
       { 
         element: 'talking_tree', angle: 130, offset: 100, 
-        caption: 'blah blah blah',
+        caption: `What? The world is rotating? Why am I not falling off?`,
       },
       { element: 'tree', angle: 150, offset: 20, color: 'white' },
     ],
@@ -180,11 +180,11 @@ function init() {
       { element: 'sun', angle: 105, offset: -70 },
       { 
         element: 'sun_event', angle: 105, offset: 10,
-        display: { caption: `Hello, I'm the sun` },
+        display: { caption: `Hello, I'm the sun. I'm a huge burning ball of hot plasma.` },
       },
       { 
         element: 'talking_tree', angle: 110, offset: 80, color: 'white',
-        caption: 'blah blah blah',
+        caption: 'Blah blah blah',
       },
       { element: 'tree', angle: 130, offset: 0, color: 'white' },
       { element: 'tree', angle: 150, offset: 20, color: 'gold' },
@@ -197,7 +197,7 @@ function init() {
       { element: 'talking_crystal', angle: 90, offset: -30 },
       { 
         element: 'talking_crystal_event', angle: 90, offset: 10,
-        display: { caption: `Konnichiwa, I'm a random crystal floating in space` },
+        display: { caption: `Konnichiwa, I'm a random crystal floating in space.` },
       },
       { element: 'crystal', angle: 100, offset: 70 },
       { element: 'crystal', angle: 105, offset: -5 },
@@ -235,7 +235,7 @@ function init() {
       },
       { 
         element: 'talking_cactus', angle: 100, offset: 20, color: 'gold', 
-        caption: 'blah blah blah',
+        caption: 'Free hug!',
       },
       { element: 'cactus', angle: 120, offset: 30, color: 'navy' },
       { element: 'cactus', angle: 150, offset: 60, color: 'gold' },
@@ -244,7 +244,7 @@ function init() {
       { element: 'tree', angle: 30, offset: 50 },
       { 
         element: 'talking_tree', angle: 50, offset: 20,
-        caption: 'blah blah blah',
+        caption: 'Who is JSON?',
       },
       { element: 'tree', angle: 60, offset: 100 },
       { element: 'tree', angle: 75, offset: 20 },
@@ -257,7 +257,7 @@ function init() {
             w: 120,
             h: 130,
           },
-          caption: 'want to play with an interactive kitten?',
+          caption: 'Want to play with an interactive kitten?',
           link: linkButton('https://codepen.io/Ma5a/full/BapbQam', `of course!`)
         }, 
       },
@@ -265,7 +265,7 @@ function init() {
       { element: 'moon', angle: 95, offset: -90 },
       { 
         element: 'moon_event', angle: 95, offset: 10,
-        display: { caption: `Hi there, did you notice that you're actually not walking side ways? The planet is moving!` },
+        display: { caption: `Hi there, did you notice that you're actually not moving side ways? The world is moving!` },
       },
     ],
   }
