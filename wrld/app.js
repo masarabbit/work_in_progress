@@ -104,14 +104,15 @@ function init() {
         element: 'talking_tree', angle: 60, offset: 100,
         color: 'gold',
         display: {
-          caption: 'test'
+          caption: 'Welcome! This started off as an experiment to create a rotating planet, but kind of became a mini portfolio. Enjoy!'
         }
       },
       { 
         element: 'house2', angle: 110, offset: 30,
         display: {
           caption: `Hi, I'm a house. Do you want to see Masa's website?`,
-          link: linkButton('https://www.ma5a.com/', `sure, why not`)
+          link: linkButton('https://www.ma5a.com/', `sure, why not`),
+          button: 'maybe next time'
         } 
       },
       { element: 'tree', angle: 130, offset: 80, color: 'navy' },
@@ -135,8 +136,8 @@ function init() {
       { 
         element: 'house1', angle: 50, offset: 60,
         display: {
-          caption: `Hey there, do you want to see Masa's website for illustration?`,
-          link: linkButton('https://masahito.co.uk/', `ok!`)
+          caption: `Hey there, do you want to see Masa's illustrations?`,
+          link: linkButton('https://masahito.co.uk/', `ok!`),
         } 
       },
       { element: 'tree', angle: 65, offset: 100, color: 'white' },
@@ -167,8 +168,8 @@ function init() {
         },
       },
       { 
-        element: 'talking_tree', angle: 130, offset: 100, 
-        caption: `What? The world is rotating? Why am I not falling off?`,
+        element: 'talking_tree', angle: 120, offset: 100, 
+        display: { caption: `What? The world is rotating? Why am I not falling off?` }
       },
       { element: 'tree', angle: 150, offset: 20, color: 'white' },
     ],
@@ -183,8 +184,8 @@ function init() {
         display: { caption: `Hello, I'm the sun. I'm a huge burning ball of hot plasma.` },
       },
       { 
-        element: 'talking_tree', angle: 110, offset: 80, color: 'white',
-        caption: 'Blah blah blah',
+        element: 'talking_tree', angle: 120, offset: 80, color: 'white',
+        display: { caption: `I guess I'm one of those things people call NPC.` }
       },
       { element: 'tree', angle: 130, offset: 0, color: 'white' },
       { element: 'tree', angle: 150, offset: 20, color: 'gold' },
@@ -226,16 +227,18 @@ function init() {
         color: 'blue',
         display: {
           image: {
-            image: 'bear_art',
-            w: 208,
-            h: 208,
+            image: 'bot_art',
+            w: 144,
+            h: 144,
           },
-          caption: 'test test bear'
+          caption: `Want to see small robots destroying each other?`,
+          link: linkButton('https://codepen.io/Ma5a/full/LYQoLNR', `urm, ok`),
+          button: 'meh'
         },
       },
       { 
         element: 'talking_cactus', angle: 100, offset: 20, color: 'gold', 
-        caption: 'Free hug!',
+        display: { caption: 'Free hug!' }
       },
       { element: 'cactus', angle: 120, offset: 30, color: 'navy' },
       { element: 'cactus', angle: 150, offset: 60, color: 'gold' },
@@ -244,7 +247,9 @@ function init() {
       { element: 'tree', angle: 30, offset: 50 },
       { 
         element: 'talking_tree', angle: 50, offset: 20,
-        caption: 'Who is JSON?',
+        display: {
+          caption: `I might one day make a small RPG based on this code. Maybe.`,
+        },
       },
       { element: 'tree', angle: 60, offset: 100 },
       { element: 'tree', angle: 75, offset: 20 },

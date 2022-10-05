@@ -51,26 +51,27 @@ function init() {
       this.s.x *= xFactor
       this.s.y += yFactor
     },
-    bounce: function({elem, key, axis}) {
-      // TODO add collision check with other smilies
-      if (elem < 0 || (elem + 32) > axis) {
-        this.s[key] *= -0.6
-        console.log(Math.abs(yFactor))
-        if(key === 'y') {
-          yFactor *= 0.6
-          if (Math.abs(this.s.y) < 0.01) this.s.y = 0
-        }
-        if(key === 'x') {
-          xFactor *= 1.00005
-          if (Math.abs(this.s.x) < 0.01) this.s.x = 0
-        }
-        console.log('this.s', this.s[key], yFactor, key)
+    bounceX: function (x) {
+      if (
+        x < 0 || (x + 32) > w
+        ) {
+        this.s.x *= -0.6
+        xFactor *= 1.00005
+        if (Math.abs(this.s.x) < 0.01) this.s.x = 0
       }  
-    }, 
+    },
+    bounceY: function (y) {
+      if (
+        y < 0 || (y + 32) > h
+        ) {
+        this.s.y *= -0.6
+        yFactor *= 0.6
+        if (Math.abs(this.s.y) < 0.01) this.s.y = 0
+      }  
+    }
   }
   testSmile.forEach(f => storeImage(f, smily.frames))
-  console.log(smily.get('x'))
-
+  console.log(smily.get('x')) 
 
 	const update = () => {
 		ctx.clearRect(0, 0, w, h)
@@ -80,8 +81,8 @@ function init() {
     const x = smily.get('x')
     const y = smily.get('y')
     
-    smily.bounce({ elem: x, key: 'x', axis: w})
-    smily.bounce({ elem: y, key: 'y', axis: h})
+    smily.bounceX(x)
+    smily.bounceY(y)
     smily.accelerate()
 
     smily.set('x', x + smily.s.x)
