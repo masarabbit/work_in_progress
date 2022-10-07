@@ -36,27 +36,20 @@ function init() {
   }
   
   testSmile.forEach(f => storeImage(f, frames))
-  let xFactor = 0.995
-  let yFactor = -0.1
-
-  const smily = {
-    ...vector, 
-    frames: [], 
-    count: 0, 
-    i: 0, 
-    s: { x: 6, y: 4 },
+  
+  const bounceFunction = {
     accelerate: function() {
       //* this needs improvement. Too linear
       //* need to add gravity
-      this.s.x *= xFactor
-      this.s.y += yFactor
+      this.s.x *= this.xFactor
+      this.s.y += this.yFactor
     },
     bounceX: function (x) {
       if (
         x < 0 || (x + 32) > w
         ) {
         this.s.x *= -0.6
-        xFactor *= 1.00005
+        this.xFactor *= 1.00005
         if (Math.abs(this.s.x) < 0.01) this.s.x = 0
       }  
     },
@@ -65,32 +58,50 @@ function init() {
         y < 0 || (y + 32) > h
         ) {
         this.s.y *= -0.6
-        yFactor *= 0.6
-        if (Math.abs(this.s.y) < 0.01) this.s.y = 0
+        this.yFactor *= 0.6
+        // if (Math.abs(this.s.y) < 0.01) this.s.y = 0
       }  
     }
   }
-  testSmile.forEach(f => storeImage(f, smily.frames))
-  console.log(smily.get('x')) 
+  
+  const smilies = [{x: 6, y: 4}, {x: 3, y: 6}].map(s => {
+    return {
+      ...vector, 
+      ...bounceFunction,
+      frames: [], 
+      count: 0, 
+      xFactor: 0.995,
+      yFactor: -0.1,
+      i: 0, 
+      s: { x: s.x, y: s.y },
+    }
+  })
+
+  testSmile.forEach(f => {
+    smilies.forEach(smily => storeImage(f, smily.frames))
+  })
+  // console.log(smily.get('x')) 
 
 	const update = () => {
 		ctx.clearRect(0, 0, w, h)
-
-    smily.count++
-    smily.incrementFrame()
-    const x = smily.get('x')
-    const y = smily.get('y')
     
-    smily.bounceX(x)
-    smily.bounceY(y)
-    smily.accelerate()
+    smilies.forEach(smily => {
+      smily.count++
+      smily.incrementFrame()
+      const x = smily.get('x')
+      const y = smily.get('y')
+      
+      smily.bounceX(x)
+      smily.bounceY(y)
+      smily.accelerate()
+  
+      smily.set('x', x + smily.s.x)
+      smily.set('y', y + smily.s.y) 
+  
+      ctx.drawImage(smily.frames[smily.i], smily.get('x'), smily.get('y'), 32, 32)
+    })
 
-    smily.set('x', x + smily.s.x)
-    smily.set('y', y + smily.s.y) 
-
-    ctx.drawImage(smily.frames[smily.i], smily.get('x'), smily.get('y'), 32, 32)
-
-    indicator.innerHTML = `s: ${smily.s.x} / ${smily.s.y}`
+    // indicator.innerHTML = `s: ${smily.s.x} / ${smily.s.y}`
 		requestAnimationFrame(update)
 	}
 
