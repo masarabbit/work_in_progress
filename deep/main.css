@@ -1,0 +1,96 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+/* :root {
+  --bot_width: calc(16px * 26 * 2);
+} */
+
+p, h1, h2, h3, h4 {
+  display: inline-block;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
+}
+
+body {
+  background-color: rgb(70, 24, 101);
+  font-family: Arial, Helvetica, sans-serif;
+  text-transform: uppercase;
+}
+
+.wrapper {
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.ocean-content {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  height: 5000px;
+}
+
+.fish {
+  position: absolute;
+  background-color: yellow;
+  width: 50px;
+  height: 20px;
+  border-radius: 50%;
+  transition: 5s;
+}
+
+.ocean {
+  position: absolute;
+  /* top: -100vh;
+  left: calc(-50vw - 60px); */
+  /* width: 100%;
+  height: 100vh; */
+  display: flex;
+  flex-direction: column;
+  transition: 0.5s;
+}
+.blue {
+  background-color: #01082ecc;
+}
+
+.blue.fill {
+  /* border: solid blue 1px; */
+  width: 100vw;
+  flex-grow: 1;
+}
+
+.blue.lg {
+  /* border: solid blue 1px; */
+  height: 100vh;
+  width: 100%;
+}
+
+.light-wrapper {
+  /* border: 1px solid red; */
+  display: flex;
+}
+
+.sign {
+  position: fixed;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+  bottom: 10px;
+  right: 10px;
+  font-size: 10px;
+  text-transform: none;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+  text-transform: none;
+}
+
+a:hover { text-decoration: underline; }
