@@ -157,7 +157,27 @@ function init() {
 
   createlight()
 
+  const moveAround = e => {
+    e.preventDefault() //TODO maybe people would want to use arrowkeys for scrolling, so allocate different key for sub movement
+    const key = e.key ? e.key.toLowerCase().replace('arrow','')[0] : e
+    const dir = {
+      u: -10,
+      r: 10,
+      l: -10,
+      d: 10
+    }
 
+    if (['u', 'd'].includes(key)) oceanData.lightPos.y+= dir[key]
+    if (['l', 'r'].includes(key)) oceanData.lightPos.x+= dir[key]
+
+    transformPos({
+      target: elements.ocean,
+      x: oceanData.lightPos.x,
+      y: oceanData.lightPos.y,
+    })
+  }
+
+  window.addEventListener('keydown', moveAround)
 
   console.log('test')
 }
