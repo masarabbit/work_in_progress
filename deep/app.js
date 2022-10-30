@@ -167,8 +167,8 @@ function init() {
       d: 10
     }
 
-    if (['u', 'd'].includes(key)) oceanData.lightPos.y+= dir[key]
-    if (['l', 'r'].includes(key)) oceanData.lightPos.x+= dir[key]
+    if (['u', 'd'].includes(key)) oceanData.lightPos.y += dir[key]
+    if (['l', 'r'].includes(key)) oceanData.lightPos.x += dir[key]
 
     transformPos({
       target: elements.ocean,
