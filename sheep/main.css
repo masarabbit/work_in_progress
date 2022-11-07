@@ -1,0 +1,77 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+/* :root {
+  --bot_width: calc(16px * 26 * 2);
+} */
+
+p, h1, h2, h3, h4 {
+  display: inline-block;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
+}
+
+body {
+  background-color: rgb(21, 179, 108);
+  font-family: Arial, Helvetica, sans-serif;
+  text-transform: uppercase;
+}
+
+.wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.sheep-route {
+  /* width: calc(100% - 200px); */
+  width: 100%;
+  height: calc(64 * 3px);
+  border: 1px solid yellow;
+  overflow: hidden;
+}
+
+.sheep {
+  position: absolute;
+  overflow: hidden;
+  /* transition: 5s; */
+}
+
+.sprite {
+  position: absolute;
+}
+
+.indicator {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  color: white;
+}
+
+.sign {
+  position: fixed;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+  bottom: 10px;
+  right: 10px;
+  font-size: 10px;
+  text-transform: none;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+  text-transform: none;
+}
+
+a:hover { text-decoration: underline; }
