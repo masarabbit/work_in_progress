@@ -67,7 +67,7 @@ function init() {
       w: px(64), h: px(44 * 3)
     })
     sheepWrapper.innerHTML = `
-    <div class="sheep">  
+    <div class="sheep" sheep_id="${sheepNo + 1}" >  
       <div class="sprite">
         ${singleSvgWrapper({
           content: svgs.sheep,
@@ -101,17 +101,18 @@ function init() {
       x: width,
       y: 0,
     })
+    transformPos({
+      target: sheep,
+      x: 0,
+      y: height - 44,
+    })
 
     timeoutTransform({
       target: sheepWrapper,
       transition: 7,
       x: -64,
-    })
-
-    transformPos({
-      target: sheep,
-      x: 0,
-      y: height - 44,
+      // id: sheepNo,
+      delay: 200,
     })
 
     timeoutTransform({
@@ -122,8 +123,9 @@ function init() {
     })
 
     setTimeout(()=> {
-      elements.counter.innerHTML = sheepNo
-    }, 1700)
+      clearInterval(sheepData[sheepNo].interval)
+      elements.counter.innerHTML = sheepNo + 1
+    }, 1800)
 
     timeoutTransform({
       target: sheep,
@@ -132,6 +134,16 @@ function init() {
       delay: 2200
     })
 
+    setTimeout(()=> {
+      animateCell({
+        target: sheep.childNodes[1],
+        frameW: 64,
+        end: 3,
+        data: sheepData[sheepNo]
+      })
+    }, 2400)
+
+
     setTimeout(()=>{
       // console.log(sheepNo)
       elements.sheepRoute.removeChild(sheepWrapper)
@@ -139,6 +151,7 @@ function init() {
     }, 7000)
   }
   
+  createSheep()
   setInterval(()=>{
     createSheep()
     // elements.counter.innerHTML = sheepCount

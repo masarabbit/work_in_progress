@@ -37,7 +37,7 @@ body {
   /* width: calc(100% - 200px); */
   width: 100%;
   height: calc(44 * 3px);
-  border: 1px solid yellow;
+  /* border: 1px solid yellow; */
   overflow: hidden;
 }
 
@@ -46,7 +46,14 @@ body {
 .sheep {
   position: absolute;
   overflow: hidden;
+  transition: 0;
   /* transition: 5s; */
+}
+
+.sheep::after {
+  content: attr(sheep_id);
+  top: 0px;
+  color: rgb(111, 255, 0);
 }
 
 .sprite {
