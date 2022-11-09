@@ -8,7 +8,7 @@ function init() {
   const elements = {
     wrapper: document.querySelector('.wrapper'),
     sheepRoute: document.querySelector('.sheep-route'),
-    indicator: document.querySelector('.indicator')
+    counter: document.querySelector('.counter')
   }
   
   let sheepCount = -1
@@ -32,7 +32,7 @@ function init() {
 
 
   const transformPos = ({ target, x, y, value }) => {
-    target.style.transform = `translate(${x}${value || 'px'},${y}${value || 'px'})`
+    target.style.transform = `translate(${x || 0}${value || 'px'},${y || 0}${value || 'px'})`
   }
 
   const animateCell = ({ target, frameW, end, data, speed }) => {
@@ -46,21 +46,28 @@ function init() {
     }, speed || 150)
   }
 
+  const timeoutTransform = ({ target, transition, x, y, delay }) => {
+    setTimeout(()=> {
+      target.style.transition = `${transition}s`
+      transformPos({ target, x, y })
+    }, delay || 0)
+  }
+
   const createSheep = () =>{
-    const sheep = document.createElement('div')
-    sheep.classList.add('sheep')
+    const sheepWrapper = document.createElement('div')
+    sheepWrapper.classList.add('sheep-wrapper')
     sheepData.push({
-      sheep,
-      interval: 'test',
+      sheep: sheepWrapper,
+      interval: null,
     })
     sheepCount++
-    // console.log('sheep', sheepCount)
+    const sheepNo = sheepCount
     setStyles({
-      target: sheep,
-      w: px(64),
-      h: px(44)
+      target: sheepWrapper,
+      w: px(64), h: px(44 * 3)
     })
-    sheep.innerHTML = `
+    sheepWrapper.innerHTML = `
+    <div class="sheep">  
       <div class="sprite">
         ${singleSvgWrapper({
           content: svgs.sheep,
@@ -68,78 +75,75 @@ function init() {
           h: 22
         })}
       </div>
+    </div>  
     `
+    const sheep = sheepWrapper.childNodes[1]
+    setStyles({
+      target: sheep,
+      w: px(64), h: px(44)
+    })
     setStyles({
       target: sheep.childNodes[1],
-      w: px(64 * 4),
-      h: px(44)
+      w: px(64 * 4), h: px(44)
     })
     animateCell({
       target: sheep.childNodes[1],
       frameW: 64,
       end: 3,
-      data: sheepData[sheepCount]
+      data: sheepData[sheepNo]
     })
 
-    elements.sheepRoute.append(sheep)
+    const { width, height } = elements.sheepRoute.getBoundingClientRect()
+
+    elements.sheepRoute.append(sheepWrapper)
+    transformPos({
+      target: sheepWrapper,
+      x: width,
+      y: 0,
+    })
+
+    timeoutTransform({
+      target: sheepWrapper,
+      transition: 7,
+      x: -64,
+    })
+
     transformPos({
       target: sheep,
-      x: elements.sheepRoute.getBoundingClientRect().width,
-      y: elements.sheepRoute.getBoundingClientRect().height - 44,
+      x: 0,
+      y: height - 44,
     })
-    console.log(elements.sheepRoute.getBoundingClientRect().width)
+
+    timeoutTransform({
+      target: sheep,
+      transition: 2,
+      y: height - 200,
+      delay: 1700
+    })
 
     setTimeout(()=> {
-      sheep.style.transition = '7s'
-      transformPos({
-        target: sheep,
-        x: -64,
-        y: elements.sheepRoute.getBoundingClientRect().height - 44,
-      })
+      elements.counter.innerHTML = sheepNo
+    }, 1700)
+
+    timeoutTransform({
+      target: sheep,
+      transition: 1.5,
+      y: height - 44,
+      delay: 2200
     })
 
     setTimeout(()=>{
-      sheep.style.transition = '2s'
-      transformPos({
-        target: sheep,
-        x: (elements.sheepRoute.getBoundingClientRect().width / 2) - 64,
-        y: elements.sheepRoute.getBoundingClientRect().height - 150,
-      })
-    }, 1800)
-
-    setTimeout(()=>{
-      sheep.style.transition = '1.5s'
-      transformPos({
-        target: sheep,
-        x: (elements.sheepRoute.getBoundingClientRect().width / 2) - 100,
-        y: elements.sheepRoute.getBoundingClientRect().height - 44,
-      })
-    }, 2200)
-
-    setTimeout(()=>{
-      sheep.style.transition = '7s'
-      transformPos({
-        target: sheep,
-        x: -80,
-        y: elements.sheepRoute.getBoundingClientRect().height - 44,
-      })
-    }, 3000)
-
-    setTimeout(()=>{
-      elements.sheepRoute.removeChild(sheep)
+      // console.log(sheepNo)
+      elements.sheepRoute.removeChild(sheepWrapper)
       // sheepData.pop()
-    }, 8000)
+    }, 7000)
   }
   
   setInterval(()=>{
     createSheep()
-    elements.indicator.innerHTML = sheepCount
-    // console.log(sheepData)
+    // elements.counter.innerHTML = sheepCount
   }, 1000 * 2)
 
-  // TODO vertical movement should be separate animation.
-
-  console.log('test')
 }
 
 window.addEventListener('DOMContentLoaded', init)

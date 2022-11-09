@@ -36,11 +36,13 @@ body {
 .sheep-route {
   /* width: calc(100% - 200px); */
   width: 100%;
-  height: calc(64 * 3px);
+  height: calc(44 * 3px);
   border: 1px solid yellow;
   overflow: hidden;
 }
 
+
+.sheep-wrapper,
 .sheep {
   position: absolute;
   overflow: hidden;
@@ -51,10 +53,18 @@ body {
   position: absolute;
 }
 
-.indicator {
+.counter_wrapper {
   position: fixed;
-  top: 10px;
-  left: 10px;
+  width: 100%;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.counter {
+  font-size: 24px;
+  font-family: 'Press Start 2P';
   color: white;
 }
 
