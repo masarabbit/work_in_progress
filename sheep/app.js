@@ -1,22 +1,28 @@
 function init() {  
   const svgs = {
-    sheep: '<path fill="#fff" d="M 107 1 h 3 v 1 h 1 v -1 h 4 v 1 h 4 v 1 h 1 v 1 h 1 v 1 h 1 v 1 h 1 v 1 h 1 v 2 h -1 v 2 h -1 v 2 h -2 v -1 h -2 v 1 h -1 v 1 h -7 v -1 h -1 v -1 h -4 v -3 h 2 v -2 h -3 v -1 h -1 v -2 h 1 v -1 h 2 v -1 h 1 v -1"/> <path fill="#fff" d="M 11 2 h 3 v 1 h 2 v -1 h 5 v 1 h 4 v 1 h 1 v 3 h 1 v 6 h -2 v 1 h -1 v 2 h -2 v 1 h -4 v 1 h -3 v -1 h -3 v -2 h -4 v -1 h -3 v -1 h 2 v -1 h 1 v -1 h 1 v -2 h 2 v -2 h -3 v -1 h -1 v -2 h 3 v -1 h 1 v -1"/> <path fill="#fff" d="M 48 2 h 2 v 1 h 5 v 2 h 2 v 1 h 1 v 7 h -3 v 1 h -1 v 1 h -1 v 1 h -7 v -1 h -8 v -1 h 2 v -1 h 1 v -2 h 1 v -1 h 1 v -2 h -2 v 1 h -1 v -1 h -2 v -1 h 1 v -1 h 1 v -1 h 1 v -1 h 1 v -1 h 6 v -1"/> <path fill="#fff" d="M 78 2 h 4 v 1 h 1 v -1 h 4 v 1 h 1 v 2 h 2 v 2 h 1 v 4 h -1 v 2 h -4 v 1 h -1 v 1 h -1 v 1 h -4 v 1 h -2 v -1 h -1 v -1 h -4 v 1 h -2 v -1 h 1 v -1 h 1 v -1 h 3 v -2 h -1 v -1 h -5 v -3 h 1 v -1 h 2 v -2 h 1 v -1 h 2 v 1 h 1 v -1 h 1 v -1"/> <path fill="#000" d="M 4 6 h 4 v 1 h 3 v 2 h -2 v 2 h -1 v 1 h -1 v 1 h -5 v -1 h -1 v -2 h 1 v -2 h 1 v -1 h 1 v -1"/> <path fill="#000" d="M 99 6 h 5 v 1 h 3 v 2 h -2 v 3 h 4 v 3 h -1 v 1 h -1 v 1 h -2 v 1 h -2 v -1 h -1 v -2 h -2 v -3 h 1 v -1 h -3 v -1 h -1 v -1 h 1 v -2 h 1 v -1"/> <path fill="#000" d="M 36 8 h 4 v 1 h 1 v -1 h 2 v 2 h -1 v 1 h -1 v 2 h -1 v 1 h -2 v 1 h -4 v -1 h -1 v -2 h 1 v -2 h 1 v -1 h 1 v -1"/> <path fill="#000" d="M 69 10 h 6 v 1 h 1 v 2 h -3 v 1 h -1 v 1 h -1 v 1 h -4 v -1 h -1 v -2 h 1 v -1 h 1 v -1 h 1 v -1"/> <path fill="#000" d="M 27 12 h 3 v 1 h 1 v 2 h -2 v 3 h -1 v 1 h -1 v -1 h -2 v -1 h -1 v -3 h 1 v -1 h 2 v -1"/> <path fill="#000" d="M 118 12 h 2 v 1 h 1 v 1 h 1 v 5 h -4 v -1 h -1 v -1 h -1 v -3 h 1 v -1 h 1 v -1"/> <path fill="#000" d="M 55 13 h 4 v 1 h 1 v 2 h -1 v 1 h -1 v 2 h -2 v -1 h -1 v -1 h -1 v -3 h 1 v -1"/> <path fill="#000" d="M 86 13 h 3 v 3 h -1 v 2 h -1 v 1 h -3 v -1 h -1 v -2 h 1 v -1 h 1 v -1 h 1 v -1"/> <path fill="#fefefe" d="M 109 13 h 1 v 1 h -1 v -1"/> <path fill="#000" d="M 5 14 h 3 v 1 h 4 v 3 h -1 v 1 h -1 v 1 h -3 v -2 h -3 v -2 h 1 v -2"/> <path fill="#000" d="M 38 15 h 3 v 1 h 1 v -1 h 4 v 1 h -1 v 2 h -1 v 3 h -3 v -1 h -2 v 1 h -1 v -1 h -1 v -3 h 1 v -2"/> <path fill="#000" d="M 73 15 h 4 v 1 h 1 v 2 h 1 v 1 h 1 v 1 h -1 v 1 h -3 v -1 h -1 v 1 h -2 v -1 h -1 v -4 h 1 v -1"/>'
+
+    sheep: ({ furColour, bodyColour }) => {
+      const fur = furColour || '#fff'
+      const body = bodyColour || '#000'
+      return `<path fill="${fur}" d="M 107 1 h 3 v 1 h 1 v -1 h 4 v 1 h 4 v 1 h 1 v 1 h 1 v 1 h 1 v 1 h 1 v 1 h 1 v 2 h -1 v 2 h -1 v 2 h -2 v -1 h -2 v 1 h -1 v 1 h -7 v -1 h -1 v -1 h -4 v -3 h 2 v -2 h -3 v -1 h -1 v -2 h 1 v -1 h 2 v -1 h 1 v -1"/> <path fill="${fur}" d="M 11 2 h 3 v 1 h 2 v -1 h 5 v 1 h 4 v 1 h 1 v 3 h 1 v 6 h -2 v 1 h -1 v 2 h -2 v 1 h -4 v 1 h -3 v -1 h -3 v -2 h -4 v -1 h -3 v -1 h 2 v -1 h 1 v -1 h 1 v -2 h 2 v -2 h -3 v -1 h -1 v -2 h 3 v -1 h 1 v -1"/> <path fill="${fur}" d="M 48 2 h 2 v 1 h 5 v 2 h 2 v 1 h 1 v 7 h -3 v 1 h -1 v 1 h -1 v 1 h -7 v -1 h -8 v -1 h 2 v -1 h 1 v -2 h 1 v -1 h 1 v -2 h -2 v 1 h -1 v -1 h -2 v -1 h 1 v -1 h 1 v -1 h 1 v -1 h 1 v -1 h 6 v -1"/> <path fill="${fur}" d="M 78 2 h 4 v 1 h 1 v -1 h 4 v 1 h 1 v 2 h 2 v 2 h 1 v 4 h -1 v 2 h -4 v 1 h -1 v 1 h -1 v 1 h -4 v 1 h -2 v -1 h -1 v -1 h -4 v 1 h -2 v -1 h 1 v -1 h 1 v -1 h 3 v -2 h -1 v -1 h -5 v -3 h 1 v -1 h 2 v -2 h 1 v -1 h 2 v 1 h 1 v -1 h 1 v -1"/> <path fill="${body}" d="M 4 6 h 4 v 1 h 3 v 2 h -2 v 2 h -1 v 1 h -1 v 1 h -5 v -1 h -1 v -2 h 1 v -2 h 1 v -1 h 1 v -1"/> <path fill="${body}" d="M 99 6 h 5 v 1 h 3 v 2 h -2 v 3 h 4 v 3 h -1 v 1 h -1 v 1 h -2 v 1 h -2 v -1 h -1 v -2 h -2 v -3 h 1 v -1 h -3 v -1 h -1 v -1 h 1 v -2 h 1 v -1"/> <path fill="${body}" d="M 36 8 h 4 v 1 h 1 v -1 h 2 v 2 h -1 v 1 h -1 v 2 h -1 v 1 h -2 v 1 h -4 v -1 h -1 v -2 h 1 v -2 h 1 v -1 h 1 v -1"/> <path fill="${body}" d="M 69 10 h 6 v 1 h 1 v 2 h -3 v 1 h -1 v 1 h -1 v 1 h -4 v -1 h -1 v -2 h 1 v -1 h 1 v -1 h 1 v -1"/> <path fill="${body}" d="M 27 12 h 3 v 1 h 1 v 2 h -2 v 3 h -1 v 1 h -1 v -1 h -2 v -1 h -1 v -3 h 1 v -1 h 2 v -1"/> <path fill="${body}" d="M 118 12 h 2 v 1 h 1 v 1 h 1 v 5 h -4 v -1 h -1 v -1 h -1 v -3 h 1 v -1 h 1 v -1"/> <path fill="${body}" d="M 55 13 h 4 v 1 h 1 v 2 h -1 v 1 h -1 v 2 h -2 v -1 h -1 v -1 h -1 v -3 h 1 v -1"/> <path fill="${body}" d="M 86 13 h 3 v 3 h -1 v 2 h -1 v 1 h -3 v -1 h -1 v -2 h 1 v -1 h 1 v -1 h 1 v -1"/> <path fill="${fur}" d="M 109 13 h 1 v 1 h -1 v -1"/> <path fill="${body}" d="M 5 14 h 3 v 1 h 4 v 3 h -1 v 1 h -1 v 1 h -3 v -2 h -3 v -2 h 1 v -2"/> <path fill="${body}" d="M 38 15 h 3 v 1 h 1 v -1 h 4 v 1 h -1 v 2 h -1 v 3 h -3 v -1 h -2 v 1 h -1 v -1 h -1 v -3 h 1 v -2"/> <path fill="${body}" d="M 73 15 h 4 v 1 h 1 v 2 h 1 v 1 h 1 v 1 h -1 v 1 h -3 v -1 h -1 v 1 h -2 v -1 h -1 v -4 h 1 v -1"/>`
+    }
   }
 
 
   
   const elements = {
-    wrapper: document.querySelector('.wrapper'),
+    // wrapper: document.querySelector('.wrapper'),
     sheepRoute: document.querySelector('.sheep-route'),
     counter: document.querySelector('.counter')
   }
   
   let sheepCount = -1
-  const sheepData = []
+  let sheepData = []
 
-
+  const nearestN = (x, n) => x === 0 ? 0 : (x - 1) + Math.abs(((x - 1) % n) - n)
   const isNum = x => typeof x === 'number'
   const px = num => `${num}px`
+  const randomN = max => Math.ceil(Math.random() * max)
 
   const setStyles = ({ target, h, w, x, y, deg }) =>{
     if (h) target.style.height = h
@@ -53,102 +59,129 @@ function init() {
     }, delay || 0)
   }
 
+  const timing = () => {
+    const total = nearestN(elements.sheepRoute.getBoundingClientRect().width * 10, 1000)
+    return {
+      jump: total * 0.25 - 100,
+      stopRun: total * 0.25,
+      land: total * 0.25 + 500,
+      resumeRun: total * 0.25 + 600,
+      total,
+    }
+  }
+
+  const filteredSheepData = n => {
+    return sheepData.filter(s => s.sheepId === n)[0]
+  }
+
+
   const createSheep = () =>{
     const sheepWrapper = document.createElement('div')
     sheepWrapper.classList.add('sheep-wrapper')
+    sheepCount++
+    const sheepNo = sheepCount
+
     sheepData.push({
       sheep: sheepWrapper,
       interval: null,
+      sheepId: sheepNo
     })
-    sheepCount++
-    const sheepNo = sheepCount
+
     setStyles({
       target: sheepWrapper,
       w: px(64), h: px(44 * 3)
     })
     sheepWrapper.innerHTML = `
     <div class="sheep" sheep_id="${sheepNo + 1}" >  
-      <div class="sprite">
-        ${singleSvgWrapper({
-          content: svgs.sheep,
-          w: 4 * 32,
-          h: 22
-        })}
+      <div class="sheep-inner-wrapper">
+        <div class="sprite">
+          ${singleSvgWrapper({
+            content: svgs.sheep({ furColour: '#ffff88' }),
+            w: 4 * 32, h: 22
+          })}
+        </div>
       </div>
     </div>  
     `
     const sheep = sheepWrapper.childNodes[1]
+    const sheepInnerWrapper = sheep.childNodes[1]
     setStyles({
       target: sheep,
       w: px(64), h: px(44)
     })
     setStyles({
-      target: sheep.childNodes[1],
+      target: sheepInnerWrapper.childNodes[1],
       w: px(64 * 4), h: px(44)
     })
     animateCell({
-      target: sheep.childNodes[1],
+      target: sheepInnerWrapper.childNodes[1],
       frameW: 64,
       end: 3,
-      data: sheepData[sheepNo]
+      data: filteredSheepData(sheepNo)
     })
 
     const { width, height } = elements.sheepRoute.getBoundingClientRect()
+    const sheepTiming = timing()
+    console.log(sheepTiming, sheepTiming.total / 1000)
+
+
 
     elements.sheepRoute.append(sheepWrapper)
     transformPos({
       target: sheepWrapper,
-      x: width,
-      y: 0,
+      x: width, y: 0,
     })
     transformPos({
       target: sheep,
-      x: 0,
-      y: height - 44,
+      x: 0, y: height - 44,
     })
 
     timeoutTransform({
       target: sheepWrapper,
-      transition: 7,
+      transition: sheepTiming.total / 1000,
       x: -64,
-      // id: sheepNo,
-      delay: 200,
+      delay: 100,
     })
 
-    timeoutTransform({
+    timeoutTransform({ // jump
       target: sheep,
       transition: 2,
-      y: height - 200,
-      delay: 1700
+      y: height - 200 - randomN(100),
+      delay: sheepTiming.jump
     })
 
-    setTimeout(()=> {
-      clearInterval(sheepData[sheepNo].interval)
+    setTimeout(()=> { // stopRun
+      clearInterval(filteredSheepData(sheepNo).interval)
+      sheepInnerWrapper.childNodes[1].style.transform = `translateX(${px(0 * -64)})`
       elements.counter.innerHTML = sheepNo + 1
-    }, 1800)
+      elements.counter.classList.add('enlarge')
+      if (Math.random() < 0.5) sheepInnerWrapper.classList.add('roll')
+    }, sheepTiming.stopRun)
 
-    timeoutTransform({
+    timeoutTransform({ // land
       target: sheep,
       transition: 1.5,
       y: height - 44,
-      delay: 2200
+      delay: sheepTiming.land
     })
 
-    setTimeout(()=> {
+    setTimeout(()=> { // resumeRun
       animateCell({
-        target: sheep.childNodes[1],
+        target: sheepInnerWrapper.childNodes[1],
         frameW: 64,
         end: 3,
-        data: sheepData[sheepNo]
+        data: filteredSheepData(sheepNo)
       })
-    }, 2400)
+      elements.counter.classList.remove('enlarge')
+      // sheepInnerWrapper.style.transition = '0s'
+      sheepInnerWrapper.classList.remove('roll')
+    }, sheepTiming.resumeRun)
 
 
-    setTimeout(()=>{
-      // console.log(sheepNo)
+    setTimeout(()=> {
       elements.sheepRoute.removeChild(sheepWrapper)
-      // sheepData.pop()
-    }, 7000)
+      sheepData = sheepData.filter(s => s.sheepId !== sheepNo)
+    }, sheepTiming.total)
   }
   
   createSheep()
