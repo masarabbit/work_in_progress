@@ -178,10 +178,10 @@ function init() {
 
   const moveAround = key => {
     const dir = {
-      w: -10,
-      a: -10,
-      s: 10,
-      z: 10
+      w: -30,
+      a: -30,
+      s: 30,
+      z: 30
     }
 
     // TODO consider adding diagonal movement (maybe awkward to set keys)
@@ -207,7 +207,6 @@ function init() {
 
   const handleKey = ({ e, letter }) => {
     const key = e?.key.toLowerCase().replace('arrow','')[0] || letter
-    console.log(letter)
     if (subData.direction !== key) {
       subData.direction = key
       clearInterval(subData.interval)
@@ -249,7 +248,7 @@ function init() {
       touchControl.active = true
       subData.interval = setInterval(()=> {
         if (touchControl.active) handleKeyAction({ letter: touchControl.direction })
-      }, 200)
+      }, 100)
     }
     const onDrag = e =>{
       const x = roundedClient(e, 'X')
