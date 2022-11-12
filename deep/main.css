@@ -77,6 +77,71 @@ body {
   display: flex;
 }
 
+.touch_wrapper {
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.touch_wrapper > div {
+  position: relative;
+  margin: 0 auto;
+  padding: 10px;
+  max-width: 700px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.touch_control {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  background-color: #0cb2c2;
+  opacity: 0.8;
+  border-radius: 50%;
+  transition: 0.3s;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAI5JREFUWEftl9EKwCAIRfP/P9rhQ6NFFNyU68C9xvR0kktJI39C7t+uAFRVbQMiAteBf+zNu0EUAgKYm99AQACec1MAZaAM5DNgIYOm2ikfVrU/BjyyfQexqv8CjPEaaWCO7TwARkY9gq6GOoSnKY5Yz5cDEbvc1SwDZeCfBlJcy6kPkzG2aU8zr8CiD+EDqUpIIc1s8VMAAAAASUVORK5CYII=);
+  image-rendering: pixelated;
+  background-repeat: no-repeat !important;
+  background-size: 160px !important; 
+}
+
+.touch_circle {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  border-radius: 50%;
+  width: 90px;
+  height: 90px;
+  background-position: center;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAJJJREFUWEftlVEKwDAIQ+f9D+3oh1CkxVShbpD9rmr6DKmoqj6Nn1AACZAACVQIiIiMDCv1yBbbcAvRdJ9MoR9eEVGK4usrGANnYisB/kz0zsEEdsO8CU+pQAJ2O49uh/jrHwLGTVtXYKhbTbja96nhlj0Qo/jCTwRRaxTPnmh7jKIMQP9DOYA2y5yjABIggXYCL89q16GHt61fAAAAAElFTkSuQmCC);
+  opacity: 0.6;
+  image-rendering: pixelated;
+  background-repeat: no-repeat !important;
+  background-size: 96px !important; 
+  transform: translate(35px, 35px);
+  cursor: grab;
+}
+
+.action_button {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-position: center;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAINJREFUSEvtlEEKwDAIBLv/f7Slh0Cx6q4FoZTkmuDEWROYmR2DCxvA7LYUAcBVsKP1O4B1+6VE7ULuYBTgi3e6eHSQFWPTkkFDRW8hUS5pBl1IFnoZsgqpJurHgEjPUlHt+WmTQ/ae1YdHx5R9CXdQa0zVh8XOyX8RK5TtbwA1N67oBIKOo7n10c7nAAAAAElFTkSuQmCC);
+  background-color: #d8d7d7ba;
+  image-rendering: pixelated;
+  background-size: 48px;
+  opacity: 1;
+  transition: 0.3s;
+  z-index: 300;
+}
+
+.action_button:hover {
+  opacity: 0.5;
+}
+
 .sign {
   position: fixed;
   font-family: Arial, Helvetica, sans-serif;

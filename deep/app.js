@@ -74,19 +74,38 @@ function init() {
   const elements = {
     wrapper: document.querySelector('.wrapper'),
     ocean: document.querySelector('.ocean'),
-    oceanContent: document.querySelector('.ocean-content')
+    oceanContent: document.querySelector('.ocean-content'),
+    control: document.querySelector('.touch_circle')
   }
+
+  const touchControl = { active: false }
 
   const oceanData = {
     lightPos: {
       x: null,
       y: null,
-    }
+    },
+  }
+
+  const subData = {
+    direction: null,
+    interval: null,
   }
 
 
   const isNum = x => typeof x === 'number'
   const px = num => `${num}px`
+
+  const addEvents = (target, event, action, array) => {
+    array.forEach(a => event === 'remove' ? target.removeEventListener(a, action) : target.addEventListener(a, action))
+  }
+  const mouse = {
+    up: (t, e, a) => addEvents(t, e, a, ['mouseup', 'touchend']),
+    move: (t, e, a) => addEvents(t, e, a, ['mousemove', 'touchmove']),
+    down: (t, e, a) => addEvents(t, e, a, ['mousedown', 'touchstart']),
+    enter: (t, e, a) => addEvents(t, e, a, ['mouseenter', 'touchstart']),
+    leave: (t, e, a) => addEvents(t, e, a, ['mouseleave', 'touchmove'])
+  }
 
   const setStyles = ({ target, h, w, x, y, deg }) =>{
     if (h) target.style.height = h
@@ -157,18 +176,27 @@ function init() {
 
   createlight()
 
-  const moveAround = e => {
-    e.preventDefault() //TODO maybe people would want to use arrowkeys for scrolling, so allocate different key for sub movement
-    const key = e.key ? e.key.toLowerCase().replace('arrow','')[0] : e
+  const moveAround = key => {
     const dir = {
-      u: -10,
-      r: 10,
-      l: -10,
-      d: 10
+      w: -10,
+      a: -10,
+      s: 10,
+      z: 10
     }
 
-    if (['u', 'd'].includes(key)) oceanData.lightPos.y += dir[key]
-    if (['l', 'r'].includes(key)) oceanData.lightPos.x += dir[key]
+    // TODO consider adding diagonal movement (maybe awkward to set keys)
+
+    if (['w', 'z'].includes(key)) oceanData.lightPos.y += dir[key]
+    if (['a', 's'].includes(key)) oceanData.lightPos.x += dir[key]
+
+    // restrict movement beyond edge
+    const { width, height } = elements.ocean.getBoundingClientRect()
+    const xEdge = -width / 2 + 60
+    const yEdge = -height / 2 + 60
+    if (oceanData.lightPos.x > -120) oceanData.lightPos.x = -120
+    if (oceanData.lightPos.x < xEdge) oceanData.lightPos.x = xEdge
+    if (oceanData.lightPos.y > -120) oceanData.lightPos.y = -120
+    if (oceanData.lightPos.y < yEdge) oceanData.lightPos.y = yEdge
 
     transformPos({
       target: elements.ocean,
@@ -177,9 +205,85 @@ function init() {
     })
   }
 
+  const handleKey = ({ e, letter }) => {
+    const key = e?.key.toLowerCase().replace('arrow','')[0] || letter
+    console.log(letter)
+    if (subData.direction !== key) {
+      subData.direction = key
+      clearInterval(subData.interval)
+      subData.interval = setInterval(()=> {
+        moveAround(key)
+      }, 100) 
+    } else {
+      subData.direction = null
+    }
+  }
+
+
+  const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
+
+  const drag = (target, pos, x, y) => {
+    pos.a = pos.c - x
+    pos.b = pos.d - y
+    const newX = target.offsetLeft - pos.a
+    const newY = target.offsetTop - pos.b
+    if (distanceBetween({ x: 0, y: 0 }, { x: newX, y: newY }) < 40) {
+      setStyles({ target, x: px(newX), y: px(newY) })
+      touchControl.direction = Math.abs(newX) < Math.abs(newY)
+        ? newY < 0 ? 'w' : 'z'
+        : newX < 0 ? 'a' : 's'
+    }  
+  }
+
+  const client = (e, type) => e.type[0] === 'm' ? e[`client${type}`] : e.touches[0][`client${type}`]
+  const roundedClient = (e, type) => Math.round(client(e, type))
+
+  const addTouchAction = (target, handleKeyAction) =>{
+    const pos = { a: 0, b: 0, c: 0, d: 0 }
+    
+    const onGrab = e =>{
+      pos.c = roundedClient(e, 'X')
+      pos.d = roundedClient(e, 'Y')  
+      mouse.up(document, 'add', onLetGo)
+      mouse.move(document, 'add', onDrag)
+      touchControl.active = true
+      subData.interval = setInterval(()=> {
+        if (touchControl.active) handleKeyAction({ letter: touchControl.direction })
+      }, 200)
+    }
+    const onDrag = e =>{
+      const x = roundedClient(e, 'X')
+      const y = roundedClient(e, 'Y')
+      drag(target, pos, x, y)
+      pos.c = x
+      pos.d = y
+    }
+    const onLetGo = () => {
+      mouse.up(document, 'remove', onLetGo)
+      mouse.move(document,'remove', onDrag)
+      target.style.transition = '0.2s'
+      setStyles({ target, x: px(0), y: px(0) })
+      setTimeout(()=>{
+        target.style.transition = '0s'
+      }, 200)
+      clearInterval(subData.interval)
+      touchControl.active = false
+      subData.direction = null
+    }
+    mouse.down(target,'add', onGrab)
+  }
+
+  addTouchAction(elements.control, handleKey)
+
   window.addEventListener('keydown', moveAround)
 
-  console.log('test')
+  window.addEventListener('keydown', e => handleKey({ e }))
+  window.addEventListener('keyup', ()=> {
+    clearInterval(subData.interval)
+    subData.direction = null
+  })
+
+  // TODO need reposition
 }
 
 window.addEventListener('DOMContentLoaded', init)

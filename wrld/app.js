@@ -426,13 +426,11 @@ function init() {
   }
 
   const rotateCircle = () =>{
-    if (['l','r'].includes(circleData.key)) {
-      circleData.angle += config[circleData.key]
-      circle.style.transform = `rotate(${circleData.angle}deg)`
+    circleData.angle += config[circleData.key]
+    circle.style.transform = `rotate(${circleData.angle}deg)`
 
-      positionBear(-circleData.angle)
-      updateElements()
-    }
+    positionBear(-circleData.angle)
+    updateElements()
   }
 
   const moveBearVertically = () => {
