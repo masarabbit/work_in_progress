@@ -9,9 +9,38 @@ function init() {
   }
 
 
+  //TODO maybe set colour combinations, rather than individual colours
+  const furColours = [
+    '#fff',
+    '#fff',
+    '#fff',
+    '#fff',
+    '#fff',
+    '#fff',
+    '#fff',
+    '#fff',
+    '#ccc',
+    '#fff5e0',
+  ]
+
+  const bodyColours = [
+    '#000',
+    '#000',
+    '#000',
+    '#000',
+    '#000',
+    '#000',
+    '#000',
+    '#000',
+    '#000',
+    '#383838',
+    '#ffe7cc'
+  ]
+
+
   
   const elements = {
-    // wrapper: document.querySelector('.wrapper'),
+    wrapper: document.querySelector('.wrapper'),
     sheepRoute: document.querySelector('.sheep-route'),
     counter: document.querySelector('.counter')
   }
@@ -32,10 +61,9 @@ function init() {
     if (isNum(deg)) target.style.transform = `rotate(${deg}deg)` // TODO maybe not required for this app
   }
 
-  const singleSvgWrapper = ({ content, color, w, h }) =>{
+  const singleSvgWrapper = ({ content, color, w, h }) => {
     return `<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100%" height="100%" viewBox="0 0 ${w} ${h}" fill="${color ? color : 'black'}">${content}</svg>`
   }
-
 
   const transformPos = ({ target, x, y, value }) => {
     target.style.transform = `translate(${x || 0}${value || 'px'},${y || 0}${value || 'px'})`
@@ -70,12 +98,52 @@ function init() {
     }
   }
 
-  const filteredSheepData = n => {
-    return sheepData.filter(s => s.sheepId === n)[0]
+  const filteredSheepData = n => sheepData.filter(s => s.sheepId === n)[0]
+
+  const populateSheepHtml = (sheep, sheepNo) => {
+    sheep.innerHTML = `
+    <div class="sheep" sheep_id="${sheepNo + 1}" baa="" >  
+      <div class="sheep-inner-wrapper">
+        <div class="sprite">
+          ${singleSvgWrapper({
+            content: svgs.sheep({ 
+              furColour: furColours[randomN(furColours.length)], 
+              bodyColour: bodyColours[randomN(bodyColours.length)]  
+            }),
+            w: 4 * 32, h: 22
+          })}
+        </div>
+      </div>
+    </div>  
+    `
   }
 
+  const baaa = () => `b` + new Array(1 + randomN(3)).fill('').map(_ => 'a').join('')
 
-  const createSheep = () =>{
+  const setBaaa = (sheep, baa) => sheep.setAttribute('baa', baa)
+
+  const triggerBaa = (sheep, delay) => {
+    setTimeout(()=> {
+      setBaaa(sheep, baaa())
+      setTimeout(()=>{
+        setBaaa(sheep, '')
+      }, 1500)
+    }, randomN(delay))
+  }
+
+  const stopSheep = (sheep, sheepNo) => {
+    clearInterval(filteredSheepData(sheepNo).interval)
+    elements.counter.innerHTML = sheepNo + 1
+    elements.counter.classList.add('enlarge')
+    if (Math.random() < 0.1) {
+      sheep.classList.add('roll')
+      sheep.childNodes[1].style.transform = `translateX(${px(2 * -64)})`
+    } else {
+      sheep.childNodes[1].style.transform = `translateX(${px(0 * -64)})`
+    }
+  }
+
+  const createSheep = () => {
     const sheepWrapper = document.createElement('div')
     sheepWrapper.classList.add('sheep-wrapper')
     sheepCount++
@@ -91,18 +159,7 @@ function init() {
       target: sheepWrapper,
       w: px(64), h: px(44 * 3)
     })
-    sheepWrapper.innerHTML = `
-    <div class="sheep" sheep_id="${sheepNo + 1}" >  
-      <div class="sheep-inner-wrapper">
-        <div class="sprite">
-          ${singleSvgWrapper({
-            content: svgs.sheep({ furColour: '#ffff88' }),
-            w: 4 * 32, h: 22
-          })}
-        </div>
-      </div>
-    </div>  
-    `
+    populateSheepHtml(sheepWrapper, sheepNo)
     const sheep = sheepWrapper.childNodes[1]
     const sheepInnerWrapper = sheep.childNodes[1]
     setStyles({
@@ -122,9 +179,6 @@ function init() {
 
     const { width, height } = elements.sheepRoute.getBoundingClientRect()
     const sheepTiming = timing()
-    console.log(sheepTiming, sheepTiming.total / 1000)
-
-
 
     elements.sheepRoute.append(sheepWrapper)
     transformPos({
@@ -150,12 +204,10 @@ function init() {
       delay: sheepTiming.jump
     })
 
+    if (Math.random() < 0.3) triggerBaa(sheep, sheepTiming.total)
+
     setTimeout(()=> { // stopRun
-      clearInterval(filteredSheepData(sheepNo).interval)
-      sheepInnerWrapper.childNodes[1].style.transform = `translateX(${px(0 * -64)})`
-      elements.counter.innerHTML = sheepNo + 1
-      elements.counter.classList.add('enlarge')
-      if (Math.random() < 0.5) sheepInnerWrapper.classList.add('roll')
+      stopSheep(sheepInnerWrapper, sheepNo)
     }, sheepTiming.stopRun)
 
     timeoutTransform({ // land
@@ -173,21 +225,18 @@ function init() {
         data: filteredSheepData(sheepNo)
       })
       elements.counter.classList.remove('enlarge')
-      // sheepInnerWrapper.style.transition = '0s'
       sheepInnerWrapper.classList.remove('roll')
     }, sheepTiming.resumeRun)
-
 
     setTimeout(()=> {
       elements.sheepRoute.removeChild(sheepWrapper)
       sheepData = sheepData.filter(s => s.sheepId !== sheepNo)
     }, sheepTiming.total)
   }
-  
+
   createSheep()
   setInterval(()=>{
     createSheep()
-    // elements.counter.innerHTML = sheepCount
   }, 1000 * 2)
 
 }
