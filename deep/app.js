@@ -75,10 +75,11 @@ function init() {
     wrapper: document.querySelector('.wrapper'),
     ocean: document.querySelector('.ocean'),
     oceanContent: document.querySelector('.ocean-content'),
-    control: document.querySelector('.touch_circle')
+    control: document.querySelector('.touch_circle'),
+    indicator: document.querySelector('.indicator')
   }
 
-  const touchControl = { active: false }
+  const touchControl = { active: false, timer: null, direction: null }
 
   const oceanData = {
     lightPos: {
@@ -208,13 +209,16 @@ function init() {
   const handleKey = ({ e, letter }) => {
     const key = e?.key.toLowerCase().replace('arrow','')[0] || letter
     if (subData.direction !== key) {
-      subData.direction = key
       clearInterval(subData.interval)
+      subData.direction = key
+      elements.indicator.innerHTML = key
       subData.interval = setInterval(()=> {
-        moveAround(key)
+        if (!subData.direction) {
+          clearInterval(subData.interval) 
+        } else {
+          moveAround(key)
+        }
       }, 100) 
-    } else {
-      subData.direction = null
     }
   }
 
@@ -246,9 +250,9 @@ function init() {
       mouse.up(document, 'add', onLetGo)
       mouse.move(document, 'add', onDrag)
       touchControl.active = true
-      subData.interval = setInterval(()=> {
+      touchControl.timer = setInterval(()=> {
         if (touchControl.active) handleKeyAction({ letter: touchControl.direction })
-      }, 100)
+      }, 200)
     }
     const onDrag = e =>{
       const x = roundedClient(e, 'X')
@@ -265,7 +269,7 @@ function init() {
       setTimeout(()=>{
         target.style.transition = '0s'
       }, 200)
-      clearInterval(subData.interval)
+      clearInterval(touchControl.timer)
       touchControl.active = false
       subData.direction = null
     }
@@ -274,12 +278,11 @@ function init() {
 
   addTouchAction(elements.control, handleKey)
 
-  window.addEventListener('keydown', moveAround)
 
   window.addEventListener('keydown', e => handleKey({ e }))
   window.addEventListener('keyup', ()=> {
-    clearInterval(subData.interval)
     subData.direction = null
+    clearInterval(subData.interval)
   })
 
   // TODO need reposition

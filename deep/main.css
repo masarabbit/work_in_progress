@@ -23,6 +23,14 @@ body {
   text-transform: uppercase;
 }
 
+.indicator {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  color: white;
+  z-index: 999;
+}
+
 .wrapper {
   position: fixed;
   width: 100%;
