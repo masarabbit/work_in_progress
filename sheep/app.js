@@ -26,7 +26,7 @@ function init() {
   const elements = {
     wrapper: document.querySelector('.wrapper'),
     sheepRoute: document.querySelector('.sheep-route'),
-    counter: document.querySelector('.counter')
+    counter: document.querySelector('.counter'),
   }
 
   const nearestN = (x, n) => x === 0 ? 0 : (x - 1) + Math.abs(((x - 1) % n) - n)
@@ -52,7 +52,7 @@ function init() {
 
   const animateCell = ({ target, frameW, end, data, speed }) => {
     let i = 0
-    clearInterval(data.interval)
+    clearInterval(data?.interval)
     data.interval = setInterval(()=> {
       target.style.transform = `translateX(${px(i * -frameW)})`
       i = i >= end
@@ -74,7 +74,7 @@ function init() {
       jump: total * 0.26 - 200,
       stopRun: total * 0.26,
       land: total * 0.26 + 400,
-      resumeRun: total * 0.26 + 700,
+      resumeRun: total * 0.26 + 750,
       total,
     }
   }
@@ -109,15 +109,17 @@ function init() {
   }
 
   const stopSheep = (sheep, sheepNo) => {
-    clearInterval(filteredSheepData(sheepNo).interval)
-    elements.counter.innerHTML = sheepNo + 1
-    elements.counter.classList.add('enlarge')
-    if (Math.random() < 0.1) {
-      sheep.classList.add('roll')
-      sheep.childNodes[1].style.transform = `translateX(${px(2 * -64)})`
-    } else {
-      sheep.childNodes[1].style.transform = `translateX(${px(0 * -64)})`
-    }
+    if (!sheep.parentNode.classList.contains('hide')) {
+      clearInterval(filteredSheepData(sheepNo)?.interval)
+      elements.counter.innerHTML = sheepNo + 1
+      elements.counter.classList.add('enlarge')
+      if (Math.random() < 0.1) {
+        sheep.classList.add('roll')
+        sheep.childNodes[1].style.transform = `translateX(${px(2 * -64)})`
+      } else {
+        sheep.childNodes[1].style.transform = `translateX(${px(0 * -64)})`
+      }
+    } 
   }
 
   const createSheep = () => {
@@ -178,7 +180,7 @@ function init() {
     timeoutTransform({ // jump
       target: sheep,
       transition: 2,
-      y: height - 200 - randomN(100),
+      y: height - 180 - randomN(100),
       delay: sheepTiming.jump
     })
 
@@ -190,7 +192,7 @@ function init() {
 
     timeoutTransform({ // land
       target: sheep,
-      transition: 1.5,
+      transition: 1.8,
       y: height - 44,
       delay: sheepTiming.land
     })
@@ -216,6 +218,18 @@ function init() {
   setInterval(()=>{
     createSheep()
   }, 1000 * 2)
+
+  window.addEventListener('resize', ()=>{
+    // resets sheep on resize because resizing messes up timing for sheep jump
+    sheepData.count = 0
+    elements.counter.innerHTML = 0
+    document.querySelectorAll('.sheep-wrapper').forEach(s => {
+      const sheep = s.childNodes[1]
+      sheep.style.transition = '0s'
+      sheep.classList.add('hide')
+    })
+  })
+
 
 }
 
