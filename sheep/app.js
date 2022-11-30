@@ -39,7 +39,6 @@ function init() {
     if (w) target.style.width = w
     if (y) target.style.top = y
     if (x) target.style.left = x
-    if (isNum(deg)) target.style.transform = `rotate(${deg}deg)` // TODO maybe not required for this app
   }
 
   const singleSvgWrapper = ({ content, color, w, h }) => {
