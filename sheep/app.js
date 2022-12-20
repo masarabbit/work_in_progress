@@ -30,11 +30,10 @@ function init() {
   }
 
   const nearestN = (x, n) => x === 0 ? 0 : (x - 1) + Math.abs(((x - 1) % n) - n)
-  const isNum = x => typeof x === 'number'
   const px = num => `${num}px`
   const randomN = max => Math.ceil(Math.random() * max)
 
-  const setStyles = ({ target, h, w, x, y, deg }) =>{
+  const setStyles = ({ target, h, w, x, y }) =>{
     if (h) target.style.height = h
     if (w) target.style.width = w
     if (y) target.style.top = y
