@@ -50,8 +50,8 @@
         const { height, width } = elements.wrapper.getBoundingClientRect()
         const missileData = {
           deg: 0,
-          x: 0,
-          y: height - 30,
+          x: width / 2,
+          y: height - 15,
         }
         const { x, y, deg } = missileData 
         setStyles({
@@ -61,10 +61,11 @@
         setInterval(()=>{
           // missileData.x = missileData.x + 20
           // missileData.y = missileData.y - 10
-          missileData.x = missileData.x + (control.x > missileData.x ? 20 : -20)
-          missileData.y = missileData.y + (control.y > missileData.y ? 20 : -20)
-          const angle = radToDeg(Math.atan2(missileData.y - control.y, missileData.x - control.x))
+          missileData.x = missileData.x + (control.x > (missileData.x + 40) ? 20 : -20)
+          missileData.y = missileData.y + (control.y > (missileData.y - 15) ? 20 : -20)
+          const angle = radToDeg(Math.atan2(missileData.y - control.y, missileData.x - control.x)) + 180
           const adjustedAngle = angle < 0 ? angle + 360 : angle
+          //! maybe adjust based on current deg and new deg, and work out what the easiest way to adjust it is
           missileData.deg = adjustedAngle
 
           // adjust based on target?
@@ -72,21 +73,36 @@
           elements.indicator.innerHTML = `x: ${x} y: ${y} deg: ${deg}`
           setStyles({
             target: missile,
-            x, y, deg
+            x: x + 40, 
+            y: y - 15, 
+            deg
           })
-        }, 100)
+        }, 10)
         elements.wrapper.append(missile)
       }
     })
 
-    elements.wrapper.addEventListener('click', e =>{
+    // elements.wrapper.addEventListener('click', e =>{
+    //   // const target = document.createElement('div')
+    //   control.x = e.clientX 
+    //   control.y = e.clientY 
+    //   setStyles({
+    //     target: elements.target,
+    //     x: control.x - 20,
+    //     y: control.y - 20
+    //   })
+    //   console.log(e)
+  
+    // })
+
+    elements.wrapper.addEventListener('mousemove', e =>{
       // const target = document.createElement('div')
-      control.x = e.clientX - 20
-      control.y = e.clientY - 20
+      control.x = e.clientX 
+      control.y = e.clientY 
       setStyles({
         target: elements.target,
-        x: control.x,
-        y: control.y
+        x: control.x - 20,
+        y: control.y - 20
       })
       console.log(e)
   
