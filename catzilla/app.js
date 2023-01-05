@@ -23,7 +23,7 @@ function init() {
   const control = {
     x: null,
     y: null,
-    angle: 360,
+    angle: 0,
   }
 
   const nearestN = (n, denom) =>{
@@ -50,10 +50,10 @@ function init() {
       const { height, width } = elements.wrapper.getBoundingClientRect()
       const missileData = {
         deg: 0,
-        // x: 0,
-        // y: height - 30,
-        x: width / 2,
-        y: height / 2,
+        x: 0,
+        y: height - 30,
+        // x: width / 2,
+        // y: height / 2,
       }
       const { x, y, deg } = missileData 
       setStyles({
@@ -63,16 +63,17 @@ function init() {
       setInterval(()=>{
         // missileData.x = missileData.x + 20
         // missileData.y = missileData.y - 10
-        // missileData.x = missileData.x + (control.x > missileData.x ? 20 : -20)
-        // missileData.y = missileData.y + (control.y > missileData.y ? 20 : -20)
-        const angle = radToDeg(Math.atan2(missileData.y - control.y, missileData.x - control.x))
+        missileData.x = missileData.x + (control.x > missileData.x ? 20 : -20)
+        missileData.y = missileData.y + (control.y > missileData.y ? 20 : -20)
+        const angle = radToDeg(Math.atan2(missileData.y - control.y, missileData.x - control.x)) - 90
         const adjustedAngle = angle < 0 ? angle + 360 : angle
         console.log('test', Math.abs(adjustedAngle - missileData.deg))
         // if ( )
         // TODO need some way to rotate the correct way when turning between number close to 0 and number close to 360
-        missileData.deg = Math.abs(adjustedAngle - missileData.deg) > 270 
-          ? 360 - adjustedAngle
-          : adjustedAngle
+        // missileData.deg = Math.abs(adjustedAngle - missileData.deg) > 270 
+        //   ? 360 - adjustedAngle
+        //   : adjustedAngle
+        missileData.deg = adjustedAngle
 
         // adjust based on target?
         const { x, y, deg } = missileData 

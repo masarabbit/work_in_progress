@@ -46,12 +46,12 @@ p, h1, h2, h3, h4 {
 
 .missile {
   position: absolute;
-  width: 40px;
-  height: 15px;
+  width: 15px;
+  height: 40px;
   background-color: grey;
-  transition: left center;
+  transition: bottom center;
   border-top-left-radius: 50%;
-  border-bottom-left-radius: 50%;
+  border-top-right-radius: 50%;
 }
 
 .sign {
