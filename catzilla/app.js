@@ -77,9 +77,9 @@ const config = {
       const { height, width } = elements.wrapper.getBoundingClientRect()
       const missileData = {
         deg: 0,
-        x: 0,
+        // x: 0,
         y: height - 30,
-        // x: width / 2,
+        x: width / 2,
         // y: height / 2,
       }
       const { x, y, deg } = missileData 
@@ -103,7 +103,6 @@ const config = {
 
         const angle = radToDeg(Math.atan2(missileData.y - control.y, missileData.x - control.x)) - 90
         const adjustedAngle = adjustAngle(angle)
-
         const diff = Math.abs((adjustedAngle) - adjustAngle(missileData.deg))
 
         if (diff >= 20) missileData.deg = adjustAngle(missileData.deg + config[direction])
@@ -122,7 +121,6 @@ const config = {
   })
 
   elements.wrapper.addEventListener('click', e =>{
-    // const target = document.createElement('div')
     control.x = e.clientX - 20
     control.y = e.clientY - 20
     setStyles({

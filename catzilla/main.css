@@ -42,6 +42,7 @@ p, h1, h2, h3, h4 {
   height: 40px;
   border: red 1px solid;
   border-radius: 50%;
+  transition: 0.2s;
 }
 
 .missile {
@@ -49,7 +50,7 @@ p, h1, h2, h3, h4 {
   width: 16px;
   height: 40px;
   background-color: grey;
-  transition: center;
+  transition: center top;
   border-top-left-radius: 50%;
   border-top-right-radius: 50%;
 }
