@@ -91,7 +91,6 @@ const config = {
         if (overBuffer({ a: missileData.x, b:control.x, buffer: 10})) missileData.x = missileData.x + (control.x > missileData.x ? 20 : -20)
         if (overBuffer({ a: missileData.y, b:control.y, buffer: 10})) missileData.y = missileData.y + (control.y > missileData.y ? 20 : -20)
 
-
         const direction = getDirection({
           targetX: control.x,
           targetY: control.y,
@@ -106,9 +105,10 @@ const config = {
         const diff = Math.abs((adjustedAngle) - adjustAngle(missileData.deg))
 
         if (diff >= 20) missileData.deg = adjustAngle(missileData.deg + config[direction])
+        // if (diff >= 20) missileData.deg += config[direction]
 
         // target
-        elements.indicator.innerHTML = `targetAngle: ${adjustedAngle} | missileAngle: ${missileData.deg} |adjustedMissileAngle: ${adjustAngle(missileData.deg)} | diff: ${diff} | config: ${config[direction]}`
+        elements.indicator.innerHTML = `targetAngle: ${adjustedAngle} | missileAngle: ${missileData.deg} |adjustedMissileAngle: ${adjustAngle(missileData.deg)} | diff: ${diff} | config: ${config[direction]} | ${direction}`
 
         const { x, y, deg } = missileData 
         setStyles({
