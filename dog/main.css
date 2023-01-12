@@ -1,0 +1,124 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+  background-color: rgb(110, 96, 88);
+}
+
+p, h1, h2, h3, h4 {
+  display: inline-block;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
+}
+
+
+.indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+}
+
+.wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+}
+
+.red {
+  border: 1px solid red;
+}
+
+.leg {
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAJCAYAAAARml2dAAAAAXNSR0IArs4c6QAAACtJREFUGFdjZGBg+P///38GZMDIyMjAOGglQC6FOxnkVAYGBggJBTDPgMUAfbghA6EIXQgAAAAASUVORK5CYII=);
+  width: calc(2 * 6px);
+  height: calc(2 * 9px);
+  background-size: calc(2 * 6px) calc(2 * 9px) !important; 
+}
+
+.body {
+  position: absolute;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAAAwCAYAAAAvvfcmAAAAAXNSR0IArs4c6QAABDFJREFUeF7tnNF2gzAMQ8f/f3R3RimHMiCWIzuBaK8NRL624hDaTT/6EwERuC2B6bbKJVwEROBHBlYRiMCNCcjAN06epIsA08AvACdzXmBaDRWBZxGoNdJq2tfL7t9p+pq2VsOzMqJoRAAgUGOeF2LaM02LmWt0AOFqqAg8i4DXOBTzflDKxM8qKkWTR8BjYKp5ZeK8ZGum5xGQgZ+XU0U0EAHUwCHdV114oIpTqFQCMjAVp24mArkEZGCcd+l9GcoUV6ArRGAhgBRb6Pb5Btvo2bilV2ebd9wIWxWkCLgIIEU2ooFdX1T5y4SM7KpHXQQSkIGPgZm6rYW13nFbKGmMl4AM/E2OZtztbafdd0e9ydJ1IrAnIAO/iYQYVyaW4aIJyMDzuVTpYLk+DdpKFxlak4DUbHFS4gCr/vW8ljE3AuOJhZ4S0+ZQC+HNyG/P96ja9XRySMg45JzLw5so64VphZ5Y7KkxLXFZeXvyiXaAozki9W3no7JvtLuhxVCj35owmlhLZdYEZLn/+3Uuo96Nsy3DyHFVdbAr5cHdLYQ9mW0psfQYvPpHNDAdfinb60PP+x8ZWJmf3TbMuPsJA4wcyt5rAmv+lnFhMXj0W4spTPThPo5T6Id5SQ1kp8CToN0tmsgn6P6EEa6fqPV0AY3avXm0D2Xg8OopLOWeBPVgYOK5REoKCJyvMhkWg0e3DAzun2qGexK0mS+scKwxVer/myY1hoAv0ITrRxmPZOBw+CUjoMnppfsSn+FTc1DJ+yid4fpRzTJwyXXEz9HkyMD18CuZ7wXIwJaUkKGnHaCUYqvc0oUXj0H//DhcGlf4PDUOYi2l6UY0I8lICQARDxZSiv4zTYS4muq/20HWNg8E9qnP74jeYQzcsvqRhKS/uwBWQUYcy3Tp6SBoT9OMaB3GwNknoMSDn/lWadVzYWiksHraRm9ygdR7+vOvp2bQgELriFggXTQycjyh7C2N+M7xELSn8Ue0ogaem8HSESw5N41ZBDMOSErzpSQhKJ4U7YHP8M06Gun5PY1/tIE/iag2clChF03MXoACDky62EEkxNWlKU7gd6nV04H/raSoIRoZt1r31cqQGFNaIW06V9juKCsYpKuNZuCvjlxqf8vnjIXDOFVxmHsnsTFtWIGfFRO6aBYp7AY8bUGSgdEKuOd464+Ee1mA3P8R4ig9LRekqF/4fOKUge9pyNFUWxegMy4tF6bQ3XTlt+DWXWZvC03LhI1mLsVbJhBiYkL3lYHLudMIEZgJUE1MNC9d28VjjLmxmgequEQgkYD7YHH3zBtxuEhdYLZMPYuNDJxYlZoKJgAZOekQTgaG06gLRidgPZzLakh0E3u6b8T2YvRCU/zjEKCZ2GteGXicYlOkMQTc7+FZ2/2sLUcMPt1VBPohYN3mr+dsDOkyMIOi7iECjQj8Alde9kBUBa4xAAAAAElFTkSuQmCC);
+  width: calc(2 * 5 * 48px);
+  height: calc(2 * 48px);
+  background-size: calc(2 * 5 * 48px) calc(2 * 48px) !important; 
+}
+
+.dog {
+  position: absolute;
+  width: calc(2 * 48px);
+  height: calc(2 * 48px);
+  border: blue 1px solid;
+}
+
+.head {
+  position: absolute;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJsAAAAgCAYAAAAFbAo6AAAAAXNSR0IArs4c6QAAAzVJREFUeF7tWtGWrCAM0///aPesK9yKLU21gF46T3NGx9A0pAVcl/gEA50YWDvhBEwwsHxJbNuyfGq8Ia+Cga+Ibdu2bVnXfbhfGXOILcTmooG3uezbxsOSjLqENRjr/TUF7K6WPi9wt7e5bIvxWPMH3Y+IrQzmX+avEvl9nnfwGS+J7ldw5fdDhFmTLv7195AdP5VxaQwED+HUMjyWbyF+D+xm+UYGl8Gpw0hsJSE4OdDJ1UpMisW4H+3vUsKQeBNMFhl11RKn5ISI3oJVhnbB5vimk24P1qenbZZvjZBLCasJzjF4E9klrpQYcHEhYnPxSXzcTDwUtyR+8ruWV8krmuZbGhSrbi2pUjKMxFfdzOIynBMqgoOw0RroEbfGea3CgJPr6BL+Vvuac1M8a745sbkSbmzsYWwrMUCZgbFRsQGYuWRzDim1CSg+KPZucZdiawIMCs4Nm1tAKIl3w75Zwln8p2IDxN417v9ebIRwumC4NOTI4gd1FGP5rgpN68+0MSnuNkxsTYEVd5sVO/dLnEAt/VPt/4LgunNOna07OCEosAu13F0YcE4YYjuT+3mxpf01ZWsIblueiq1cNTIr0+6ch7MdJx5a76Ndr4mtcrrRPeFaNUEmjdCTnrZNuLZpNrF12+qRElI4jLvYqFiU0xxxYXI0ktr8yteBiXZ5Xcc9cMM2QHPsEasy4ETlVtxScqmD0rNTYXPXhM09G1Ej5f00003oCBJzz1rUFM3Wb8Jc/jZCbMW2C7v1codzrdSV+4zSSYIF+4HYssbeUkbFLQBHsWnnhRbubw1LmGhNcIk4qkeSUiDcAgX9TVqcwKujW+wyy/meZ5Nck6rE0STxh8PVxP4IVzoxeYIrHQdKvyMtU7eGGTync3U4YHZzHJnevNAmoWEMj3DL0urBt1Q6kZLK4YsWa12R1Oz4uKaVMfoIF+INbz24iq6y1aFpc6f9CfcGcbvxzZRNtj/VBFB7KxchjgVF/5iIP0RjGYsWl2EI+62jsHvjUrxTP88QJl0XufdOijWJcf9EDITYJkr26FBDbKMzMBF+iG2iZI8ONcQ2OgMT4YfYJkr26FBDbKMzMBH+DzkhgD/cZwg3AAAAAElFTkSuQmCC);
+  width: calc(2 * 5 * 31px);
+  height: calc(2 * 32px);
+  background-size: calc(2 * 5 * 31px) calc(2 * 32px) !important; 
+}
+
+.body-wrapper {
+  position: absolute;
+  width: calc(2 * 48px);
+  height: calc(2 * 48px);
+  /* border: yellow 1px solid; */
+  overflow: hidden;
+}
+
+.head-wrapper {
+  position: absolute;
+  top: 5px;
+  left: 17px;
+  width: calc(2 * 31px);
+  height: calc(2 * 32px);
+  /* border: rgb(255, 0, 242) 1px solid; */
+  overflow: hidden;
+}
+
+.flip {
+  transform: scale(-1, 1);
+}
+
+.img-bg {
+  image-rendering: pixelated;
+  background-repeat: no-repeat !important;
+}
+
+
+
+.sign {
+  position: absolute;
+  color: white;
+  bottom: 10px;
+  right: 10px;
+  font-size: 10px;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.indicator {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  color: black;
+}
