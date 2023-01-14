@@ -45,25 +45,19 @@ function init() {
   //   return nearestN(adjustedAngle, 45)
   // }
 
-const getDirection = ({x, y, xSpeed, ySpeed, targetX, targetY}) => {
-	const cross = xSpeed * (targetY - y) - ySpeed * (targetX - x)
-	return cross > 0 ? 'left' : 'right'
+const getDirection = ({ pos, facing, target }) =>{
+  const dx2 = facing.x - pos.x
+  const dy1 = pos.y - target.y
+  const dx1 = target.x - pos.x
+  const dy2 = pos.y - facing.y
+
+  return dx2 * dy1 > dx1 * dy2 ? 'anti-clockwise' : 'clockwise'
 }
 
-// const rotateVector = ({ dx, dy, rotate }) =>
-// {
-// 	const rot = rotate * ( Math.PI() / 180 )
-
-// 	const rx = Math.cos(rot) * dx - Math.sin(rot) * dy
-// 	const ry = Math.sin(rot) * dx + Math.cos(rot) * dy
-
-// 	dx = rx
-// 	dy = ry
-// }
 
 const config = {
-  left: -20,
-  right: 20
+  'anti-clockwise': -20,
+  clockwise: 20
 }
 
   elements.indicator.innerHTML = 'test'
@@ -78,9 +72,16 @@ const config = {
       const missileData = {
         deg: 0,
         // x: 0,
-        y: height - 30,
-        x: width / 2,
-        // y: height / 2,
+        pos: {
+          y: height - 30,
+          // y: height / 2,
+          x: width / 2,
+        },
+        facing: {
+          y: height - 60,
+          // y: height / 2 - 60,
+          x: width / 2,
+        }
       }
       const { x, y, deg } = missileData 
       setStyles({
@@ -88,29 +89,31 @@ const config = {
         x, y, deg
       })
       setInterval(()=>{
-        if (overBuffer({ a: missileData.x, b:control.x, buffer: 10})) missileData.x = missileData.x + (control.x > missileData.x ? 20 : -20)
-        if (overBuffer({ a: missileData.y, b:control.y, buffer: 10})) missileData.y = missileData.y + (control.y > missileData.y ? 20 : -20)
+        if (overBuffer({ a: missileData.pos.x, b:control.x, buffer: 10})) missileData.pos.x = missileData.pos.x + (control.x > missileData.pos.x ? 20 : -20)
+        if (overBuffer({ a: missileData.pos.y, b:control.y, buffer: 10})) missileData.pos.y = missileData.pos.y + (control.y > missileData.pos.y ? 20 : -20)
 
         const direction = getDirection({
-          targetX: control.x,
-          targetY: control.y,
-          xSpeed: 5,
-          ySpeed: 5,
-          x: missileData.x,
-          y: missileData.y
+          target: control,
+          pos: missileData.pos,
+          facing: missileData.facing,
         })
 
-        const angle = radToDeg(Math.atan2(missileData.y - control.y, missileData.x - control.x)) - 90
+        const angle = radToDeg(Math.atan2(missileData.pos.y - control.y, missileData.pos.x - control.x)) - 90
         const adjustedAngle = adjustAngle(angle)
         const diff = Math.abs((adjustedAngle) - adjustAngle(missileData.deg))
 
-        if (diff >= 20) missileData.deg = adjustAngle(missileData.deg + config[direction])
-        // if (diff >= 20) missileData.deg += config[direction]
+        // TODO need logic similar to angle logic in dog
+        if (diff >= 20) {
+          missileData.deg = missileData.deg += config[direction]
+        } else {
+          missileData.facing.x = control.x
+          missileData.facing.y = control.y
+        }
 
         // target
         elements.indicator.innerHTML = `targetAngle: ${adjustedAngle} | missileAngle: ${missileData.deg} |adjustedMissileAngle: ${adjustAngle(missileData.deg)} | diff: ${diff} | config: ${config[direction]} | ${direction}`
 
-        const { x, y, deg } = missileData 
+        const { pos: { x, y }, deg } = missileData 
         setStyles({
           target: missile,
           x, y, deg

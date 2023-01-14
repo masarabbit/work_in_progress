@@ -160,11 +160,11 @@ function init() {
     }), speed || 150)
   }
 
-  const getDirection = ({dogX, dogY, facingX, facingY, targetX, targetY}) =>{
-    const dx2 = facingX - dogX
-    const dy1 = dogY - targetY
-    const dx1 = targetX - dogX
-    const dy2 = dogY - facingY
+  const getDirection = ({ pos, facing, target }) =>{
+    const dx2 = facing.x - pos.x
+    const dy1 = pos.y - target.y
+    const dx1 = target.x - pos.x
+    const dy2 = pos.y - facing.y
 
     return dx2 * dy1 > dx1 * dy2 ? 'anit-clockwise' : 'clockwise'
   }
@@ -261,12 +261,9 @@ function init() {
     // console.log('test', directionConversions[clickedAngle(currentDog)], angles.indexOf(currentDog.angle), currentDog.angle)
 
     const direction = getDirection({ 
-      dogX: currentDog.pos.x,
-      dogY: currentDog.pos.y,
-      facingX: currentDog.facing.x,
-      facingY: currentDog.facing.y,
-      targetX: control.x,
-      targetY: control.y
+      pos: currentDog.pos,
+      facing: currentDog.facing,
+      target: control,
     })
 
     const start = angles.indexOf(currentDog.angle)
