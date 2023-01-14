@@ -46,7 +46,7 @@ p, h1, h2, h3, h4 {
   width: calc(2 * 6px);
   height: calc(2 * 9px);
   background-size: calc(2 * 6px) calc(2 * 9px) !important; 
-  transition: 0.2s;
+  transition: 0.15s;
 }
 
 .body {
@@ -78,8 +78,8 @@ p, h1, h2, h3, h4 {
 .green { background-color: green; }
 
 .body-wrapper {
-  /* z-index: 1; */
-  opacity: 0.4;
+  z-index: 1;
+  /* opacity: 0.4; */
   position: absolute;
   width: calc(2 * 48px);
   height: calc(2 * 48px);
@@ -88,8 +88,8 @@ p, h1, h2, h3, h4 {
 }
 
 .head-wrapper {
-  /* z-index: 1; */
-  opacity: 0.4;
+  z-index: 1;
+  /* opacity: 0.4; */
   position: absolute;
   top: 5px;
   left: 17px;

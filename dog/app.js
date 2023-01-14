@@ -58,16 +58,16 @@ function init() {
       4: { x: 9, y: 65 },
     }, //2
     {
-      1: { x: 0, y: 0 },
-      2: { x: 0, y: 0 },
-      3: { x: 0, y: 0 },
-      4: { x: 0, y: 0 },
+      1: { x: 47, y: 66 },
+      2: { x: 63, y: 62 },
+      3: { x: 12, y: 57 },
+      4: { x: 29, y: 54 },
     }, //3
     {
-      1: { x: 0, y: 0 },
-      2: { x: 0, y: 0 },
-      3: { x: 0, y: 0 },
-      4: { x: 0, y: 0 },
+      1: { x: 28, y: 62 },
+      2: { x: 55, y: 62 },
+      3: { x: 28, y: 25 },
+      4: { x: 55, y: 25 },
     }, //4
     {
       1: { x: 20, y: 63 },
@@ -76,16 +76,16 @@ function init() {
       4: { x: 72, y: 60 },
     }, //5
     {
-      1: { x: 0, y: 0 },
-      2: { x: 0, y: 0 },
-      3: { x: 0, y: 0 },
-      4: { x: 0, y: 0 },
+      1: { x: 23, y: 64 },
+      2: { x: 30, y: 68 },
+      3: { x: 62, y: 64 },
+      4: { x: 69, y: 68 },
     }, //6
     {
-      1: { x: 0, y: 0 },
-      2: { x: 0, y: 0 },
-      3: { x: 0, y: 0 },
-      4: { x: 0, y: 0 },
+      1: { x: 44, y: 53 },
+      2: { x: 23, y: 57 },
+      3: { x: 72, y: 74 },
+      4: { x: 50, y: 81 },
     }, //7
   ]
 
@@ -121,13 +121,13 @@ function init() {
 
 
   const animateDog = ({ target, frameW, currentFrame, end, data, part, speed, direction }) => {
-    const offset = direction === 'right' ? 1 : -1
+    const offset = direction === 'clockwise' ? 1 : -1
 
     // ? update indicator
-    elements.indicator.innerHTML = `angle: ${data.angle} | currentFrame: ${currentFrame} | direction: ${direction} | offset: ${offset} | frameOffset: ${data.animation[currentFrame][0] * frameW * offset}`
+    elements.indicator.innerHTML = `angle: ${data.angle} | currentFrame: ${currentFrame} | direction: ${direction} | offset: ${offset} | frameOffset: ${data.animation[currentFrame][0] * frameW * offset} | ${data.facing.x} / ${data.facing.y} `
 
     target.style.transform = `translateX(${px(data.animation[currentFrame][0] * -frameW)})`
-    positionLegs(data.dog, currentFrame)
+    if (part === 'body') positionLegs(data.dog, currentFrame)
     data.angle = angles[currentFrame]
 
     target.parentNode.classList.remove('flip')
@@ -145,6 +145,9 @@ function init() {
         currentFrame: nextFrame, end, direction,
         speed,
       }), speed || 150)
+    } else {
+      data.facing.x = control.x
+      data.facing.y = control.y
     }
   }
 
@@ -157,17 +160,22 @@ function init() {
     }), speed || 150)
   }
 
-  const getDirection = ({ x, y, targetX, targetY }) => {
-    const cross = (targetY - y) - (targetX - x)
-    return cross > 0 ? 'left' : 'right'
+  const getDirection = ({dogX, dogY, facingX, facingY, targetX, targetY}) =>{
+    const dx2 = facingX - dogX
+    const dy1 = dogY - targetY
+    const dx1 = targetX - dogX
+    const dy2 = dogY - facingY
+
+    return dx2 * dy1 > dx1 * dy2 ? 'anit-clockwise' : 'clockwise'
   }
 
-  //  A ---- A  ________ __________
-  // |        |         |          |
-  // |        |         |          |
-  //  ________ _________|__________|
-  //           | |  | |   | |   | |
-  //            1    2     3     4
+
+  //  A ---- A  ________ ________
+  // |        |         |        |
+  // |        |         |        |
+  //  ________ _________|________|
+  //           | |  | |  | |  | |
+  //            1    2    3    4
   //           red blue yellow green
   const createDog = () => {
     const dog = document.createElement('div')
@@ -179,47 +187,47 @@ function init() {
       <div class="head-wrapper">
         <div class="head img-bg"></div>
       </div>
-      <div class="leg red img-bg"></div>
-      <div class="leg blue img-bg"></div>
-      <div class="leg yellow img-bg"></div>
-      <div class="leg green img-bg"></div>
+      <div class="leg img-bg"></div>
+      <div class="leg img-bg"></div>
+      <div class="leg img-bg"></div>
+      <div class="leg img-bg"></div>
     `
     // console.log(dog.childNodes[5], dog.childNodes[7], dog.childNodes[9], dog.childNodes[11])
-    // 1: { x: 61, y: 65 },
-    // 2: { x: 44, y: 62 },
-    // 3: { x: 28, y: 71 },
-    // 4: { x: 9, y: 65 },
-    const body = dog.childNodes[1].childNodes[1]
-    const head = dog.childNodes[3].childNodes[1]
-    setStyles({
-      target: dog.childNodes[5],
-      x: px(61), y: px(65),
-    })
-    setStyles({
-      target: dog.childNodes[7],
-      x: px(44), y: px(62),
-    })
-    setStyles({
-      target: dog.childNodes[9],
-      x: px(28), y: px(71),
-    })
-    setStyles({
-      target: dog.childNodes[11],
-      x: px(9), y: px(65),
-    })
+    // 1: { x: 44, y: 53 },
+    // 2: { x: 23, y: 57 },
+    // 3: { x: 72, y: 74 },
+    // 4: { x: 50, y: 81 },
+    // const body = dog.childNodes[1].childNodes[1]
+    // const head = dog.childNodes[3].childNodes[1]
+    // setStyles({
+    //   target: dog.childNodes[5],
+    //   x: px(44), y: px(53),
+    // })
+    // setStyles({
+    //   target: dog.childNodes[7],
+    //   x: px(23), y: px(57),
+    // })
+    // setStyles({
+    //   target: dog.childNodes[9],
+    //   x: px(72), y: px(74),
+    // })
+    // setStyles({
+    //   target: dog.childNodes[11],
+    //   x: px(50), y: px(81),
+    // })
     
-    // frame 2 * 31
-    setStyles({
-      target: head,
-      x: px(-(3 * 2 * 31)),
-    })
-    setStyles({
-      target: body,
-      x: px(-(3 * 2 * 48)),
-    })
+    // // frame 2 * 31
+    // setStyles({
+    //   target: head,
+    //   x: px(-(1 * 2 * 31)),
+    // })
+    // setStyles({
+    //   target: body,
+    //   x: px(-(1 * 2 * 48)),
+    // })
     elements.wrapper.append(dog)
     const { width, height, left, top } = dog.getBoundingClientRect()
-
+    positionLegs(dog, 0)
 
     const dogData = {
       timer: {
@@ -230,6 +238,10 @@ function init() {
       pos: {
         x: left + (width / 2),
         y: top + (height / 2),
+      },
+      facing: {
+        x: left + (width / 2),
+        y: top + (height / 2) - 30,
       },
       id: 'test-id',
       animation: animationFrames.rotate,
@@ -249,8 +261,10 @@ function init() {
     // console.log('test', directionConversions[clickedAngle(currentDog)], angles.indexOf(currentDog.angle), currentDog.angle)
 
     const direction = getDirection({ 
-      x: currentDog.pos.x,
-      y: currentDog.pos.y,
+      dogX: currentDog.pos.x,
+      dogY: currentDog.pos.y,
+      facingX: currentDog.facing.x,
+      facingY: currentDog.facing.y,
       targetX: control.x,
       targetY: control.y
     })
