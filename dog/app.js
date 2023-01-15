@@ -6,13 +6,13 @@ function init() {
     body: document.querySelector('.wrapper'),
     wrapper: document.querySelector('.wrapper'),
     indicator: document.querySelector('.indicator'),
-    dogs: [],
+    dog: null,
   }
 
   const control = {
     x: null,
     y: null,
-    angle: 360,
+    // angle: 360,
   }
 
   const nearestN = (x, n) => x === 0 ? 0 : (x - 1) + Math.abs(((x - 1) % n) - n)
@@ -38,85 +38,102 @@ function init() {
   }
 
   const angles = [360, 45, 90, 135, 180, 225, 270, 315]
-  const legPositions = [
-    {
-      1: { x: 25, y: 43 },
-      2: { x: 57, y: 43 },
-      3: { x: 25, y: 83 },
-      4: { x: 57, y: 83 },
-    }, //0
-    {
-      1: { x: 36, y: 56 },
-      2: { x: 59, y: 56 },
-      3: { x: 12, y: 75 },
-      4: { x: 32, y: 80 },
-    }, //1
-    {
-      1: { x: 61, y: 65 },
-      2: { x: 44, y: 62 },
-      3: { x: 28, y: 71 },
-      4: { x: 9, y: 65 },
-    }, //2
-    {
-      1: { x: 47, y: 66 },
-      2: { x: 63, y: 62 },
-      3: { x: 12, y: 57 },
-      4: { x: 29, y: 54 },
-    }, //3
-    {
-      1: { x: 28, y: 62 },
-      2: { x: 55, y: 62 },
-      3: { x: 28, y: 25 },
-      4: { x: 55, y: 25 },
-    }, //4
-    {
-      1: { x: 20, y: 63 },
-      2: { x: 40, y: 67 },
-      3: { x: 52, y: 57 },
-      4: { x: 72, y: 60 },
-    }, //5
-    {
-      1: { x: 23, y: 64 },
-      2: { x: 30, y: 68 },
-      3: { x: 62, y: 64 },
-      4: { x: 69, y: 68 },
-    }, //6
-    {
-      1: { x: 44, y: 53 },
-      2: { x: 23, y: 57 },
-      3: { x: 72, y: 74 },
-      4: { x: 50, y: 81 },
-    }, //7
+  const defaultEnd = 4
+  const partPositions = [
+    { //0
+      1: { x: 26, y: 43 },
+      2: { x: 54, y: 43 },
+      3: { x: 26, y: 75 },
+      4: { x: 54, y: 75 },
+      tail: { x: 40, y: 70, z: 1 },
+    }, 
+    { //1
+      1: { x: 33, y: 56 },
+      2: { x: 55, y: 56 },
+      3: { x: 12, y: 72 },
+      4: { x: 32, y: 74 },
+      tail: { x: 20, y: 64, z: 1 },
+    }, 
+    { //2
+      1: { x: 59, y: 60 },
+      2: { x: 42, y: 58 },
+      3: { x: 24, y: 64 },
+      4: { x: 9, y: 61 },
+      tail: { x: 5, y: 52, z: 1 },
+    }, 
+    { //3
+      1: { x: 39, y: 63 },
+      2: { x: 60, y: 56 },
+      3: { x: 12, y: 52 },
+      4: { x: 28, y: 50 },
+      tail: { x: 7, y: 21, z: 0 },
+    }, 
+    { //4
+      1: { x: 23, y: 54 },
+      2: { x: 56, y: 54 },
+      3: { x: 24, y: 25 },
+      4: { x: 54, y: 25 },
+      tail: { x: 38, y: 2, z: 0 },
+    }, 
+    { //5
+      1: { x: 21, y: 58 },
+      2: { x: 41, y: 64 },
+      3: { x: 53, y: 50 },
+      4: { x: 69, y: 53 },
+      tail: { x: 72, y: 22, z: 0 },
+    }, 
+    { //6
+      1: { x: 22, y: 59 },
+      2: { x: 30, y: 64 },
+      3: { x: 56, y: 59 },
+      4: { x: 68, y: 62 },
+      tail: { x: 78, y: 40, z: 0 },
+    }, 
+    { //7
+      1: { x: 47, y: 45 },
+      2: { x: 24, y: 53 },
+      3: { x: 68, y: 68 },
+      4: { x: 47, y: 73 },
+      tail: { x: 65, y: 65, z: 1 },
+    }, 
   ]
-
-  // const directionConversions = {
-  //   360: 'up',
-  //   45: 'upright',
-  //   90: 'right',
-  //   135: 'downright',
-  //   180: 'down',
-  //   225: 'downleft',
-  //   270: 'left',
-  //   315: 'upleft',
-  // }
 
   const positionLegs = (dog, frame) => {
     setStyles({
       target: dog.childNodes[5],
-      x: px(legPositions[frame][1].x), y: px(legPositions[frame][1].y),
+      x: px(partPositions[frame][1].x), y: px(partPositions[frame][1].y),
     })
     setStyles({
       target: dog.childNodes[7],
-      x: px(legPositions[frame][2].x), y: px(legPositions[frame][2].y),
+      x: px(partPositions[frame][2].x), y: px(partPositions[frame][2].y),
     })
     setStyles({
       target: dog.childNodes[9],
-      x: px(legPositions[frame][3].x), y: px(legPositions[frame][3].y),
+      x: px(partPositions[frame][3].x), y: px(partPositions[frame][3].y),
     })
     setStyles({
       target: dog.childNodes[11],
-      x: px(legPositions[frame][4].x), y: px(legPositions[frame][4].y),
+      x: px(partPositions[frame][4].x), y: px(partPositions[frame][4].y),
     })
+  }
+
+  const moveLegs = dog => {
+    ;[5, 11].forEach(i => dog.childNodes[i].childNodes[1].classList.add('walk-1'))
+    ;[7, 9].forEach(i => dog.childNodes[i].childNodes[1].classList.add('walk-2'))
+  }
+
+  const stopLegs = dog => {
+    ;[5, 11].forEach(i => dog.childNodes[i].childNodes[1].classList.remove('walk-1'))
+    ;[7, 9].forEach(i => dog.childNodes[i].childNodes[1].classList.remove('walk-2'))
+  }
+
+  const positionTail = (dog, frame) => { 
+    setStyles({
+      target: dog.childNodes[13],
+      x: px(partPositions[frame].tail.x), y: px(partPositions[frame].tail.y),
+    })
+    dog.childNodes[13].style.zIndex = partPositions[frame].tail.z
+    dog.childNodes[13].childNodes[1].classList.add('wag')
   }
 
 
@@ -127,7 +144,11 @@ function init() {
     elements.indicator.innerHTML = `angle: ${data.angle} | currentFrame: ${currentFrame} | direction: ${direction} | offset: ${offset} | frameOffset: ${data.animation[currentFrame][0] * frameW * offset} | ${data.facing.x} / ${data.facing.y} `
 
     target.style.transform = `translateX(${px(data.animation[currentFrame][0] * -frameW)})`
-    if (part === 'body') positionLegs(data.dog, currentFrame)
+    if (part === 'body') {
+      positionLegs(data.dog, currentFrame)
+      moveLegs(data.dog)
+      positionTail(data.dog, currentFrame)
+    }
     data.angle = angles[currentFrame]
 
     target.parentNode.classList.remove('flip')
@@ -148,6 +169,12 @@ function init() {
     } else {
       data.facing.x = control.x
       data.facing.y = control.y
+      setTimeout(()=> {
+        stopLegs(data.dog)
+      }, 200)
+      // setTimeout(()=> {
+      //   data.dog.childNodes[13].childNodes[1].classList.remove('wag')
+      // }, 5000)
     }
   }
 
@@ -161,12 +188,37 @@ function init() {
   }
 
   const getDirection = ({ pos, facing, target }) =>{
+    // https://qiita.com/tydesign/items/d41ac74b5effd87141b8
     const dx2 = facing.x - pos.x
     const dy1 = pos.y - target.y
     const dx1 = target.x - pos.x
     const dy2 = pos.y - facing.y
 
     return dx2 * dy1 > dx1 * dy2 ? 'anit-clockwise' : 'clockwise'
+  }
+
+  const turnDog = ({ dog, start, end, direction }) => {
+    triggerDogAnimation({ 
+      target: dog.dog.childNodes[3].childNodes[1],
+      frameW: 31 * 2,
+      start, end,
+      data: dog,
+      speed: 100,
+      direction,
+      part: 'head'
+    }) 
+    
+    setTimeout(()=>{
+      triggerDogAnimation({ 
+        target: dog.dog.childNodes[1].childNodes[1],
+        frameW: 48 * 2,
+        start, end,
+        data: dog,
+        speed: 100,
+        direction,
+        part: 'body'
+      }) 
+    }, 300)
   }
 
 
@@ -187,44 +239,23 @@ function init() {
       <div class="head-wrapper">
         <div class="head img-bg"></div>
       </div>
-      <div class="leg img-bg"></div>
-      <div class="leg img-bg"></div>
-      <div class="leg img-bg"></div>
-      <div class="leg img-bg"></div>
+      <div class="leg-wrapper">
+        <div class="leg one img-bg"></div>
+      </div>
+      <div class="leg-wrapper">
+        <div class="leg two img-bg"></div>
+      </div>
+      <div class="leg-wrapper">
+        <div class="leg three img-bg"></div>
+      </div>
+      <div class="leg-wrapper">
+        <div class="leg four img-bg"></div>
+      </div>
+      <div class="tail-wrapper">
+        <div class="tail img-bg"></div>
+      </div>
     `
-    // console.log(dog.childNodes[5], dog.childNodes[7], dog.childNodes[9], dog.childNodes[11])
-    // 1: { x: 44, y: 53 },
-    // 2: { x: 23, y: 57 },
-    // 3: { x: 72, y: 74 },
-    // 4: { x: 50, y: 81 },
-    // const body = dog.childNodes[1].childNodes[1]
-    // const head = dog.childNodes[3].childNodes[1]
-    // setStyles({
-    //   target: dog.childNodes[5],
-    //   x: px(44), y: px(53),
-    // })
-    // setStyles({
-    //   target: dog.childNodes[7],
-    //   x: px(23), y: px(57),
-    // })
-    // setStyles({
-    //   target: dog.childNodes[9],
-    //   x: px(72), y: px(74),
-    // })
-    // setStyles({
-    //   target: dog.childNodes[11],
-    //   x: px(50), y: px(81),
-    // })
     
-    // // frame 2 * 31
-    // setStyles({
-    //   target: head,
-    //   x: px(-(1 * 2 * 31)),
-    // })
-    // setStyles({
-    //   target: body,
-    //   x: px(-(1 * 2 * 48)),
-    // })
     elements.wrapper.append(dog)
     const { width, height, left, top } = dog.getBoundingClientRect()
     positionLegs(dog, 0)
@@ -241,23 +272,33 @@ function init() {
       },
       facing: {
         x: left + (width / 2),
-        y: top + (height / 2) - 30,
+        y: top + (height / 2) + 30,
       },
-      id: 'test-id',
+      // id: 'test-id',
       animation: animationFrames.rotate,
       angle: 360,
       dog,
     }
-    elements.dogs.push(dogData)
+    elements.dog = dogData
+    // elements.dogs.push(dogData)
+    turnDog({
+      dog: dogData,
+      start:0,
+      end: defaultEnd,
+      direction: 'clockwise'
+    })
+    positionTail(dog, 0)
   }
 
   createDog()
+
+
 
   elements.body.addEventListener('click', e =>{
     control.x = e.pageX 
     control.y = e.pageY
 
-    const currentDog = elements.dogs[0]
+    const currentDog = elements.dog
     // console.log('test', directionConversions[clickedAngle(currentDog)], angles.indexOf(currentDog.angle), currentDog.angle)
 
     const direction = getDirection({ 
@@ -268,29 +309,15 @@ function init() {
 
     const start = angles.indexOf(currentDog.angle)
     const end = angles.indexOf(clickedAngle(currentDog))
-
-    triggerDogAnimation({ 
-      target: currentDog.dog.childNodes[3].childNodes[1],
-      frameW: 31 * 2,
-      start, end,
-      data: currentDog,
-      speed: 100,
-      direction,
-      part: 'head'
-    }) 
+    // console.log(start, end, direction)
+    turnDog({
+      dog: currentDog,
+      start, end, direction
+    })
     
-    setTimeout(()=>{
-      triggerDogAnimation({ 
-        target: currentDog.dog.childNodes[1].childNodes[1],
-        frameW: 48 * 2,
-        start, end,
-        data: currentDog,
-        speed: 100,
-        direction,
-        part: 'body'
-      }) 
-    }, 300)
-    // TODO frames of the body need to be updated to correspond with head (it's the wrong way round)
+    // ? override
+    // const direction = 
+    // const end = 
   })
 
 
@@ -298,29 +325,3 @@ function init() {
   
 window.addEventListener('DOMContentLoaded', init)
 
-
-
-  // TODO maybe get part of the logic from penguin
-  // const animationFrames = {
-  //   walk: [0, 1, 2, 1, 3, 4],
-  //   stop: [0],
-  //   celebrate: [5, 6, 7, 6, 3, 4],
-  //   turnFromup: [0, 1, 2, 3, 4],
-  //   turnFromdUp: [1, 2, 3, 4],
-  //   turnFromside: [2, 3, 4],
-  //   turnFromdDown: [3, 4],
-  //   turnFromdown: [4],
-  // }
-
-  // const animateCell = ({ target, frameW, end, data, speed, interval }) => {
-  //   let i = 0
-  //   clearInterval(interval)
-  //   interval = setInterval(()=> {
-  //     target.style.transform = `translateX(${px(data.animation[i][0] * -frameW)})`
-  //     target.parentNode.classList.remove('flip')
-  //     if (data.animation[i][1] === 'f') target.parentNode.classList.add('flip')
-  //     i = i >= end
-  //       ? 0
-  //       : i + 1
-  //   }, speed || 150)
-  // }
