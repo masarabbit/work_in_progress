@@ -12,13 +12,14 @@ function init() {
   const control = {
     x: null,
     y: null,
-    // angle: 360,
+    angle: null,
   }
 
   const nearestN = (x, n) => x === 0 ? 0 : (x - 1) + Math.abs(((x - 1) % n) - n)
   const px = num => `${num}px`
   // const randomN = max => Math.ceil(Math.random() * max)
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
+  const distance = 10
 
   const setStyles = ({ target, h, w, x, y }) =>{
     if (h) target.style.height = h
@@ -98,6 +99,26 @@ function init() {
     }, 
   ]
 
+  const directionConversions = {
+    360: 'up',
+    45: 'upright',
+    90: 'right',
+    135: 'downright',
+    180: 'down',
+    225: 'downleft',
+    270: 'left',
+    315: 'upleft',
+  }
+
+  const overlap = (a, b) =>{
+    const buffer = 20
+    return Math.abs(a - b) < buffer
+  }
+
+  const reachedTheGoal = (x, y) =>{
+    overlap(control.x, x) && overlap(control.y, y)
+  }
+
   const positionLegs = (dog, frame) => {
     setStyles({
       target: dog.childNodes[5],
@@ -141,15 +162,23 @@ function init() {
     const offset = direction === 'clockwise' ? 1 : -1
 
     // ? update indicator
-    elements.indicator.innerHTML = `angle: ${data.angle} | currentFrame: ${currentFrame} | direction: ${direction} | offset: ${offset} | frameOffset: ${data.animation[currentFrame][0] * frameW * offset} | ${data.facing.x} / ${data.facing.y} `
+    elements.indicator.innerHTML = `dog-angle: ${data.angle} | control angle:${control.angle} | currentFrame: ${currentFrame} | direction: ${direction} | offset: ${offset} | frameOffset: ${data.animation[currentFrame][0] * frameW * offset} | ${data.facing.x} / ${data.facing.y} `
 
     target.style.transform = `translateX(${px(data.animation[currentFrame][0] * -frameW)})`
     if (part === 'body') {
       positionLegs(data.dog, currentFrame)
       moveLegs(data.dog)
-      positionTail(data.dog, currentFrame)
+      positionTail(data.dog, currentFrame) 
+    } else {
+      target.parentNode.classList.add('happy')
     }
     data.angle = angles[currentFrame]
+    if (data.angle === angles[end]) {
+      // TODO needs to be adjusted
+      // console.log(data.angle, angles[end])
+      control.angle = angles[end]
+      data.walk = true
+    }
 
     target.parentNode.classList.remove('flip')
     if (data.animation[currentFrame][1] === 'f') target.parentNode.classList.add('flip')
@@ -172,9 +201,11 @@ function init() {
       setTimeout(()=> {
         stopLegs(data.dog)
       }, 200)
-      // setTimeout(()=> {
-      //   data.dog.childNodes[13].childNodes[1].classList.remove('wag')
-      // }, 5000)
+      setTimeout(()=> {
+        target.parentNode.classList.remove('happy')
+        // TODO logic for happy to be removed somehow
+        // data.dog.childNodes[13].childNodes[1].classList.remove('wag')
+      }, 5000)
     }
   }
 
@@ -230,6 +261,7 @@ function init() {
   //            1    2    3    4
   //           red blue yellow green
   const createDog = () => {
+    // TODO this could be in the HTML to begin with
     const dog = document.createElement('div')
     dog.classList.add('dog')
     dog.innerHTML = `
@@ -258,6 +290,9 @@ function init() {
     
     elements.wrapper.append(dog)
     const { width, height, left, top } = dog.getBoundingClientRect()
+    dog.style.left = px(left)
+    dog.style.top = px(top)
+
     positionLegs(dog, 0)
 
     const dogData = {
@@ -269,6 +304,10 @@ function init() {
       pos: {
         x: left + (width / 2),
         y: top + (height / 2),
+      },
+      actualPos: {
+        x: left,
+        y: top,
       },
       facing: {
         x: left + (width / 2),
@@ -294,30 +333,67 @@ function init() {
 
 
 
-  elements.body.addEventListener('click', e =>{
-    control.x = e.pageX 
+  elements.body.addEventListener('mousemove', e =>{
+    control.x = e.pageX
     control.y = e.pageY
+    control.angle = null
 
     const currentDog = elements.dog
-    // console.log('test', directionConversions[clickedAngle(currentDog)], angles.indexOf(currentDog.angle), currentDog.angle)
-
+    currentDog.walk = false
+    // console.log('test', directionConversions[clickedAngle(currentDog)], angles.indexOf(currentDog.angle), currentDog.angle)  
     const direction = getDirection({ 
       pos: currentDog.pos,
       facing: currentDog.facing,
       target: control,
     })
-
     const start = angles.indexOf(currentDog.angle)
     const end = angles.indexOf(clickedAngle(currentDog))
-    // console.log(start, end, direction)
     turnDog({
       dog: currentDog,
       start, end, direction
     })
-    
-    // ? override
-    // const direction = 
-    // const end = 
+  })
+
+  const checkBoundaryAndUpdateDogPos = (x, y, dog, dogData) =>{
+    const lowerLimit = -40 // buffer from window edge
+    const upperLimit = 40
+
+    if (x > lowerLimit && x < (elements.body.clientWidth - upperLimit)){
+      dogData.actualPos.x = x
+    } 
+    if (y > lowerLimit && y < (elements.body.clientHeight - upperLimit)){
+      dogData.actualPos.y = y
+    }
+    dog.style.left = px(x)
+    dog.style.top = px(y)
+  }
+
+  elements.body.addEventListener('click', ()=> {
+    clearInterval(elements.dog.timer.all)
+    // console.log(elements.dog.dog)
+    const { dog } = elements.dog
+    const { left, top } = dog.getBoundingClientRect()
+    elements.dog.timer.all = setInterval(()=> {
+      // console.log(control.angle, elements.dog.angle)
+      if (elements.dog.walk && !reachedTheGoal(left + 48, top + 48)) {
+        // TODO this needs to be adjusted so dog walks in the correct angle
+        // TODO dog needs to turn and face the goal
+        let { x, y } = elements.dog.actualPos
+        console.log(directionConversions[elements.dog.angle])
+        const dir = directionConversions[elements.dog.angle]
+        if (dir !== 'up' && dir !== 'down') x += (dir.includes('left')) ? -distance : distance
+        if (dir !== 'left' && dir !== 'right') y += (dir.includes('up')) ? -distance : distance
+        
+        checkBoundaryAndUpdateDogPos(x, y, dog, elements.dog)
+        moveLegs(dog)
+      } else {
+        clearInterval(elements.dog.timer.all)
+        const { x, y } = elements.dog.actualPos
+        dog.style.left = px(x)
+        dog.style.top = px(y)
+        stopLegs(dog)
+      }
+    }, 200)
   })
 
 

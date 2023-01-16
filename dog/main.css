@@ -68,6 +68,8 @@ p, h1, h2, h3, h4 {
   height: calc(2 * 48px);
   border: blue 1px solid;
   animation: fade-in forwards 1s;
+  /* transition: 6s; */
+  transition: 0.5s;
 }
 
 @keyframes fade-in {
@@ -81,6 +83,30 @@ p, h1, h2, h3, h4 {
   width: calc(2 * 5 * 31px);
   height: calc(2 * 32px);
   background-size: calc(2 * 5 * 31px) calc(2 * 32px) !important; 
+}
+
+
+
+.head-wrapper.happy > .head {
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJsAAAAgCAYAAAAFbAo6AAAAAXNSR0IArs4c6QAAA0pJREFUeF7tWll2hDAMg2P1/h8ci77JTKgxXuSQANOEr74OIFtW5CzM07gGAxcxMF+EM2AGA9M3iW2dpq+Kd8iLMfAtYlvXdZ3mOYX7LTEPsQ2xVdHA01z2afGIJKMuEU0mer+lgORq+XqAuz3NZVvEE60fdD8iNp7MX+WPEnm9r3byG14W3Utw/O+PCDdNVvGv90sSfm7jWgwED+E0Ep7It5J/Dexm9UaC28Cpw2hsZSFUcqCdq3FMiiW4H53f5YIh+WaYTWTUVTkO54SIPoLFUztgS3zTQZeSrTOnbVZvj5BDC7MEVzH5ENkcVysMuLhQsaX8ND4KCw/lrYmf/N+rq+YVTeutBSWq2yuqVowg8aabRVxGckJHcBA22gNr5O1xbnUYcHB9Zgnv1b7n3BQvWm9JbFUJD07sYewoMUCbgbFRsQGYW8uWHFKbJqD4oNgvy5uLrQkwKLhq2NICwil8NezCFi7inxUbIPZL8/73YiOET+uyTPPPD104mM6COoh3n+MwptC8+VkLbO+d6O88byq2pip33K05dnKJZUlhMME1xy5x1ZJpgjafUsR+ed7diI06HJs4X046EYWKXbowkJxwiG3vxY8sONoudq2anHbw52e285w3wLV5HrKvicQ4xNaR2IzTjccNshxrROjWM1TovbXRy7Z6BFfbOhzSRhHHMla+u+O1iLMNsZUyT54rWRGehQVOVIqcTRMEdVB6dqps7oawpXcj/GjO9j5Bb3wJ85aM2BT+DrGxRYnkbEWce+7D9xm1k4QI4SfEtnWTp7TRVyEiuYeHhCHy5mI3tl2a5E3FWDq4pdUw+j++BZPF/qRN3SbEO3tcXLTNBJ8F12JT+XBiIu8nSgMU3nqh8aPnp9ambtMR7rQxSkS1ghPrj3wFEfrywrNYFoP1keEp3F2bw8VmDnDpnWnwvk9h0hX56kX96sN6kUewYKMpxsBztYiPYB5crpQDY6sDoeBU7myeiOZvYtJpQBabIzKx3l4wNRYMHoZVAPrRYySWM5hiu0FU8rmnJvbVOVO8wxSLcBD5bXusJjGBeoxbe2RgiK3Hqt+U8xDbTcT3CDvE1mPVb8p5iO0m4nuEHWLrseo35TzEdhPxPcL+AqXClj8izA3DAAAAAElFTkSuQmCC);
+}
+
+.head-wrapper.happy {
+  animation: infinite 0.5s pant;
+}
+
+@keyframes pant {
+  0%, 100% { transform: translateY(-1px); }
+  50% { transform: translateY(1px); }
+}
+
+.head-wrapper.flip.happy {
+  animation: infinite 0.5s pant-flip;
+}
+
+@keyframes pant-flip {
+  0%, 100% { transform: translateY(-1px) scale(-1, 1); }
+  50% { transform: translateY(1px) scale(-1, 1); }
 }
 
 .tail {
@@ -118,13 +144,13 @@ p, h1, h2, h3, h4 {
 } 
 
 .walk-1 {
-  animation: infinite 0.8s walking;
+  animation: infinite 0.4s walking;
   animation-delay: 0;
 }
 
 .walk-2 {
-  animation: infinite 0.6s walking;
-  animation-delay: 0.3s;
+  animation: infinite 0.4s walking;
+  animation-delay: 0.2s;
 }
 
 @keyframes walking {
