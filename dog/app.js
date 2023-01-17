@@ -7,6 +7,7 @@ function init() {
     wrapper: document.querySelector('.wrapper'),
     indicator: document.querySelector('.indicator'),
     dog: document.querySelector('.dog'),
+    mark: document.querySelector('.mark')
   }
 
   const animationFrames = {
@@ -115,8 +116,8 @@ function init() {
     return nearestN(adjustedAngle, 45)
   }
 
-  const reachedTheGoal = (x, y) =>{
-    overlap(control.x , x) && overlap(control.y, y)
+  const reachedTheGoalYeah = (x, y) =>{
+    return overlap(control.x , x) && overlap(control.y, y)
   }
 
   const positionLegs = (dog, frame) => {
@@ -174,12 +175,6 @@ function init() {
     }
     data.angle = angles[currentFrame]
     data.index = currentFrame
-    // if (data.angle === angles[end]) {
-    //   // TODO needs to be adjusted
-    //   // console.log(data.angle, angles[end])
-    //   control.angle = angles[end]
-    //   data.walk = true
-    // }
 
     target.parentNode.classList.remove('flip')
     if (data.animation[currentFrame][1] === 'f') target.parentNode.classList.add('flip')
@@ -253,7 +248,7 @@ function init() {
         direction,
         part: 'body'
       }) 
-    }, 300)
+    }, 200)
   }
 
 
@@ -300,8 +295,7 @@ function init() {
 
     turnDog({
       dog: dogData,
-      start: index,
-      end: defaultEnd,
+      start: index, end: 4,
       direction: 'clockwise'
     })
     positionTail(dog, 0)
@@ -326,55 +320,61 @@ function init() {
     clearInterval(elements.dog.timer.all)
     // console.log(elements.dog.dog)
     const { dog } = elements.dog
-    const { left, top } = dog.getBoundingClientRect()
+
     elements.dog.timer.all = setInterval(()=> {
-      // console.log(control.angle, elements.dog.angle)
+      const { left, top } = dog.getBoundingClientRect()
       const start = angles.indexOf(elements.dog.angle)
       const end = angles.indexOf(targetAngle(elements.dog))
-      console.log(start, end)
-      // TODO logic here is messed up and needs tidying up
-      // TODO this bit isn't right
-      if (start === end) {
-        console.log('test', elements.dog.walk)
-        elements.dog.turning = false
-        // elements.dog.walk = true
+
+      // stop dog
+      if (reachedTheGoalYeah(left + 48, top + 48)) {
+        clearInterval(elements.dog.timer.all)
+        const { x, y } = elements.dog.actualPos
+        dog.style.left = px(x)
+        dog.style.top = px(y)
+        stopLegs(dog)
+        turnDog({
+          dog: elements.dog,
+          start,
+          end: defaultEnd,
+          direction: 'clockwise'
+        })
+        return
       }
 
-      if (!elements.dog.turning && elements.dog.walk && !reachedTheGoal(left + 48, top + 48)) {
-        // TODO this needs to be adjusted so dog walks in the correct angle
-        // TODO dog needs to turn and face the goal
+      let { x, y } = elements.dog.actualPos
+      const dir = directionConversions[targetAngle(elements.dog)]
+      if (dir !== 'up' && dir !== 'down') x += (dir.includes('left')) ? -distance : distance
+      if (dir !== 'left' && dir !== 'right') y += (dir.includes('up')) ? -distance : distance
+      // TODO facing direction isn't quite accurate
+      elements.dog.facing.x = x + 48
+      elements.dog.facing.y = y + 48
+
+      elements.mark.style.left = px(x + 48)
+      elements.mark.style.top = px(y + 48)
+      
+      // stop turning
+      if (start === end) {
+        elements.dog.turning = false
+      }
+
+      if (!elements.dog.turning && elements.dog.walk) {
         if (start !== end) {
-          elements.dog.walk = false
           elements.dog.turning = true
           const direction = getDirection({ 
             pos: elements.dog.pos,
             facing: elements.dog.facing,
             target: control,
           })
-          // console.log('test direction', angles[elements.dog.index], targetAngle(elements.dog))
-          // TODO need to turn dog based on targetAngle
+          console.log('turn !')
           turnDog({
             dog: elements.dog,
-            start,
-            end,
-            direction,
+            start, end, direction,
           })
         } else {
-          let { x, y } = elements.dog.actualPos
-          // console.log(directionConversions[elements.dog.angle])
-          const dir = directionConversions[targetAngle(elements.dog)]
-          if (dir !== 'up' && dir !== 'down') x += (dir.includes('left')) ? -distance : distance
-          if (dir !== 'left' && dir !== 'right') y += (dir.includes('up')) ? -distance : distance
-          
           checkBoundaryAndUpdateDogPos(x, y, dog, elements.dog)
           moveLegs(dog)
         }
-      } else if (reachedTheGoal(left + 48, top + 48) || !elements.dog.turning) {
-        clearInterval(elements.dog.timer.all)
-        const { x, y } = elements.dog.actualPos
-        dog.style.left = px(x)
-        dog.style.top = px(y)
-        stopLegs(dog)
       }
     }, 200)
   }
