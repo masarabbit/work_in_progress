@@ -4,8 +4,11 @@ function init() {
   const elements = {
     indicator: document.querySelector('.indicator'),
     wrapper: document.querySelector('.wrapper'),
-    target: document.querySelector('.target')
+    target: document.querySelector('.target'),
+    mark: document.querySelector('.mark')
   }
+
+  let missileData = {}
 
 
   const px = num => `${num}px`
@@ -20,7 +23,18 @@ function init() {
 
   const overBuffer = ({ a, b, buffer }) => Math.abs(a - b) > buffer
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
+  const degToRad = deg => deg / (180 / Math.PI)
   const isNum = x => typeof x === 'number'
+
+  const rotateCoord = ({ angle, oX, oY, x, y }) =>{
+    const a = degToRad(angle)
+    const aX = x - oX
+    const aY = y - oY
+    return {
+      x: (aX * Math.cos(a)) - (aY * Math.sin(a)) + oX,
+      y: (aX * Math.sin(a)) + (aY * Math.cos(a)) + oY,
+    }
+  }
 
   const control = {
     x: null,
@@ -39,11 +53,13 @@ function init() {
       : adjustedAngle
   }
 
-  // const clickedAngle = () =>{
-  //   const angle = radToDeg(Math.atan2(penguinData.pos.y - control.y, penguinData.pos.x - control.x)) - 90
-  //   const adjustedAngle = angle < 0 ? angle + 360 : angle
-  //   return nearestN(adjustedAngle, 45)
-  // }
+  const clickedAngle = ({ x, y }) =>{
+    if (!missileData) return
+    const angle = radToDeg(Math.atan2(y - control.y, x - control.x)) - 90
+    console.log('click test', x, y)
+    // const adjustedAngle = angle < 0 ? angle + 360 : angle
+    return adjustAngle(angle)
+  }
 
 const getDirection = ({ pos, facing, target }) =>{
   const dx2 = facing.x - pos.x
@@ -69,28 +85,32 @@ const config = {
       missile.classList.add('missile')
       missile.style.transition = '1s'
       const { height, width } = elements.wrapper.getBoundingClientRect()
-      const missileData = {
+      missileData = {
         deg: 0,
         // x: 0,
         pos: {
-          y: height - 30,
-          // y: height / 2,
+          // y: height - 30,
+          y: height / 2,
           x: width / 2,
         },
         facing: {
-          y: height - 60,
-          // y: height / 2 - 60,
+          // y: height - 60,
+          y: height / 2 - 60,
           x: width / 2,
         }
       }
-      const { x, y, deg } = missileData 
+      const { pos: { x, y }, deg } = missileData 
       setStyles({
         target: missile,
         x, y, deg
       })
+      setStyles({
+        target: elements.mark,
+        x, y: y - 30
+      })
       setInterval(()=>{
-        if (overBuffer({ a: missileData.pos.x, b:control.x, buffer: 10})) missileData.pos.x = missileData.pos.x + (control.x > missileData.pos.x ? 20 : -20)
-        if (overBuffer({ a: missileData.pos.y, b:control.y, buffer: 10})) missileData.pos.y = missileData.pos.y + (control.y > missileData.pos.y ? 20 : -20)
+        // if (overBuffer({ a: missileData.pos.x, b:control.x, buffer: 10})) missileData.pos.x = missileData.pos.x + (control.x > missileData.pos.x ? 20 : -20)
+        // if (overBuffer({ a: missileData.pos.y, b:control.y, buffer: 10})) missileData.pos.y = missileData.pos.y + (control.y > missileData.pos.y ? 20 : -20)
 
         const direction = getDirection({
           target: control,
@@ -105,9 +125,28 @@ const config = {
         // TODO need logic similar to angle logic in dog
         if (diff >= 20) {
           missileData.deg = missileData.deg += config[direction]
+
+          // const { x, y } = rotateCoord({
+          //   angle: control.angle,
+          //   oX: missileData.pos.x, 
+          //   oY: missileData.pos.y,
+          //   x: missileData.facing.x,
+          //   y: missileData.facing.y,
+          // })
+          // console.log('test', control.angle)
+
+          // setStyles({
+          //   target: elements.mark,
+          //   x, y
+          // })
+
+          // missileData.facing.x = x
+          // missileData.facing.y = y
         } else {
+          
           missileData.facing.x = control.x
           missileData.facing.y = control.y
+    
         }
 
         // target
@@ -124,6 +163,8 @@ const config = {
   })
 
   elements.wrapper.addEventListener('click', e =>{
+    if (!missileData.pos) return
+
     control.x = e.clientX - 20
     control.y = e.clientY - 20
     setStyles({
@@ -131,7 +172,8 @@ const config = {
       x: control.x,
       y: control.y
     })
-    // console.log(e)
+    control.angle = clickedAngle({ x: missileData.pos.x, y: missileData.pos.y })
+    console.log('click', clickedAngle({ x: missileData.pos.x, y: missileData.pos.y }))
   
   })
 }

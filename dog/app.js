@@ -7,7 +7,7 @@ function init() {
     wrapper: document.querySelector('.wrapper'),
     indicator: document.querySelector('.indicator'),
     dog: document.querySelector('.dog'),
-    mark: document.querySelector('.mark')
+    mark: document.querySelectorAll('.mark'),
   }
 
   const animationFrames = {
@@ -29,59 +29,59 @@ function init() {
   const defaultEnd = 4
   const partPositions = [
     { //0
-      1: { x: 26, y: 43 },
-      2: { x: 54, y: 43 },
-      3: { x: 26, y: 75 },
-      4: { x: 54, y: 75 },
+      leg1: { x: 26, y: 43 },
+      leg2: { x: 54, y: 43 },
+      leg3: { x: 26, y: 75 },
+      leg4: { x: 54, y: 75 },
       tail: { x: 40, y: 70, z: 1 },
     }, 
     { //1
-      1: { x: 33, y: 56 },
-      2: { x: 55, y: 56 },
-      3: { x: 12, y: 72 },
-      4: { x: 32, y: 74 },
+      leg1: { x: 33, y: 56 },
+      leg2: { x: 55, y: 56 },
+      leg3: { x: 12, y: 72 },
+      leg4: { x: 32, y: 74 },
       tail: { x: 20, y: 64, z: 1 },
     }, 
     { //2
-      1: { x: 59, y: 60 },
-      2: { x: 42, y: 58 },
-      3: { x: 24, y: 64 },
-      4: { x: 9, y: 61 },
+      leg1: { x: 59, y: 60 },
+      leg2: { x: 42, y: 58 },
+      leg3: { x: 24, y: 64 },
+      leg4: { x: 9, y: 61 },
       tail: { x: 5, y: 52, z: 1 },
     }, 
     { //3
-      1: { x: 39, y: 63 },
-      2: { x: 60, y: 56 },
-      3: { x: 12, y: 52 },
-      4: { x: 28, y: 50 },
+      leg1: { x: 39, y: 63 },
+      leg2: { x: 60, y: 56 },
+      leg3: { x: 12, y: 52 },
+      leg4: { x: 28, y: 50 },
       tail: { x: 7, y: 21, z: 0 },
     }, 
     { //4
-      1: { x: 23, y: 54 },
-      2: { x: 56, y: 54 },
-      3: { x: 24, y: 25 },
-      4: { x: 54, y: 25 },
+      leg1: { x: 23, y: 54 },
+      leg2: { x: 56, y: 54 },
+      leg3: { x: 24, y: 25 },
+      leg4: { x: 54, y: 25 },
       tail: { x: 38, y: 2, z: 0 },
     }, 
     { //5
-      1: { x: 21, y: 58 },
-      2: { x: 41, y: 64 },
-      3: { x: 53, y: 50 },
-      4: { x: 69, y: 53 },
+      leg1: { x: 21, y: 58 },
+      leg2: { x: 41, y: 64 },
+      leg3: { x: 53, y: 50 },
+      leg4: { x: 69, y: 53 },
       tail: { x: 72, y: 22, z: 0 },
     }, 
     { //6
-      1: { x: 22, y: 59 },
-      2: { x: 30, y: 64 },
-      3: { x: 56, y: 59 },
-      4: { x: 68, y: 62 },
+      leg1: { x: 22, y: 59 },
+      leg2: { x: 30, y: 64 },
+      leg3: { x: 56, y: 59 },
+      leg4: { x: 68, y: 62 },
       tail: { x: 78, y: 40, z: 0 },
     }, 
     { //7
-      1: { x: 47, y: 45 },
-      2: { x: 24, y: 53 },
-      3: { x: 68, y: 68 },
-      4: { x: 47, y: 73 },
+      leg1: { x: 47, y: 45 },
+      leg2: { x: 24, y: 53 },
+      leg3: { x: 68, y: 68 },
+      leg4: { x: 47, y: 73 },
       tail: { x: 65, y: 65, z: 1 },
     }, 
   ]
@@ -98,10 +98,23 @@ function init() {
   const px = num => `${num}px`
   // const randomN = max => Math.ceil(Math.random() * max)
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
+  const degToRad = deg => deg / (180 / Math.PI)
   const overlap = (a, b) =>{
     const buffer = 20
     return Math.abs(a - b) < buffer
   }
+
+
+  const rotateCoord = ({ angle, oX, oY, x, y }) =>{
+    const a = degToRad(angle)
+    const aX = x - oX
+    const aY = y - oY
+    return {
+      x: (aX * Math.cos(a)) - (aY * Math.sin(a)) + oX,
+      y: (aX * Math.sin(a)) + (aY * Math.cos(a)) + oY,
+    }
+  }
+
 
   const setStyles = ({ target, h, w, x, y }) =>{
     if (h) target.style.height = h
@@ -121,21 +134,11 @@ function init() {
   }
 
   const positionLegs = (dog, frame) => {
-    setStyles({
-      target: dog.childNodes[5],
-      x: px(partPositions[frame][1].x), y: px(partPositions[frame][1].y),
-    })
-    setStyles({
-      target: dog.childNodes[7],
-      x: px(partPositions[frame][2].x), y: px(partPositions[frame][2].y),
-    })
-    setStyles({
-      target: dog.childNodes[9],
-      x: px(partPositions[frame][3].x), y: px(partPositions[frame][3].y),
-    })
-    setStyles({
-      target: dog.childNodes[11],
-      x: px(partPositions[frame][4].x), y: px(partPositions[frame][4].y),
+    ;[5, 7, 9, 11].forEach((n, i) => {
+      setStyles({
+        target: dog.childNodes[n],
+        x: px(partPositions[frame][`leg${i + 1}`].x), y: px(partPositions[frame][`leg${i + 1}`].y),
+      })
     })
   }
 
@@ -176,8 +179,7 @@ function init() {
     data.angle = angles[currentFrame]
     data.index = currentFrame
 
-    target.parentNode.classList.remove('flip')
-    if (data.animation[currentFrame][1] === 'f') target.parentNode.classList.add('flip')
+    target.parentNode.classList[data.animation[currentFrame][1] === 'f' ? 'add' : 'remove']('flip')
 
     let nextFrame = currentFrame + offset
     nextFrame = nextFrame === -1 
@@ -191,10 +193,8 @@ function init() {
         currentFrame: nextFrame, end, direction,
         speed,
       }), speed || 150)
-    } else {
+    } else if (part === 'body') {
       // end
-      data.facing.x = control.x
-      data.facing.y = control.y
       control.angle = angles[end]
       data.walk = true
       setTimeout(()=> {
@@ -270,9 +270,7 @@ function init() {
 
     const dogData = {
       timer: {
-        head: null,
-        body: null,
-        all: null,
+        head: null, body: null, all: null,
       },
       pos: {
         x: left + (width / 2),
@@ -292,6 +290,7 @@ function init() {
       dog,
     }
     elements.dog = dogData
+
 
     turnDog({
       dog: dogData,
@@ -318,7 +317,6 @@ function init() {
 
   const moveDog = () =>{
     clearInterval(elements.dog.timer.all)
-    // console.log(elements.dog.dog)
     const { dog } = elements.dog
 
     elements.dog.timer.all = setInterval(()=> {
@@ -347,11 +345,26 @@ function init() {
       if (dir !== 'up' && dir !== 'down') x += (dir.includes('left')) ? -distance : distance
       if (dir !== 'left' && dir !== 'right') y += (dir.includes('up')) ? -distance : distance
       // TODO facing direction isn't quite accurate
-      elements.dog.facing.x = x + 48
-      elements.dog.facing.y = y + 48
 
-      elements.mark.style.left = px(x + 48)
-      elements.mark.style.top = px(y + 48)
+
+      elements.mark[0].style.left = px(elements.dog.pos.x)
+      elements.mark[0].style.top = px(elements.dog.pos.y)
+      elements.mark[2].style.left = px(control.x)
+      elements.mark[2].style.top = px(control.y)
+
+
+      const { x: x2, y: y2 } = rotateCoord({
+        angle: elements.dog.angle,
+        oX: elements.dog.pos.x, 
+        oY: elements.dog.pos.y,
+        x: elements.dog.pos.x,
+        y: elements.dog.pos.y - 100,
+      })
+      elements.dog.facing.x = x2
+      elements.dog.facing.y = y2
+      elements.mark[1].style.left = px(x2)
+      elements.mark[1].style.top = px(y2)
+
       
       // stop turning
       if (start === end) {
@@ -361,12 +374,13 @@ function init() {
       if (!elements.dog.turning && elements.dog.walk) {
         if (start !== end) {
           elements.dog.turning = true
+          // console.log('turning', dir)
+
           const direction = getDirection({ 
             pos: elements.dog.pos,
             facing: elements.dog.facing,
             target: control,
           })
-          console.log('turn !')
           turnDog({
             dog: elements.dog,
             start, end, direction,
