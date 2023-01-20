@@ -294,7 +294,7 @@ function init() {
 
     turnDog({
       dog: dogData,
-      start: index, end: 4,
+      start: index, end: defaultEnd,
       direction: 'clockwise'
     })
     positionTail(dog, 0)
