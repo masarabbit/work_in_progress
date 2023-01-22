@@ -5,9 +5,9 @@ function init() {
   const elements = {
     body: document.querySelector('.wrapper'),
     wrapper: document.querySelector('.wrapper'),
-    indicator: document.querySelector('.indicator'),
+    // indicator: document.querySelector('.indicator'),
     dog: document.querySelector('.dog'),
-    mark: document.querySelectorAll('.mark'),
+    marker: document.querySelectorAll('.marker'),
   }
 
   const animationFrames = {
@@ -43,10 +43,10 @@ function init() {
       tail: { x: 20, y: 64, z: 1 },
     }, 
     { //2
-      leg1: { x: 59, y: 60 },
-      leg2: { x: 42, y: 58 },
-      leg3: { x: 24, y: 64 },
-      leg4: { x: 9, y: 61 },
+      leg1: { x: 59, y: 62 },
+      leg2: { x: 44, y: 60 },
+      leg3: { x: 25, y: 64 },
+      leg4: { x: 11, y: 61 },
       tail: { x: 5, y: 52, z: 1 },
     }, 
     { //3
@@ -73,7 +73,7 @@ function init() {
     { //6
       leg1: { x: 22, y: 59 },
       leg2: { x: 30, y: 64 },
-      leg3: { x: 56, y: 59 },
+      leg3: { x: 56, y: 60 },
       leg4: { x: 68, y: 62 },
       tail: { x: 78, y: 40, z: 0 },
     }, 
@@ -96,7 +96,6 @@ function init() {
 
   const nearestN = (x, n) => x === 0 ? 0 : (x - 1) + Math.abs(((x - 1) % n) - n)
   const px = num => `${num}px`
-  // const randomN = max => Math.ceil(Math.random() * max)
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
   const degToRad = deg => deg / (180 / Math.PI)
   const overlap = (a, b) =>{
@@ -105,13 +104,13 @@ function init() {
   }
 
 
-  const rotateCoord = ({ angle, oX, oY, x, y }) =>{
+  const rotateCoord = ({ angle, origin, x, y }) =>{
     const a = degToRad(angle)
-    const aX = x - oX
-    const aY = y - oY
+    const aX = x - origin.x
+    const aY = y - origin.y
     return {
-      x: (aX * Math.cos(a)) - (aY * Math.sin(a)) + oX,
-      y: (aX * Math.sin(a)) + (aY * Math.cos(a)) + oY,
+      x: (aX * Math.cos(a)) - (aY * Math.sin(a)) + origin.x,
+      y: (aX * Math.sin(a)) + (aY * Math.cos(a)) + origin.y,
     }
   }
 
@@ -165,8 +164,8 @@ function init() {
   const animateDog = ({ target, frameW, currentFrame, end, data, part, speed, direction }) => {
     const offset = direction === 'clockwise' ? 1 : -1
 
-    // ? update indicator
-    elements.indicator.innerHTML = `dog-angle: ${data.angle} | control angle:${control.angle} | currentFrame: ${currentFrame} | direction: ${direction} | offset: ${offset} | frameOffset: ${data.animation[currentFrame][0] * frameW * offset} | ${data.facing.x} / ${data.facing.y} `
+    //update indicator
+    // elements.indicator.innerHTML = `dog-angle: ${data.angle} | control angle:${control.angle} | currentFrame: ${currentFrame} | direction: ${direction} | offset: ${offset} | frameOffset: ${data.animation[currentFrame][0] * frameW * offset} | ${data.facing.x} / ${data.facing.y} `
 
     target.style.transform = `translateX(${px(data.animation[currentFrame][0] * -frameW)})`
     if (part === 'body') {
@@ -202,8 +201,6 @@ function init() {
       }, 200)
       setTimeout(()=> {
         target.parentNode.classList.remove('happy')
-        // TODO logic for happy to be removed somehow
-        // data.dog.childNodes[13].childNodes[1].classList.remove('wag')
       }, 5000)
     }
   }
@@ -315,6 +312,11 @@ function init() {
     dog.style.top = px(y)
   }
 
+  const positionMarker = (i, pos) => {
+    elements.marker[i].style.left = px(pos.x)
+    elements.marker[i].style.top = px(pos.y)
+  }
+
   const moveDog = () =>{
     clearInterval(elements.dog.timer.all)
     const { dog } = elements.dog
@@ -344,29 +346,21 @@ function init() {
       const dir = directionConversions[targetAngle(elements.dog)]
       if (dir !== 'up' && dir !== 'down') x += (dir.includes('left')) ? -distance : distance
       if (dir !== 'left' && dir !== 'right') y += (dir.includes('up')) ? -distance : distance
-      // TODO facing direction isn't quite accurate
 
-
-      elements.mark[0].style.left = px(elements.dog.pos.x)
-      elements.mark[0].style.top = px(elements.dog.pos.y)
-      elements.mark[2].style.left = px(control.x)
-      elements.mark[2].style.top = px(control.y)
-
+      positionMarker(0, elements.dog.pos)
+      positionMarker(2, control)
 
       const { x: x2, y: y2 } = rotateCoord({
         angle: elements.dog.angle,
-        oX: elements.dog.pos.x, 
-        oY: elements.dog.pos.y,
+        origin: elements.dog.pos, 
         x: elements.dog.pos.x,
         y: elements.dog.pos.y - 100,
       })
       elements.dog.facing.x = x2
       elements.dog.facing.y = y2
-      elements.mark[1].style.left = px(x2)
-      elements.mark[1].style.top = px(y2)
+      positionMarker(1, elements.dog.facing)
 
-      
-      // stop turning
+
       if (start === end) {
         elements.dog.turning = false
       }
@@ -374,7 +368,6 @@ function init() {
       if (!elements.dog.turning && elements.dog.walk) {
         if (start !== end) {
           elements.dog.turning = true
-          // console.log('turning', dir)
 
           const direction = getDirection({ 
             pos: elements.dog.pos,
@@ -396,26 +389,30 @@ function init() {
 
   createDog()
 
+  const triggerTurnDog = () => {
+    control.angle = null
+
+    const dog = elements.dog
+    dog.walk = false
+
+    const direction = getDirection({ 
+      pos: dog.pos,
+      facing: dog.facing,
+      target: control,
+    })
+    const start = angles.indexOf(dog.angle)
+    const end = angles.indexOf(targetAngle(dog))
+    turnDog({
+      dog,
+      start, end, direction
+    })
+  }
+
 
   elements.body.addEventListener('mousemove', e =>{
     control.x = e.pageX
     control.y = e.pageY
-    control.angle = null
-
-    const currentDog = elements.dog
-    currentDog.walk = false
-    // console.log('test', directionConversions[targetAngle(currentDog)], angles.indexOf(currentDog.angle), currentDog.angle)  
-    const direction = getDirection({ 
-      pos: currentDog.pos,
-      facing: currentDog.facing,
-      target: control,
-    })
-    const start = angles.indexOf(currentDog.angle)
-    const end = angles.indexOf(targetAngle(currentDog))
-    turnDog({
-      dog: currentDog,
-      start, end, direction
-    })
+    triggerTurnDog()
   })
 
 
