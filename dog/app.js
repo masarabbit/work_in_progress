@@ -11,7 +11,7 @@ function init() {
   }
 
   const animationFrames = {
-    rotate: [[0], [1], [2], [3], [4], [3, 'f'], [2, 'f'], [1, 'f']]
+    rotate: [[0], [1], [2], [3], [5], [3, 'f'], [2, 'f'], [1, 'f']]
   }
 
   const directionConversions = {
@@ -27,6 +27,13 @@ function init() {
 
   const angles = [360, 45, 90, 135, 180, 225, 270, 315]
   const defaultEnd = 4
+  //  A ---- A  ________ ________
+  // |         |         |        |
+  // | ^     ^ |         |        |
+  //  ____^___  _________|________|
+  //            | |  | |  | |  | |
+  //             1    2    3    4
+  //             L    R    L    R
   const partPositions = [
     { //0
       leg1: { x: 26, y: 43 },
@@ -47,7 +54,7 @@ function init() {
       leg2: { x: 44, y: 60 },
       leg3: { x: 25, y: 64 },
       leg4: { x: 11, y: 61 },
-      tail: { x: 5, y: 52, z: 1 },
+      tail: { x: 4, y: 44, z: 1 },
     }, 
     { //3
       leg1: { x: 39, y: 63 },
@@ -134,9 +141,10 @@ function init() {
 
   const positionLegs = (dog, frame) => {
     ;[5, 7, 9, 11].forEach((n, i) => {
+      const { x, y } = partPositions[frame][`leg${i + 1}`]
       setStyles({
         target: dog.childNodes[n],
-        x: px(partPositions[frame][`leg${i + 1}`].x), y: px(partPositions[frame][`leg${i + 1}`].y),
+        x: px(x), y: px(y),
       })
     })
   }
@@ -248,14 +256,6 @@ function init() {
     }, 200)
   }
 
-
-  //  A ---- A  ________ ________
-  // |        |         |        |
-  // |        |         |        |
-  //  ________ _________|________|
-  //           | |  | |  | |  | |
-  //            1    2    3    4
-  //           red blue yellow green
   const createDog = () => {
     const { dog } = elements
     const { width, height, left, top } = dog.getBoundingClientRect()
