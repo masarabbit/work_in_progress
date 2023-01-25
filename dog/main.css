@@ -19,29 +19,6 @@ p, h1, h2, h3, h4 {
   padding-inline-start: 0px;
 }
 
-
-.indicator {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-}
-
-.marker {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  position: absolute;
-  transition: 0.5s;
-  z-index: 100;
-  margin-top: -5px;
-  margin-left: -5px;
-}
-
-.red { background-color: rgb(255, 64, 0); }
-.blue { background-color: rgb(0, 140, 255); }
-.yellow { background-color: rgb(253, 253, 141); }
-
-
 .wrapper {
   position: absolute;
   width: 100%;
@@ -127,7 +104,6 @@ p, h1, h2, h3, h4 {
   transition: 0.15s;
 }
 
-
 .body-wrapper {
   position: absolute;
   width: calc(2 * 48px);
@@ -209,3 +185,24 @@ a:hover {
 .d-none {
   display: none;
 }
+
+.indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+}
+
+.marker {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: absolute;
+  transition: 0.5s;
+  z-index: 100;
+  margin-top: -5px;
+  margin-left: -5px;
+}
+
+.red { background-color: rgb(255, 64, 0); }
+.green { background-color: rgb(42, 239, 190); }
+.blue { background-color: rgb(0, 140, 255); }

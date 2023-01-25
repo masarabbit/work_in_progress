@@ -1,13 +1,12 @@
 
 function init() { 
 
-  
   const elements = {
     body: document.querySelector('.wrapper'),
     wrapper: document.querySelector('.wrapper'),
-    // indicator: document.querySelector('.indicator'),
     dog: document.querySelector('.dog'),
     marker: document.querySelectorAll('.marker'),
+    // indicator: document.querySelector('.indicator'),
   }
 
   const animationFrames = {
@@ -110,7 +109,6 @@ function init() {
     return Math.abs(a - b) < buffer
   }
 
-
   const rotateCoord = ({ angle, origin, x, y }) =>{
     const a = degToRad(angle)
     const aX = x - origin.x
@@ -120,7 +118,6 @@ function init() {
       y: (aX * Math.sin(a)) + (aY * Math.cos(a)) + origin.y,
     }
   }
-
 
   const setStyles = ({ target, h, w, x, y }) =>{
     if (h) target.style.height = h
@@ -208,7 +205,7 @@ function init() {
         stopLegs(data.dog)
       }, 200)
       setTimeout(()=> {
-        target.parentNode.classList.remove('happy')
+        document.querySelector('.happy')?.classList.remove('happy')
       }, 5000)
     }
   }
@@ -288,7 +285,6 @@ function init() {
     }
     elements.dog = dogData
 
-
     turnDog({
       dog: dogData,
       start: index, end: defaultEnd,
@@ -344,11 +340,12 @@ function init() {
 
       let { x, y } = elements.dog.actualPos
       const dir = directionConversions[targetAngle(elements.dog)]
+      // console.log(dir)
       if (dir !== 'up' && dir !== 'down') x += (dir.includes('left')) ? -distance : distance
       if (dir !== 'left' && dir !== 'right') y += (dir.includes('up')) ? -distance : distance
 
       positionMarker(0, elements.dog.pos)
-      positionMarker(2, control)
+      positionMarker(1, control)
 
       const { x: x2, y: y2 } = rotateCoord({
         angle: elements.dog.angle,
@@ -358,8 +355,7 @@ function init() {
       })
       elements.dog.facing.x = x2
       elements.dog.facing.y = y2
-      positionMarker(1, elements.dog.facing)
-
+      positionMarker(2, elements.dog.facing)
 
       if (start === end) {
         elements.dog.turning = false
@@ -390,16 +386,16 @@ function init() {
   createDog()
 
   const triggerTurnDog = () => {
-    control.angle = null
-
     const dog = elements.dog
     dog.walk = false
+    control.angle = null
 
     const direction = getDirection({ 
       pos: dog.pos,
       facing: dog.facing,
       target: control,
     })
+
     const start = angles.indexOf(dog.angle)
     const end = angles.indexOf(targetAngle(dog))
     turnDog({
@@ -407,7 +403,6 @@ function init() {
       start, end, direction
     })
   }
-
 
   elements.body.addEventListener('mousemove', e =>{
     control.x = e.pageX

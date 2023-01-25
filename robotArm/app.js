@@ -44,20 +44,20 @@ function init() {
   armData.pos.x = left + 25
   armData.pos.y = top + 25
 
-  setInterval(()=> {
-    const deg1 = armData.arm1Deg += 10
-    const deg2 = armData.arm2Deg -= 20
+  // setInterval(()=> {
+  //   const deg1 = armData.arm1Deg += 10
+  //   const deg2 = armData.arm2Deg -= 20
 
-    setStyles({
-      target: elements.arm1,
-      deg: deg1
-    })
-    setStyles({
-      target: elements.arm2,
-      deg: deg2
-    })
+  //   setStyles({
+  //     target: elements.arm1,
+  //     deg: deg1
+  //   })
+  //   setStyles({
+  //     target: elements.arm2,
+  //     deg: deg2
+  //   })
   
-  }, 200)
+  // }, 200)
   
   elements.body.addEventListener('click', e => {
     control.x = e.pageX
