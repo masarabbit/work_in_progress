@@ -55,29 +55,92 @@ p, h1, h2, h3, h4 {
   left: 10px; */
 }
 
+.joint-1 {
+  width: 50px;
+  height: 50px;
+  border-radius: 50px;
+  transition: 0.5s;
+  border: 1px solid white;
+  margin-top: 0px;
+  margin-left: 24px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.joint-2 {
+  width: 40px;
+  height: 40px;
+  border-radius: 50px;
+  transition: 0.5s;
+  border: 1px solid white;
+  display: flex;
+  align-items: flex-end;
+  margin-left: 4px;
+}
+
 .arm-1 {
   border: rgb(94, 207, 245) 1px solid;
   width: 50px;
   height: 300px;
-  transform-origin: center bottom;
-  transition: 0.5s;
-
-  margin-top: -250px;
-  margin-left: 24px;
-  transform: rotate(10deg);
+  /* transition: 0.5s; */
 }
 
 .arm-2 {
   border: rgb(192, 245, 94) 1px solid;
   width: 40px;
   height: 200px;
-  transform-origin: center bottom;
-  transition: 0.5s;
-
-  margin-top: -160px;
-  margin-left: 4px;
-  transform: rotate(-10deg);
+  /* transition: 0.5s; */
 }
+
+.img-bg {
+  image-rendering: pixelated;
+  background-repeat: no-repeat !important;
+}
+
+.conveyor_belt_edge {
+  position: absolute;
+  background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC0AAAAKCAYAAAAgs9cUAAAAAXNSR0IArs4c6QAAAPNJREFUSEu9lbENwjAQRe1xKLMADROkJVMgUUIFZSSmgDYTpMkClIxj9BGHvk9nx7IS0sV6d/72/fN5R991GsN9ePKS69rGnbY7L4ubQx/2beMeinvdjhEDHrGcz2I0l2KYizbigEj59weC/8VcpjGc6bJYz0e0FoMArHOQZlAVMLoKfCiLwRrH1OTxlhgpqVjDOpTYA1bB4Swxc3nYjpInp0eYSLTlaYAoh9xOyvcQKLe8NhPdUO1m0pg50UsyWXuUlCxlodrS6wa08piNWNIcJc1qMdr7NXkWf/K0qDWezp9oefrmBkfpAGKxMmRqh4seUm+QcYln/r9boQAAAABJRU5ErkJggg==);
+  width: calc(5 * 4 * 9px);
+  height: calc(4 * 10px);
+  background-size: calc(5 * 4 * 9px) calc(4 * 10px) !important; 
+}
+
+.conveyor_belt_edge_wrapper {
+  width: calc(4 * 9px);
+  height: calc(4 * 10px);
+  overflow: hidden;
+  position: relative;
+  /* border: 1px solid yellow; */
+}
+
+.conveyor_belt {
+  position: absolute;
+  background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAKCAYAAABBq/VWAAAAAXNSR0IArs4c6QAAAEBJREFUOE9jVCnq/c+ABBICDcG8BevPIwuD2SA5csQZMUyigcCoJSQF6mhwDcLgajm87z+2DIaeQZHVoGdKQnwApXUfT/7QpZgAAAAASUVORK5CYII=);
+  width: calc(5 * 4 * 5px);
+  height: calc(4 * 10px);
+  background-size: calc(5 * 4 * 5px) calc(4 * 10px) !important; 
+}
+
+.conveyor_belt_wrapper {
+  width: calc(4 * 5px);
+  height: calc(4 * 10px);
+  overflow: hidden;
+  position: relative;
+  /* border: 1px solid pink; */
+}
+
+.belt_wrapper {
+  position: absolute;
+  /* border: 1px solid cyan; */
+  display: flex;
+  top: 50px;
+  left: 50px;
+}
+
+.flip {
+  transform: scale(-1, -1)
+}
+
 
 a {
   color: white;
