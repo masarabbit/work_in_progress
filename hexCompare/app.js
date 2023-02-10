@@ -1,6 +1,6 @@
 
-
-    test
+  function init() { 
+    // hex compare
     const inputs = document.querySelectorAll('input')
     const box = document.querySelector('.box')
 
