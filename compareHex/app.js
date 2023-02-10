@@ -1,12 +1,12 @@
-test
+
   function init() { 
     
     const inputs = document.querySelectorAll('input')
-    const b = document.querySelector('.box')
+    const box = document.querySelector('.box')
 
     inputs.forEach(input => {
         input.addEventListener('change', ()=>{
-          b.childNodes[+input.dataset.id].style.backgroundColor = input.value
+          box.childNodes[+input.dataset.id].style.backgroundColor = input.value
         })
       }     
     )
