@@ -1,4 +1,4 @@
-
+test
   function init() { 
     
     const inputs = document.querySelectorAll('input')
