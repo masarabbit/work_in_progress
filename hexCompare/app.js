@@ -1,6 +1,6 @@
 
 
-    
+    test
     const inputs = document.querySelectorAll('input')
     const box = document.querySelector('.box')
 
