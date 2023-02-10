@@ -1,7 +1,6 @@
 
-  function init() { 
-    const test = 'test'
-    console.log(test)
+
+    
     const inputs = document.querySelectorAll('input')
     const box = document.querySelector('.box')
 
