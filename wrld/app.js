@@ -111,7 +111,7 @@ function init() {
         element: 'house2', angle: 110, offset: 30,
         display: {
           caption: `Hi, I'm a house. Do you want to see Masa's website?`,
-          link: linkButton('https://www.ma5a.com/', `sure, why not`),
+          link: linkButton('https://ma5a.com/', 'sure, why not'),
           button: 'maybe next time'
         } 
       },
@@ -164,12 +164,12 @@ function init() {
             h: 150,
           },
           caption: 'Come and play with the point and click penguin',
-          link: linkButton('https://codepen.io/Ma5a/full/MWrZPOP', `ok!`)
+          link: linkButton('https://codepen.io/Ma5a/full/MWrZPOP', 'ok!')
         },
       },
       { 
         element: 'talking_tree', angle: 120, offset: 100, 
-        display: { caption: `What? The world is rotating? Why am I not falling off?` }
+        display: { caption: 'What? The world is rotating? Why am I not falling off?' }
       },
       { element: 'tree', angle: 150, offset: 20, color: 'white' },
     ],
@@ -447,11 +447,11 @@ function init() {
       const { zIndex: bearPos } = bearData.bear.style
       if (
         withinBuffer({ 
-          a:element.angle, b:angleWithinCurrentMap, 
+          a: element.angle, b: angleWithinCurrentMap, 
           buffer:(elements[element.element].w / halfCircumference(220 - elementPos)) * 90
           }) &&
         withinBuffer({
-          a:elementPos, b:bearPos, 
+          a: elementPos, b: bearPos, 
           buffer: 15
         }) && 
         (circleData.key === 'u' && +elementPos < +bearPos || circleData.key === 'd' && +elementPos > +bearPos)
@@ -514,6 +514,9 @@ function init() {
       senseiData.userProgress.investigate = true 
       bearData.pause = !bearData.pause
       displayWrapper.classList.toggle('display')
+      
+      // unfocus from close button so it doesn't misfire with 'enter'
+      if (!displayWrapper.classList.contains('display')) displays[3].blur()
       displays[1].innerHTML = circleData.activeEvent.display.caption || ''
       displays[2].innerHTML = circleData.activeEvent.display.link || ''
       displays[3].innerHTML = circleData.activeEvent.display.button || 'close'
