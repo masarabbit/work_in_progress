@@ -3,7 +3,7 @@ function init() {
 
   const elements = {
     duck: document.querySelector('.duck'),
-    babyDucks: document.querySelectorAll('.baby-duck'),
+    ducklings: document.querySelectorAll('.duckling'),
     // body: document.querySelector('.wrapper'),
     // wrapper: document.querySelector('.wrapper'),
     // dog: document.querySelector('.dog'),
@@ -26,9 +26,9 @@ function init() {
       angle: null,
       offset: 24
     },
-    babyDucks: [ // ? this could be set with function too.
+    Ducklings: [ // ? this could be set with function too.
       {
-        target: elements.babyDucks[0],
+        target: elements.ducklings[0],
         x: null,
         y: null,
         angle: null,
@@ -36,7 +36,7 @@ function init() {
         offset: 6,
       },
       {
-        target: elements.babyDucks[1],
+        target: elements.ducklings[1],
         x: null,
         y: null,
         angle: null,
@@ -44,7 +44,7 @@ function init() {
         offset: 6,
       },
       {
-        target: elements.babyDucks[2],
+        target: elements.ducklings[2],
         x: null,
         y: null,
         angle: null,
@@ -65,9 +65,9 @@ function init() {
   //   setStyles(data)
   // }
 
-  const moveBabyDucks = e => {
+  const moveDucklings = e => {
     //TODO the position needs to be altered based on where the mother actually is
-    control.babyDucks.forEach((baby, i) => {
+    control.Ducklings.forEach((baby, i) => {
       clearTimeout(baby.timer)
       baby.timer = setTimeout(()=> {
         moveDuck(e, baby)
@@ -85,7 +85,7 @@ function init() {
 
   const moveMotherDuck = e => {
     moveDuck(e, control.duck)
-    moveBabyDucks(e)
+    moveDucklings(e)
   }
 
   window.addEventListener('click', moveMotherDuck)

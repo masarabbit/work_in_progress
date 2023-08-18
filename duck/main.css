@@ -37,7 +37,14 @@ p, h1, h2, h3, h4 {
   transition: 1s;
 }
 
-.baby-duck {
+.duck .duck-head {
+  position: absolute;
+  border: blue 1px solid;
+  width: 24px;
+  height: 24px;
+}
+
+.duckling {
   position: absolute;
   background-color: #fff945;
   width: 12px;
