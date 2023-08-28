@@ -122,7 +122,7 @@ function init() {
   const setStyles = ({ target, h, w, x, y }) =>{
     if (h) target.style.height = h
     if (w) target.style.width = w
-    target.style.transform = `translate(${x || 0}, ${y || 0})`
+    target.style.transform = `translate(${x || 0}, ${y || 0});`
   }
 
   const targetAngle = dog =>{
