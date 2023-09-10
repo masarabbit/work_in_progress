@@ -1,7 +1,7 @@
 
 * {
   box-sizing: border-box;
-}
+} 
 
 body {
   padding: 0;
@@ -47,8 +47,8 @@ p, h1, h2, h3, h4 {
   --h: 22; 
   width: calc(var(--w) * 2px);
   height: calc(var(--h) * 2px);
-  transition: 2s;
-  /* border: 1px solid red; */
+  transition: 1s linear;
+  border: 1px solid red;
 }
 
 .duck-body {
@@ -112,7 +112,7 @@ p, h1, h2, h3, h4 {
 
 .duck-head-wrapper {
   position: absolute;
-  /* border: blue 1px solid; */
+  border: blue 1px solid;
   top: 0;
   width: 32px;
   height: 32px;
@@ -134,7 +134,7 @@ p, h1, h2, h3, h4 {
 
 .duck-head {
   position: absolute;
-  /* border: rgb(0, 255, 229) 1px solid; */
+  border: rgb(0, 255, 229) 1px solid;
   --w: 16;
   --h: 12; 
   width: calc(var(--w) * 2px);
@@ -152,11 +152,11 @@ p, h1, h2, h3, h4 {
   height: calc(var(--h) * 2px);
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAFCAYAAAB8ZH1oAAAAAXNSR0IArs4c6QAAACtJREFUGFdjZICCPyei/sPYyDSLxTJGEB9M4FIE0wBSzEhIEUwx8SYS60YAP7UTI/Omy/EAAAAASUVORK5CYII=);
   transition: 1s;
-  top: 0;
-  left: 0;
+  /* top: 0;
+  left: 0; */
 }
 
-.duck.up .beak {
+/* .duck.up .beak {
   top: -3px;
   z-index: -1;
 }
@@ -171,7 +171,7 @@ p, h1, h2, h3, h4 {
 
 .duck.right .beak {
   left: calc((var(--w) * 2px) + 5px)
-}
+} */
 
 .duck.down .legs {
   z-index: 1;
@@ -229,3 +229,30 @@ a:hover {
 }
 
 
+.marker {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: -5px;
+  margin-left: -5px;
+  z-index: 100;
+  transition: 0.2s;
+}
+
+.red { 
+  background-color: rgb(223, 74, 41); 
+}
+.blue { 
+  background-color: rgb(140, 238, 250); 
+}
+
+.duckling {
+  position: absolute;
+  background: rgb(234, 7, 192);
+
+  width: 30px;
+  height: 30px;
+  color: white;
+  transition: 0.5s;
+}
