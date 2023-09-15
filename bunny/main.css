@@ -29,25 +29,40 @@ p, h1, h2, h3, h4 {
   align-items: end;
 }
 
-
+:root {
+  --joint: 25px;
+}
 /* 
 div {
   border: 1px solid white;
 } */
 
+/* .waist {
+  margin-bottom: 70px;
+} */
+
 .body {
-  position: absolute;
   width: 80px;
   height: 70px;
   border: 1px solid yellow;
-  --joint: 25px;
-  margin-bottom: 70px;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, calc(-70px + var(--joint)));
 }
 
-.body div:not(.joint) {
+.bunny {
+  width: 300px;
+  height: 300px;
+}
+
+
+.bunny div:not(.joint) {
   position: absolute;
 }
 
+/* .test-joint {
+  transform: rotate(-45deg);
+} */
 
 .joint {
   width: var(--joint);
@@ -83,6 +98,7 @@ div {
 }
 
 .upper-body,
+/* .upper-waist, */
 .waist {
   /* position: absolute; */
   height: var(--joint);
@@ -106,18 +122,19 @@ div {
 }
 
 
-.waist {
-  width: 100%;
-  bottom: 0;
-}
-
-.waist.upper {
-  bottom: 0;
+.belly {
+  width: 80px;
+  height: var(--joint);
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: rgba(255, 192, 203, 0.354);
+  display: flex;
   justify-content: center;
 }
 
-.waist.lower {
+.waist {
+  height: var(--joint);
   width: 80px;
   background-color: rgba(92, 183, 208, 0.275);
   left: 50%;
@@ -128,6 +145,7 @@ div {
   width: var(--joint);
   height: calc(var(--joint) * 2);
   background-color: #ffffff9e;
+  bottom: 0;
 }
 
 .leg {
@@ -168,4 +186,14 @@ a:hover {
   top: 10px;
   left: 10px;
   color: #fff945;
+}
+
+.buttons {
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.buttons button {
+  margin: 8px;
 }
