@@ -41,6 +41,10 @@ function init() {
       x: 0,
       y: 0,
     },
+    limitedTarget: {
+      x: 0,
+      y: 0,
+    },
     cursor: {
       x: null,
       y: null,
@@ -74,7 +78,7 @@ function init() {
 
 
   const elAngle = el =>{
-    const { x, y } = control.target
+    const { x, y } = control.limitedTarget
     const angle = radToDeg(Math.atan2(el.y - y, el.x - x)) - 90
     const adjustedAngle = angle < 0 ? angle + 360 : angle
     return nearestN(adjustedAngle, 1)
@@ -119,13 +123,12 @@ function init() {
     const dx1 = target.x - pos.x
     const dy2 = pos.y - facing.y
 
-    return dx2 * dy1 > dx1 * dy2 ? 'anit-clockwise' : 'clockwise'
+    return dx2 * dy1 > dx1 * dy2 ? 'anti-clockwise' : 'clockwise'
   }
 
 
   const animateDuck = () => {
-    elements.indicator.innerHTML = directionConversions[nearestN(control.duck.angle, 45)]
-    control.duck.el.className = `duck ${directionConversions[nearestN(control.duck.angle, 45)]} waddle`
+    indicator.innerHTML = `${control.duck.angle} - ${directionConversions[nearestN(control.duck.angle, 45)]}`
   }
 
   window.addEventListener('mousemove', e => {
@@ -158,27 +161,30 @@ function init() {
         target: { x, y },
       })
   
-      console.log('1.5', direction)
+      
   
       control.target = { x, y }
 
-      // control.target = rotateCoord({
-      //   deg: {
-      //     'clockwise': 30,
-      //     'anti-clockwise': -30
-      //   }[direction],
-      //   x, y,
-      //   offset: control.duck
-      // })
+      control.limitedTarget = rotateCoord({
+        deg: {
+          'clockwise': 30,
+          'anti-clockwise': -30
+        }[direction],
+        x, y,
+        offset: control.duck
+      })
+
+      console.log('1.5', direction, control.limitedTarget)
   
       positionMarker(1, control.target)
-      positionMarker(2, { x, y })  
+      positionMarker(2, control.limitedTarget)  
 
       updateData(control.duck, {
         angle: elAngle(control.duck),
       })
 
       setStyles(control.duck)
+      animateDuck()
 
     }, 1000)
       

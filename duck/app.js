@@ -60,8 +60,8 @@ function init() {
     },
     duck: {
       el: elements.duck,
-      x: 10,
-      y: 10,
+      x: 0,
+      y: 0,
       angle: null,
       offset: 24,
       neck: {
@@ -269,7 +269,7 @@ const rotateCoord = ({ deg, x, y, offset }) => {
     const dx1 = target.x - pos.x
     const dy2 = pos.y - facing.y
 
-    return dx2 * dy1 > dx1 * dy2 ? 'anit-clockwise' : 'clockwise'
+    return dx2 * dy1 > dx1 * dy2 ? 'anti-clockwise' : 'clockwise'
   }
 
 
