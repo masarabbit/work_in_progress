@@ -60,8 +60,8 @@ function init() {
     },
     duck: {
       el: elements.duck,
-      x: 0,
-      y: 0,
+      x: 10,
+      y: 10,
       angle: null,
       offset: 24,
       neck: {
@@ -71,7 +71,12 @@ function init() {
       body: {
         el: elements.duck.childNodes[1],
         angle: 0
+      },
+      tail: {
+        el: document.querySelector('.duck-tail'),
+        angle: 0
       }
+
     },
     ducklingTargets: [ // ? this could be set with function too.
       {
@@ -136,6 +141,30 @@ function init() {
     : value
   }
 
+//   function rotatePoint2D(nRadians, nX, nY) {
+//     var nSin = Math.sin(nRadians);
+//     var nCos = Math.cos(nRadians);
+//     var point2D = new createjs.Point();
+//     point2D.x = nCos * nX - nSin * nY;
+//     point2D.y = nSin * nX + nCos * nY;
+//     return point2D;
+// 　}
+
+
+
+const rotateCoord = ({ deg, x, y, offset }) => {
+  const rad = degToRad(deg)
+  const nX = x - offset.x
+  const nY = y - offset.y
+  const nSin = Math.sin(rad)
+  const nCos = Math.cos(rad)
+  return {
+    x: (nCos * nX - nSin * nY) + offset.x,
+    y: (nSin * nX + nCos * nY) + offset.y
+  }
+}
+
+
   const moveWithinBound = ({ el, boundary, pos, buffer }) => {
     const { left: hX, top: hY, width, height } = boundary.getBoundingClientRect()
 
@@ -185,7 +214,6 @@ function init() {
   // https://mathwords.net/naibunzahyo
 
   const getNewPosBasedOnTarget = ({ start, target, distance: d, fullDistance }) => {
-
     const { x: aX, y: aY } = start
     const { x: bX, y: bY } = target
     
@@ -234,26 +262,44 @@ function init() {
     })
   })
 
+  const getDirection = ({ pos, facing, target }) =>{
+    // https://qiita.com/tydesign/items/d41ac74b5effd87141b8
+    const dx2 = facing.x - pos.x
+    const dy1 = pos.y - target.y
+    const dx1 = target.x - pos.x
+    const dy2 = pos.y - facing.y
+
+    return dx2 * dy1 > dx1 * dy2 ? 'anit-clockwise' : 'clockwise'
+  }
+
 
   const animateDuck = () => {
-
+    console.log('1', control.duck.angle)
+    // TODO turn 1 bit at a time?
     updateData(control.duck, {
       angle: elAngle(control.duck),
     })
+  
+    console.log('2', control.duck.angle)
 
-    setStyles({
-      el: control.duck.body.el,
-      deg: elAngle(control.duck) + 180
-    })
+    // setStyles({
+    //   el: control.duck.body.el,
+    //   deg: elAngle(control.duck) + 180
+    // })
 
-    setStyles({
-      el: control.duck.neck.el,
-      deg: elAngle(control.duck)
-    })
-    setStyles({
-      el: control.duck.neck.el.childNodes[1],
-      deg: -elAngle(control.duck)
-    })
+    // setStyles({
+    //   el: control.duck.tail.el,
+    //   deg: elAngle(control.duck) + 180 * -1
+    // })
+
+    // setStyles({
+    //   el: control.duck.neck.el,
+    //   deg: elAngle(control.duck)
+    // })
+    // setStyles({
+    //   el: control.duck.neck.el.childNodes[1],
+    //   deg: -elAngle(control.duck)
+    // })
     
     elements.indicator.innerHTML = directionConversions[nearestN(control.duck.angle, 45)]
     control.duck.el.className = `duck ${directionConversions[nearestN(control.duck.angle, 45)]} waddle`
@@ -280,23 +326,33 @@ function init() {
     control.cursor.x = e.pageX
     control.cursor.y = e.pageY
 
-    // control.target = {
-    //   x: e.pageX,
-    //   y: e.pageY
-    // }
-
     positionMarker(0, {
       x: e.pageX,
       y: e.pageY
     })
   })
 
+
+  // const checkBoundaryAndUpdatePos = (x, y, data) => {
+  //   const buffer = 50
+  //   const checkBoundaryAndUpdate = (p, n, elem) => {
+  //     data.xy[p] = n > (body[elem] - buffer)
+  //       ? body[elem] - randomShift()
+  //       : n < buffer
+  //         ? randomShift()
+  //         : n
+  //   }      
+  //   checkBoundaryAndUpdate('x', x, 'clientWidth')
+  //   checkBoundaryAndUpdate('y', y, 'clientHeight')
+    
+  //   setMargin(data.bot, data.xy.x, data.xy.y)
+  // }
+
   const triggerMovement = () => {
 
     setInterval(()=> {
       const fullDistance = distanceBetween(control.duck, control.cursor)
 
-      console.log(fullDistance)
       if (!fullDistance || fullDistance < 100) {
         control.duck.el.classList.remove('waddle')
 
@@ -310,13 +366,34 @@ function init() {
         start: control.duck,
         target: control.cursor
       })
-      
-      // TODO need to add logic to adjust angle
 
-      moveMotherDuck({ x, y })
+      const direction = getDirection({
+        pos: control.duck,
+        facing: control.target,
+        target: { x, y },
+      })
+
+      console.log('1.5', direction)
+
+
+      control.target = rotateCoord({
+        deg: {
+          'clockwise': 30,
+          'anti-clockwise': -30
+        }[direction],
+        x, y,
+        offset: control.duck
+      })
+      // control.target = { x, y }
+
+
+      moveMotherDuck(control.target)
   
-      positionMarker(1, { x, y })
-      animateDuck()
+      positionMarker(1, control.target)
+      positionMarker(2, { x, y })
+
+    
+      animateDuck(control.target)
     }, 1000)
     
     control.ducklings.forEach((duckling, i) => {
