@@ -1,6 +1,8 @@
 
 function init() { 
 
+  // TODO add experessions
+
   const parts = {
     neck: document.querySelector('.neck-base'),
     shoulders: document.querySelectorAll('.shoulder'),
@@ -10,96 +12,33 @@ function init() {
 
   const poses = {
     shrug: [
-      {
-        el: parts.neck,
-        deg: 20
-      },
-      {
-        el: parts.shoulders[0],
-        deg: 65
-      },
-      {
-        el: parts.elbows[0],
-        deg: 40
-      },
-      {
-        el: parts.shoulders[1],
-        deg: -65
-      },
-      {
-        el: parts.elbows[1],
-        deg: -40
-      },
+      { el: parts.neck, deg: 20 },
+      { el: parts.shoulders[0], deg: 65 },
+      { el: parts.elbows[0], deg: 40 },
+      { el: parts.shoulders[1], deg: -65 },
+      { el: parts.elbows[1], deg: -40 },
     ],
     leftArmUp: [
-      {
-        el: parts.neck,
-        deg: 10
-      },
-      {
-        el: parts.shoulders[0],
-        deg: 100
-      },
-      {
-        el: parts.elbows[0],
-        deg: 45
-      },
-      {
-        el: parts.shoulders[1],
-        deg: -50
-      },
-      {
-        el: parts.elbows[1],
-        deg: 65
-      },
-      {
-        el: parts.waist,
-        deg: 5
-      },
+      { el: parts.neck, deg: 10 },
+      { el: parts.shoulders[0], deg: 100 },
+      { el: parts.elbows[0], deg: 45 },
+      { el: parts.shoulders[1], deg: -50 },
+      { el: parts.elbows[1], deg: 65 },
+      { el: parts.waist, deg: 5 },
     ],
     rightArmUp: [
-      {
-        el: parts.neck,
-        deg: -10
-      },
-      {
-        el: parts.shoulders[0],
-        deg: 50
-      },
-      {
-        el: parts.elbows[0],
-        deg: -65
-      },
-      {
-        el: parts.shoulders[1],
-        deg: -100
-      },
-      {
-        el: parts.elbows[1],
-        deg: -45
-      },
-      {
-        el: parts.waist,
-        deg: -5
-      },
+      { el: parts.neck, deg: -10 },
+      { el: parts.shoulders[0], deg: 50 },
+      { el: parts.elbows[0], deg: -65 },
+      { el: parts.shoulders[1], deg: -100 },
+      { el: parts.elbows[1], deg: -45 },
+      { el: parts.waist, deg: -5 },
     ],
     bothArmsUp: [
-      {
-        el: parts.shoulders[0],
-        deg: 120
-      },
-      {
-        el: parts.elbows[0],
-        deg: 45
-      },
-      {
-        el: parts.shoulders[1],
-        deg: -120
-      },
-      {
-        el: parts.elbows[1],
-        deg: -45
-      },
+      { el: parts.shoulders[0], deg: 120 },
+      { el: parts.elbows[0], deg: 45 },
+      { el: parts.shoulders[1], deg: -120 },
+      { el: parts.elbows[1], deg: -45 },
     ],
   }
 

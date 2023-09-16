@@ -43,11 +43,11 @@ div {
 
 .body {
   width: 80px;
-  height: 70px;
+  height: 50px;
   border: 1px solid yellow;
   top: 0;
   left: 50%;
-  transform: translate(-50%, calc(-70px + var(--joint)));
+  transform: translate(-50%, calc(-50px + var(--joint)));
 }
 
 .bunny {
@@ -65,6 +65,7 @@ div {
 } */
 
 .joint {
+  position: relative;
   width: var(--joint);
   height: var(--joint);
   border-radius: 50%;
@@ -78,11 +79,28 @@ div {
 }
 
 .head {
-  width: 100px;
-  height: 70px;
+  width: 140px;
+  height: 100px;
   left: 50%;
-  transform: translate(-50%, -60px);
+  transform: translate(-50%, -90px);
   border: 1px solid rgb(154, 154, 239);
+  display: flex;
+  justify-content: center;
+}
+
+.ears {
+  width: 100px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.ear {
+  height: 80px;
+  width: 30px;
+  border: 1px solid rgba(255, 255, 0, 0.32);
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .neck {
@@ -97,10 +115,13 @@ div {
   left: calc(var(--joint) / -2);
 }
 
+.upper-body {
+  width: calc(100% + var(--joint) * 1.5);
+  left: calc(var(--joint) * -0.75);
+}
+
 .upper-body,
-/* .upper-waist, */
 .waist {
-  /* position: absolute; */
   height: var(--joint);
   border: 1px solid rgb(112, 247, 121);
   display: flex;
@@ -109,9 +130,8 @@ div {
 
 .upper-arm,
 .lower-arm {
-  /* position: absolute; */
   width: var(--joint);
-  height: 50px;
+  height: 45px;
   border: 1px solid rgb(83, 180, 245);
   display: flex;
   align-items: end;
@@ -152,9 +172,15 @@ div {
   /* position: absolute; */
   top: 0;
   width: var(--joint);
-  height: 70px;
+  height: 60px;
   border: 1px solid rgb(83, 180, 245);
 }
+
+
+
+
+
+/* background */
 
 .ground {
   position: absolute;
