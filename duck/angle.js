@@ -35,9 +35,27 @@ function init() {
     }
   }
 
-  const setStyles = ({ el, angle }) =>{
-    el.style.transform = `rotate(${angle || 0}deg)`
+  // const setStyles = ({ el, angle }) =>{
+  //   el.style.transform = `rotate(${angle || 0}deg)`
+  //   el.style.zIndex = y
+  // }
+
+  const setStyles = ({ el, h, w, x, y, angle }) =>{
+    if (h) el.style.height = h
+    if (w) el.style.width = w
+    el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0}) rotate(${angle || 0}deg)`
+
     el.style.zIndex = y
+  }
+
+  const moveDuck = ({ x, y }, duck) => {
+    updateData(duck, {
+      // x: x - duck.offset, 
+      // y: y - duck.offset,
+      x, y 
+    })
+    // console.log(x, y, duck)
+    setStyles(duck)
   }
 
   const elAngle = (el, pos) =>{
@@ -74,12 +92,12 @@ function init() {
   const { x, y } = box.getBoundingClientRect()
   control.duck.x = x
   control.duck.y = y
-  positionMarker(3, offsetPosition(control.duck))
+  positionMarker(3, control.duck)
   control.target = {
     x: control.duck.x + control.duck.offset,
     y: control.duck.y + control.duck.offset + 100
   }
-  control.duck.angle = elAngle(offsetPosition(control.duck), control.target)
+  // control.duck.angle = elAngle(control.duck, control.target)
 
 
 
@@ -154,6 +172,8 @@ function init() {
 
   const triggerMovement = () => {
     setInterval(()=> {
+        
+      positionMarker(3, control.duck) 
       const fullDistance = distanceBetween(offsetPosition(control.duck), control.cursor)
 
       const { x, y } = getNewPosBasedOnTarget({
@@ -163,35 +183,49 @@ function init() {
         target: control.cursor
       })
 
-      if (distanceBetween(control.target, { x, y }) < 20) return
-
       control.duck.direction = getDirection({
         pos: offsetPosition(control.duck),
         facing: control.target,
         target: { x, y }
       })
+
+      positionMarker(2, { x, y })  
+
+      // if (distanceBetween(control.target, { x, y }) > 20) {
   
-      positionMarker(1, { x, y }) 
-      console.log(control.target)
+        positionMarker(1, { x, y }) 
+        console.log(control.target)
+  
+        control.target = rotateCoord({
+          deg: {
+            'clockwise': 20,
+            'anti-clockwise': -20
+          }[control.duck.direction],
+          // x: control.target.x, 
+          // y: control.target.y,
+          x, y,
+          offset: offsetPosition(control.duck),
+        })
+      // } else {
+      //   control.target = { x, y }
+      // }
 
-      control.target = rotateCoord({
-        deg: {
-          'clockwise': 20,
-          'anti-clockwise': -20
-        }[control.duck.direction],
-        x: control.target.x, 
-        y: control.target.y,
-        offset: offsetPosition(control.duck)
-      })
+      positionMarker(1, control.target)  
+      
+   
+      
 
-      positionMarker(2, control.target)  
+
       // console.log('1.5', control.duck.direction)
-      const angle = elAngle(control.duck, control.target)
+      const angle = elAngle(offsetPosition(control.duck), control.target)
 
-      updateData(control.duck, { angle })
+      // updateData(control.duck, { angle })
       // setStyles(control.duck)
-      box.className = `box ${directionConversions[nearestN(control.duck.angle, 45)]}`
-      animateDuck()
+      box.className = `box ${directionConversions[nearestN(angle, 45)]}`
+
+      indicator.innerHTML = `${directionConversions[nearestN(angle, 45)]}`
+      // animateDuck()
+      moveDuck(control.target, control.duck)
     }, 1000)
   }
 
