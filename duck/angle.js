@@ -58,6 +58,14 @@ function init() {
     setStyles(duck)
   }
 
+  const adjustedAngle = angle => {
+    return angle < 0 
+      ? angle + 360 
+      : angle > 360
+      ? angle - 360
+      : angle
+  }
+
   const elAngle = (el, pos) =>{
     const { x, y } = pos
     const angle = radToDeg(Math.atan2(el.y - y, el.x - x)) - 90
@@ -85,7 +93,7 @@ function init() {
       angle: null,
       offset: 24,
       el: box,
-      direction: 'up'
+      direction: 'up',
     },
   }
 
@@ -193,40 +201,54 @@ function init() {
 
       // if (distanceBetween(control.target, { x, y }) > 20) {
   
-        positionMarker(1, { x, y }) 
+        // positionMarker(1, { x, y }) 
         console.log(control.target)
-  
-        control.target = rotateCoord({
-          deg: {
-            'clockwise': 20,
-            'anti-clockwise': -20
-          }[control.duck.direction],
-          // x: control.target.x, 
-          // y: control.target.y,
-          x, y,
-          offset: offsetPosition(control.duck),
-        })
-      // } else {
-      //   control.target = { x, y }
-      // }
 
-      positionMarker(1, control.target)  
-      
-   
-      
+        const angle = elAngle(offsetPosition(control.duck), control.target)
+        const newAngle = elAngle(offsetPosition(control.duck), { x, y })
+        
+        const diff = Math.abs(angle - newAngle)
+        const actualDiff = Math.abs(adjustedAngle(angle) - adjustedAngle(newAngle))
+        // TODO the diff appears much larget than it is when 
 
+        const limit = 60
 
-      // console.log('1.5', control.duck.direction)
-      const angle = elAngle(offsetPosition(control.duck), control.target)
+        if (actualDiff > limit) {
+          control.target = rotateCoord({
+            deg: {
+              'clockwise': diff > limit ? limit : diff,
+              'anti-clockwise': diff > limit ? -limit : -diff
+            }[control.duck.direction],
+            x: control.target.x, 
+            y: control.target.y,
+            offset: offsetPosition(control.duck),
+          })
+          positionMarker(1, control.target)  
+          
+          const angle = elAngle(offsetPosition(control.duck), control.target)
+          box.className = `box ${directionConversions[nearestN(angle, 45)]}`
+          indicator.innerHTML = `rotate ${actualDiff} ${diff} ${directionConversions[nearestN(angle, 45)]}`
 
-      // updateData(control.duck, { angle })
-      // setStyles(control.duck)
-      box.className = `box ${directionConversions[nearestN(angle, 45)]}`
+          // TODO it would be good if there was some way to move closer even while rotating
+        } else {
+          control.target = rotateCoord({
+            deg: {
+              'clockwise': diff,
+              'anti-clockwise': -diff
+            }[control.duck.direction],
+            x, y,
+            offset: offsetPosition(control.duck),
+          })
 
-      indicator.innerHTML = `${directionConversions[nearestN(angle, 45)]}`
-      // animateDuck()
-      moveDuck(control.target, control.duck)
-    }, 1000)
+          // control.target = { x, y }
+
+          const angle = elAngle(offsetPosition(control.duck), control.target)
+          box.className = `box ${directionConversions[nearestN(angle, 45)]}`
+          indicator.innerHTML = `${diff} ${directionConversions[nearestN(angle, 45)]}`
+          moveDuck(control.target, control.duck)
+        }
+
+    }, 700)
   }
 
   triggerMovement()
