@@ -159,8 +159,8 @@ const rotateCoord = ({ deg, x, y, offset }) => {
   const nSin = Math.sin(rad)
   const nCos = Math.cos(rad)
   return {
-    x: (nCos * nX - nSin * nY) + offset.x,
-    y: (nSin * nX + nCos * nY) + offset.y
+    x: Math.round((nCos * nX - nSin * nY) + offset.x),
+    y: Math.round((nSin * nX + nCos * nY) + offset.y)
   }
 }
 

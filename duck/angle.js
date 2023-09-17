@@ -1,7 +1,6 @@
 
 function init() { 
 
-  
   const marker = document.querySelectorAll('.marker')
   const box = document.querySelector('.box')
   const indicator = document.querySelector('.indicator')
@@ -27,24 +26,37 @@ function init() {
     270: 'left',
     315: 'up left',
   }
-
+  
+  // TODO could apply this in opposit way when setting duck position, since or embed in setStyles since we only need the unoffsetted position for setStyles
+  const offsetPosition = data => {
+    return {
+      x: data.x + data.offset,
+      y: data.y + data.offset,
+    }
+  }
 
   const setStyles = ({ el, angle }) =>{
     el.style.transform = `rotate(${angle || 0}deg)`
-
     el.style.zIndex = y
   }
 
+  const elAngle = (el, pos) =>{
+    const { x, y } = pos
+    const angle = radToDeg(Math.atan2(el.y - y, el.x - x)) - 90
+    const adjustedAngle = angle < 0 ? angle + 360 : angle
+    return nearestN(adjustedAngle, 1)
+    // return nearestN(angle, 1)
+  }
 
   const control = {
     target: {
-      x: 0,
-      y: 0,
+      x: 100,
+      y: 100,
     },
-    limitedTarget: {
-      x: 0,
-      y: 0,
-    },
+    // limitedTarget: {
+    //   x: 0,
+    //   y: 0,
+    // },
     cursor: {
       x: null,
       y: null,
@@ -54,14 +66,21 @@ function init() {
       y: 0,
       angle: null,
       offset: 24,
-      el: box
+      el: box,
+      direction: 'up'
     },
   }
 
   const { x, y } = box.getBoundingClientRect()
-  control.duck.x = x + 25
-  control.duck.y = y + 25
-  positionMarker(3, control.duck)
+  control.duck.x = x
+  control.duck.y = y
+  positionMarker(3, offsetPosition(control.duck))
+  control.target = {
+    x: control.duck.x + control.duck.offset,
+    y: control.duck.y + control.duck.offset + 100
+  }
+  control.duck.angle = elAngle(offsetPosition(control.duck), control.target)
+
 
 
   const rotateCoord = ({ deg, x, y, offset }) => {
@@ -71,18 +90,11 @@ function init() {
     const nSin = Math.sin(rad)
     const nCos = Math.cos(rad)
     return {
-      x: (nCos * nX - nSin * nY) + offset.x,
-      y: (nSin * nX + nCos * nY) + offset.y
+      x: Math.round((nCos * nX - nSin * nY) + offset.x),
+      y: Math.round((nSin * nX + nCos * nY) + offset.y)
     }
   }
 
-
-  const elAngle = el =>{
-    const { x, y } = control.limitedTarget
-    const angle = radToDeg(Math.atan2(el.y - y, el.x - x)) - 90
-    const adjustedAngle = angle < 0 ? angle + 360 : angle
-    return nearestN(adjustedAngle, 1)
-  }
 
   const updateData = (data, newData) => {
     Object.keys(newData).forEach(key => {
@@ -101,9 +113,6 @@ function init() {
   }
 
 
-
-  // https://mathwords.net/naibunzahyo
-
   const getNewPosBasedOnTarget = ({ start, target, distance: d, fullDistance }) => {
     const { x: aX, y: aY } = start
     const { x: bX, y: bY } = target
@@ -117,7 +126,6 @@ function init() {
 
 
   const getDirection = ({ pos, facing, target }) =>{
-    // https://qiita.com/tydesign/items/d41ac74b5effd87141b8
     const dx2 = facing.x - pos.x
     const dy1 = pos.y - target.y
     const dx1 = target.x - pos.x
@@ -125,6 +133,8 @@ function init() {
 
     return dx2 * dy1 > dx1 * dy2 ? 'anti-clockwise' : 'clockwise'
   }
+
+
 
 
   const animateDuck = () => {
@@ -142,55 +152,51 @@ function init() {
   })
 
 
-
   const triggerMovement = () => {
-    
     setInterval(()=> {
-      const fullDistance = distanceBetween(control.duck, control.cursor)
+      const fullDistance = distanceBetween(offsetPosition(control.duck), control.cursor)
 
       const { x, y } = getNewPosBasedOnTarget({
         distance: 100,
         fullDistance,
-        start: control.duck,
+        start: offsetPosition(control.duck),
         target: control.cursor
       })
-  
-      const direction = getDirection({
-        pos: control.duck,
+
+      if (distanceBetween(control.target, { x, y }) < 20) return
+
+      control.duck.direction = getDirection({
+        pos: offsetPosition(control.duck),
         facing: control.target,
-        target: { x, y },
+        target: { x, y }
       })
   
-      
-  
-      control.target = { x, y }
+      positionMarker(1, { x, y }) 
+      console.log(control.target)
 
-      control.limitedTarget = rotateCoord({
+      control.target = rotateCoord({
         deg: {
-          'clockwise': 30,
-          'anti-clockwise': -30
-        }[direction],
-        x, y,
-        offset: control.duck
+          'clockwise': 20,
+          'anti-clockwise': -20
+        }[control.duck.direction],
+        x: control.target.x, 
+        y: control.target.y,
+        offset: offsetPosition(control.duck)
       })
 
-      console.log('1.5', direction, control.limitedTarget)
-  
-      positionMarker(1, control.target)
-      positionMarker(2, control.limitedTarget)  
+      positionMarker(2, control.target)  
+      // console.log('1.5', control.duck.direction)
+      const angle = elAngle(control.duck, control.target)
 
-      updateData(control.duck, {
-        angle: elAngle(control.duck),
-      })
-
-      setStyles(control.duck)
+      updateData(control.duck, { angle })
+      // setStyles(control.duck)
+      box.className = `box ${directionConversions[nearestN(control.duck.angle, 45)]}`
       animateDuck()
-
     }, 1000)
-      
   }
 
   triggerMovement()
+
 
   // TODO getOffSetPos isn't the right way to get this answer
 

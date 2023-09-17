@@ -226,7 +226,7 @@ function init() {
     const dx1 = target.x - pos.x
     const dy2 = pos.y - facing.y
 
-    return dx2 * dy1 > dx1 * dy2 ? 'anit-clockwise' : 'clockwise'
+    return dx2 * dy1 > dx1 * dy2 ? 'anti-clockwise' : 'clockwise'
   }
 
   const turnDog = ({ dog, start, end, direction }) => {
