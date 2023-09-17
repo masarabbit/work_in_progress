@@ -76,8 +76,8 @@ function init() {
 
   const control = {
     target: {
-      x: 100,
-      y: 100,
+      x: null,
+      y: null,
     },
     // limitedTarget: {
     //   x: 0,
@@ -197,7 +197,7 @@ function init() {
         target: { x, y }
       })
 
-      positionMarker(2, { x, y })  
+      positionMarker(1, { x, y })  
 
       // if (distanceBetween(control.target, { x, y }) > 20) {
   
@@ -214,7 +214,7 @@ function init() {
         const limit = 60
 
         if (actualDiff > limit) {
-          control.target = rotateCoord({
+          control.target = rotateCoord({ // TODO I think something isn't right with this bit
             deg: {
               'clockwise': diff > limit ? limit : diff,
               'anti-clockwise': diff > limit ? -limit : -diff
@@ -223,13 +223,23 @@ function init() {
             y: control.target.y,
             offset: offsetPosition(control.duck),
           })
-          positionMarker(1, control.target)  
+        
           
           const angle = elAngle(offsetPosition(control.duck), control.target)
           box.className = `box ${directionConversions[nearestN(angle, 45)]}`
           indicator.innerHTML = `rotate ${actualDiff} ${diff} ${directionConversions[nearestN(angle, 45)]}`
+          positionMarker(2, control.target)  
+          
 
           // TODO it would be good if there was some way to move closer even while rotating
+          // moveDuck(getOffsetPos({ 
+          //   x: control.duck.x, 
+          //   y: control.duck.y, 
+          //   distance: 30, 
+          //   angle: newAngle
+          // }), control.duck)
+
+
         } else {
           control.target = rotateCoord({
             deg: {
@@ -239,14 +249,16 @@ function init() {
             x, y,
             offset: offsetPosition(control.duck),
           })
-
           // control.target = { x, y }
 
           const angle = elAngle(offsetPosition(control.duck), control.target)
+          // updateData(control.duck, { angle })
           box.className = `box ${directionConversions[nearestN(angle, 45)]}`
           indicator.innerHTML = `${diff} ${directionConversions[nearestN(angle, 45)]}`
           moveDuck(control.target, control.duck)
         }
+
+   
 
     }, 700)
   }
