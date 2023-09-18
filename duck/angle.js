@@ -27,7 +27,7 @@ function init() {
     315: 'up left',
   }
   
-  // TODO could apply this in opposit way when setting duck position, since or embed in setStyles since we only need the unoffsetted position for setStyles
+
   const offsetPosition = data => {
     return {
       x: data.x + data.offset,
@@ -35,10 +35,6 @@ function init() {
     }
   }
 
-  // const setStyles = ({ el, angle }) =>{
-  //   el.style.transform = `rotate(${angle || 0}deg)`
-  //   el.style.zIndex = y
-  // }
 
   const setStyles = ({ el, h, w, x, y, angle }) =>{
     if (h) el.style.height = h
@@ -50,11 +46,8 @@ function init() {
 
   const moveDuck = ({ x, y }, duck) => {
     updateData(duck, {
-      // x: x - duck.offset, 
-      // y: y - duck.offset,
-      x, y 
+      x, y
     })
-    // console.log(x, y, duck)
     setStyles(duck)
   }
 
@@ -78,11 +71,8 @@ function init() {
     target: {
       x: null,
       y: null,
+      offset: 24,
     },
-    // limitedTarget: {
-    //   x: 0,
-    //   y: 0,
-    // },
     cursor: {
       x: null,
       y: null,
@@ -101,10 +91,12 @@ function init() {
   control.duck.x = x
   control.duck.y = y
   positionMarker(3, control.duck)
-  control.target = {
-    x: control.duck.x + control.duck.offset,
-    y: control.duck.y + control.duck.offset + 100
-  }
+  // control.target = {
+  //   x: control.duck.x + control.duck.offset,
+  //   y: control.duck.y + control.duck.offset - 100
+  // }
+
+  positionMarker(1, control.target)  
   // control.duck.angle = elAngle(control.duck, control.target)
 
 
@@ -177,15 +169,21 @@ function init() {
     })
   })
 
+  const returnSmallerDiff = (angleA, angleB) => {
+    const diff1 = Math.abs(angleA - angleB)
+    const diff2 = 360 - diff1
+
+    return diff1 > diff2 ? diff2 : diff1
+  }
+
 
   const triggerMovement = () => {
-    setInterval(()=> {
-        
-      positionMarker(3, control.duck) 
+    setInterval(()=> {   
       const fullDistance = distanceBetween(offsetPosition(control.duck), control.cursor)
+      const distanceToMove = fullDistance > 50 ? 50 : fullDistance
 
       const { x, y } = getNewPosBasedOnTarget({
-        distance: 100,
+        distance: distanceToMove,
         fullDistance,
         start: offsetPosition(control.duck),
         target: control.cursor
@@ -196,77 +194,70 @@ function init() {
         facing: control.target,
         target: { x, y }
       })
-
+      
+      positionMarker(3, offsetPosition(control.duck)) 
+      positionMarker(2, control.target)  
       positionMarker(1, { x, y })  
 
-      // if (distanceBetween(control.target, { x, y }) > 20) {
-  
-        // positionMarker(1, { x, y }) 
-        console.log(control.target)
 
-        const angle = elAngle(offsetPosition(control.duck), control.target)
-        const newAngle = elAngle(offsetPosition(control.duck), { x, y })
-        
-        const diff = Math.abs(angle - newAngle)
-        const actualDiff = Math.abs(adjustedAngle(angle) - adjustedAngle(newAngle))
-        // TODO the diff appears much larget than it is when 
+      const angle = elAngle(offsetPosition(control.duck), control.target)
+      const newAngle = elAngle(offsetPosition(control.duck), { x, y })
+      const diff = returnSmallerDiff(angle, newAngle)
+      const limit = 60
 
-        const limit = 60
+      indicator.innerHTML = `angle ${newAngle} diff ${diff} direction: ${control.duck.direction}`
 
-        if (actualDiff > limit) {
-          control.target = rotateCoord({ // TODO I think something isn't right with this bit
-            deg: {
-              'clockwise': diff > limit ? limit : diff,
-              'anti-clockwise': diff > limit ? -limit : -diff
-            }[control.duck.direction],
-            x: control.target.x, 
-            y: control.target.y,
-            offset: offsetPosition(control.duck),
-          })
-        
-          
-          const angle = elAngle(offsetPosition(control.duck), control.target)
-          box.className = `box ${directionConversions[nearestN(angle, 45)]}`
-          indicator.innerHTML = `rotate ${actualDiff} ${diff} ${directionConversions[nearestN(angle, 45)]}`
-          positionMarker(2, control.target)  
-          
-
-          // TODO it would be good if there was some way to move closer even while rotating
-          // moveDuck(getOffsetPos({ 
-          //   x: control.duck.x, 
-          //   y: control.duck.y, 
-          //   distance: 30, 
-          //   angle: newAngle
-          // }), control.duck)
+      if (diff > limit) {
+        control.target = rotateCoord({
+          deg: {
+            'clockwise': diff > limit ? limit : diff,
+            'anti-clockwise': diff > limit ? -limit : -diff
+          }[control.duck.direction],
+          x: control.target.x, 
+          y: control.target.y,
+          offset: offsetPosition(control.duck),
+        })
+      
+        const nAngle = elAngle(offsetPosition(control.duck), control.target)
+        box.className = `box ${directionConversions[nearestN(nAngle, 45)]}`
+      } else {
+        const angle =  elAngle(offsetPosition(control.duck), { x, y })
+        box.className = `box ${directionConversions[nearestN(angle, 45)]}`
+        moveDuck({ x, y }, control.duck)
+        positionMarker(4, control.duck)  
 
 
-        } else {
-          control.target = rotateCoord({
-            deg: {
-              'clockwise': diff,
-              'anti-clockwise': -diff
-            }[control.duck.direction],
-            x, y,
-            offset: offsetPosition(control.duck),
-          })
-          // control.target = { x, y }
+        //* get offsetPos seems to be 90 degrees off (or elAngle is?)
+        control.target = getOffsetPos({ 
+          x: control.duck.x, 
+          y: control.duck.y,
+          distance: 50, 
+          angle: angle - 90
+        })
+        positionMarker(5, control.target)  
 
-          const angle = elAngle(offsetPosition(control.duck), control.target)
-          // updateData(control.duck, { angle })
-          box.className = `box ${directionConversions[nearestN(angle, 45)]}`
-          indicator.innerHTML = `${diff} ${directionConversions[nearestN(angle, 45)]}`
-          moveDuck(control.target, control.duck)
-        }
-
-   
-
-    }, 700)
+      }
+    }, 600)
   }
 
   triggerMovement()
 
 
-  // TODO getOffSetPos isn't the right way to get this answer
+  // TODO test code indicates that getOffsetPos needs adjustment to get the right position
+  // const pos1 = { x: 100, y: 200 }
+  // const pos2 = { x: 120, y: 200 }
+  // positionMarker(1, pos1)  
+
+  // positionMarker(2, pos2)  
+
+  // positionMarker(3, getOffsetPos({ 
+  //   x: pos2.x, 
+  //   y: pos2.y,
+  //   distance: 100, 
+  //   angle: elAngle(pos1, pos2) - 90
+  // }))  
+
+  // indicator.innerHTML = elAngle(pos1, pos2)
 
 }
   
