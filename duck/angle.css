@@ -29,57 +29,94 @@ p, h1, h2, h3, h4 {
   align-items: center; */
 }
 
-.box {
+/* .box {
   width: 50px;
   height: 50px;
   border: 1px solid hotpink;
-  /* display: flex;
-  justify-content: center;
-  align-items: center; */
   color: white;
   font-size: 40px;
   transition: 1s;
   --x: 15px;
   --y: 15px;
+} */
+
+.box {
+  border: 1px solid hotpink;
+  transition: 1s;
+  /* --x: 15px;
+  --y: 15px; */
+
+  --w: 20;
+  --h: 14; 
+  background-size: calc(var(--w) * 2px) calc(var(--h) * 2px) !important; 
+  background-repeat: no-repeat !important;
+  image-rendering: pixelated;
+
+  width: calc(var(--w) * 2px);
+  height: calc(var(--h) * 2px);
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAOCAYAAAAvxDzwAAAAAXNSR0IArs4c6QAAAFRJREFUOE9jZMAC/v///x+bOLoYIyMjI4YYsgCxBuEzGG4DuYbBDIe5FmwgpYYhG0p9A6nlOrgrR6CBgz+WYbFDaeSgJGxKDUXO0xiZm5QwxVY4AADV9Tf/s/CuJAAAAABJRU5ErkJggg==);
 }
+
 
 .small-box {
   position: absolute;
-  background-color: red;
+  border: 1px solid blue;
   width: 20px;
   height: 20px;
   transition: 1s;
   transform: translate(var(--x), var(--y));
+  --x: 10px;
+  --y: 4px;
 }
 
-.b {
+/* .b {
   background-color: rgb(25, 0, 255);
   width: 20px;
   height: 20px;
   transition: 1s;
   transform: translate(var(--x), var(--y));
+} */
+
+.b {
+  background-size: calc(var(--w) * 2px) calc(var(--h) * 2px) !important; 
+  background-repeat: no-repeat !important;
+  image-rendering: pixelated;
+
+  position: absolute;
+  --w: 6;
+  --h: 7;
+  width: calc(var(--w) * 2px);
+  height: calc(var(--h) * 2px);
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAHCAYAAAArkDztAAAAAXNSR0IArs4c6QAAAC1JREFUGFdjZICC/////wcxGRkZGcE0iIAJwhSBJHFLoKuG68IpgdcOZEmYvQA6WRwAeFIlLwAAAABJRU5ErkJggg==);
+  border: 1px solid red;
+  z-index: 2;
+  transition: 1s;
+  transform: translate(var(--x), var(--y));
+  --x: 14px;
+  --y: 7px;
+
 }
 
-.up {
+.up .small-box{
   --y: 0px;
 }
 
-.right {
-  --x: 30px; 
+.right .small-box{
+  --x: 20px; 
 }
 
-.down {
-  --y: 30px;
+.down .small-box{
+  --y: 8px;
 }
 
-.left {
+.left .small-box{
   --x: 0px;
 }
 
 
 
 .up .b {
-  --y: 30px;
+  --y: 14px;
 }
 
 .right .b {
@@ -91,7 +128,7 @@ p, h1, h2, h3, h4 {
 }
 
 .left .b {
-  --x: 30px;
+  --x: 28px;
 }
 
 

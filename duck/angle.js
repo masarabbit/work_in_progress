@@ -30,8 +30,8 @@ function init() {
 
   const offsetPosition = data => {
     return {
-      x: data.x + data.offset,
-      y: data.y + data.offset,
+      x: data.x + data.offset.x,
+      y: data.y + data.offset.y,
     }
   }
 
@@ -71,7 +71,6 @@ function init() {
     target: {
       x: null,
       y: null,
-      offset: 24,
     },
     cursor: {
       x: null,
@@ -81,7 +80,10 @@ function init() {
       x: 0,
       y: 0,
       angle: null,
-      offset: 24,
+      offset: {
+        x: 20,
+        y: 14,
+      },
       el: box,
       direction: 'up',
     },
@@ -91,10 +93,7 @@ function init() {
   control.duck.x = x
   control.duck.y = y
   positionMarker(3, control.duck)
-  // control.target = {
-  //   x: control.duck.x + control.duck.offset,
-  //   y: control.duck.y + control.duck.offset - 100
-  // }
+
 
   positionMarker(1, control.target)  
   // control.duck.angle = elAngle(control.duck, control.target)
@@ -258,6 +257,8 @@ function init() {
   // }))  
 
   // indicator.innerHTML = elAngle(pos1, pos2)
+
+  // TODO update duck styling
 
 }
   
