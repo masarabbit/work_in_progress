@@ -15,7 +15,7 @@ function init() {
     marker[i].style.top = px(pos.y)
   }
 
-
+   // TODO fold this
   const directionConversions = {
     360: 'up',
     45: 'up right',
@@ -219,6 +219,21 @@ function init() {
       
         const nAngle = elAngle(offsetPosition(control.duck), control.target)
         box.className = `box ${directionConversions[nearestN(nAngle, 45)]}`
+
+        
+        // TODO adjusting this bit alters how much duck moves while waddling
+        moveDuck(getOffsetPos({ 
+          x: control.duck.x, 
+          y: control.duck.y,
+          distance: 50, 
+          angle: nAngle - 90
+        }), control.duck)
+        control.target = getOffsetPos({ 
+          x: control.duck.x, 
+          y: control.duck.y,
+          distance: 100, 
+          angle: nAngle - 90
+        })
       } else {
         const angle =  elAngle(offsetPosition(control.duck), { x, y })
         box.className = `box ${directionConversions[nearestN(angle, 45)]}`
@@ -226,7 +241,7 @@ function init() {
         positionMarker(4, control.duck)  
 
 
-        //* get offsetPos seems to be 90 degrees off (or elAngle is?)
+        //* get offsetPos seems to be 90 degrees off, so perhaps apply the adjustment within the function
         control.target = getOffsetPos({ 
           x: control.duck.x, 
           y: control.duck.y,
