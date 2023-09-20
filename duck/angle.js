@@ -2,7 +2,7 @@
 function init() { 
 
   const marker = document.querySelectorAll('.marker')
-  const box = document.querySelector('.box')
+  const box = document.querySelector('.duck')
   const indicator = document.querySelector('.indicator')
 
   const px = num => `${num}px`
@@ -36,12 +36,12 @@ function init() {
   }
 
 
-  const setStyles = ({ el, h, w, x, y, angle }) =>{
+  const setStyles = ({ el, h, w, x, y, angle, z }) =>{
     if (h) el.style.height = h
     if (w) el.style.width = w
     el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0}) rotate(${angle || 0}deg)`
 
-    el.style.zIndex = y
+    if (z) el.style.zIndex = y
   }
 
   const moveDuck = ({ x, y }, duck) => {
@@ -151,7 +151,34 @@ function init() {
     return dx2 * dy1 > dx1 * dy2 ? 'anti-clockwise' : 'clockwise'
   }
 
+  const getValueWithinBound = ({ value, min, max, buffer }) => {
+    return value = value < (min - buffer)
+    ? min - buffer
+    : value > (max + buffer)
+    ? max + buffer
+    : value
+  }
 
+  const moveWithinBound = ({ el, boundary, pos, buffer }) => {
+    const { left: hX, top: hY, width, height } = boundary.getBoundingClientRect()
+
+    setStyles({ 
+      el, 
+      z: true,
+      x: getValueWithinBound({
+          value: pos.x - (el.clientWidth / 2),
+          min: hX,
+          max: hX + width - el.clientWidth,
+          buffer: buffer.x
+        }) - hX, 
+      y: getValueWithinBound({
+          value: pos.y - (el.clientHeight / 2),
+          min: hY,
+          max: hY + height - el.clientHeight,
+          buffer: buffer.y
+        }) - hY, 
+    })
+  }
 
 
   const animateDuck = () => {
@@ -179,6 +206,14 @@ function init() {
   const triggerMovement = () => {
     setInterval(()=> {   
       const fullDistance = distanceBetween(offsetPosition(control.duck), control.cursor)
+
+      if (!fullDistance || fullDistance < 100) {
+        control.duck.el.classList.remove('waddle')
+
+        // TODO can even stop interval at this point
+        return
+      }  
+
       const distanceToMove = fullDistance > 50 ? 50 : fullDistance
 
       const { x, y } = getNewPosBasedOnTarget({
@@ -218,7 +253,7 @@ function init() {
         })
       
         const nAngle = elAngle(offsetPosition(control.duck), control.target)
-        box.className = `box ${directionConversions[nearestN(nAngle, 45)]}`
+        box.className = `duck box waddle ${directionConversions[nearestN(nAngle, 45)]}`
 
         
         // TODO adjusting this bit alters how much duck moves while waddling
@@ -236,7 +271,7 @@ function init() {
         })
       } else {
         const angle =  elAngle(offsetPosition(control.duck), { x, y })
-        box.className = `box ${directionConversions[nearestN(angle, 45)]}`
+        box.className = `duck box waddle ${directionConversions[nearestN(angle, 45)]}`
         moveDuck({ x, y }, control.duck)
         positionMarker(4, control.duck)  
 
@@ -249,6 +284,21 @@ function init() {
           angle: angle - 90
         })
         positionMarker(5, control.target)  
+
+
+        ;[
+          { 
+            el: document.querySelector('.beak'), 
+            boundary: document.querySelector('.duck-head'),
+          },
+        ].forEach(item => {
+            moveWithinBound({
+              el: item.el,
+              boundary: item.boundary,
+              pos: control.duck,
+              buffer: item.buffer || { x: 5, y: 5 } 
+            })
+          })
 
       }
     }, 600)
