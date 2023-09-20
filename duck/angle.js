@@ -2,7 +2,6 @@
 function init() { 
 
   const marker = document.querySelectorAll('.marker')
-  const box = document.querySelector('.duck')
   const indicator = document.querySelector('.indicator')
 
   const px = num => `${num}px`
@@ -17,14 +16,7 @@ function init() {
 
    // TODO fold this
   const directionConversions = {
-    360: 'up',
-    45: 'up right',
-    90: 'right',
-    135: 'down right',
-    180: 'down',
-    225: 'down left',
-    270: 'left',
-    315: 'up left',
+    360: 'up', 45: 'up right', 90: 'right', 135: 'down right', 180: 'down', 225: 'down left', 270: 'left', 315: 'up left',
   }
   
 
@@ -36,35 +28,25 @@ function init() {
   }
 
 
-  const setStyles = ({ el, h, w, x, y, angle, z }) =>{
+  const setStyles = ({ el, h, w, x, y, angle, adjustZ }) =>{
     if (h) el.style.height = h
     if (w) el.style.width = w
     el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0}) rotate(${angle || 0}deg)`
 
-    if (z) el.style.zIndex = y
+    if (adjustZ) el.style.zIndex = y
   }
 
   const moveDuck = ({ x, y }, duck) => {
-    updateData(duck, {
-      x, y
-    })
+    updateData(duck, { x, y })
     setStyles(duck)
   }
 
-  const adjustedAngle = angle => {
-    return angle < 0 
-      ? angle + 360 
-      : angle > 360
-      ? angle - 360
-      : angle
-  }
 
   const elAngle = (el, pos) =>{
     const { x, y } = pos
     const angle = radToDeg(Math.atan2(el.y - y, el.x - x)) - 90
     const adjustedAngle = angle < 0 ? angle + 360 : angle
     return nearestN(adjustedAngle, 1)
-    // return nearestN(angle, 1)
   }
 
   const control = {
@@ -84,19 +66,16 @@ function init() {
         x: 20,
         y: 14,
       },
-      el: box,
-      direction: 'up',
+      el: document.querySelector('.duck'), // TODO add rest
+      head: document.querySelector('.duck-head'),
+      beak:  document.querySelector('.beak'), 
+      direction: 'down',
     },
   }
 
-  const { x, y } = box.getBoundingClientRect()
+  const { x, y } = control.duck.el.getBoundingClientRect()
   control.duck.x = x
   control.duck.y = y
-  positionMarker(3, control.duck)
-
-
-  positionMarker(1, control.target)  
-  // control.duck.angle = elAngle(control.duck, control.target)
 
 
 
@@ -124,8 +103,8 @@ function init() {
 
   const getOffsetPos = ({ x, y, distance, angle }) => {
     return {
-      x: x + (distance * Math.cos(degToRad(angle))),
-      y: y + (distance * Math.sin(degToRad(angle)))
+      x: x + (distance * Math.cos(degToRad(angle - 90))),
+      y: y + (distance * Math.sin(degToRad(angle - 90)))
     }
   }
 
@@ -134,10 +113,10 @@ function init() {
     const { x: aX, y: aY } = start
     const { x: bX, y: bY } = target
     
-    const leftD = fullDistance - d
+    const remainingD = fullDistance - d
     return {
-      x: Math.round(((leftD * aX) + (d * bX)) / fullDistance),
-      y: Math.round(((leftD * aY) + (d * bY)) / fullDistance)
+      x: Math.round(((remainingD * aX) + (d * bX)) / fullDistance),
+      y: Math.round(((remainingD * aY) + (d * bY)) / fullDistance)
     }
   }
 
@@ -164,7 +143,7 @@ function init() {
 
     setStyles({ 
       el, 
-      z: true,
+      adjustZ: true,
       x: getValueWithinBound({
           value: pos.x - (el.clientWidth / 2),
           min: hX,
@@ -181,21 +160,23 @@ function init() {
   }
 
 
-  const animateDuck = () => {
-    indicator.innerHTML = `${control.duck.angle} - ${directionConversions[nearestN(control.duck.angle, 45)]}`
+  const animateDuck = (duck, buffer) => {
+    moveWithinBound({
+      el: duck.beak,
+      boundary: duck.head,
+      pos: duck,
+      buffer: buffer || { x: 5, y: 5 } 
+    })
   }
 
   window.addEventListener('mousemove', e => {
     control.cursor.x = e.pageX
     control.cursor.y = e.pageY
 
-    positionMarker(0, {
-      x: e.pageX,
-      y: e.pageY
-    })
+    positionMarker(0, control.cursor)
   })
 
-  const returnSmallerDiff = (angleA, angleB) => {
+  const returnAngleDiff = (angleA, angleB) => {
     const diff1 = Math.abs(angleA - angleB)
     const diff2 = 360 - diff1
 
@@ -214,7 +195,7 @@ function init() {
         return
       }  
 
-      const distanceToMove = fullDistance > 50 ? 50 : fullDistance
+      const distanceToMove = fullDistance > 100 ? 100 : fullDistance
 
       const { x, y } = getNewPosBasedOnTarget({
         distance: distanceToMove,
@@ -233,10 +214,9 @@ function init() {
       positionMarker(2, control.target)  
       positionMarker(1, { x, y })  
 
-
       const angle = elAngle(offsetPosition(control.duck), control.target)
       const newAngle = elAngle(offsetPosition(control.duck), { x, y })
-      const diff = returnSmallerDiff(angle, newAngle)
+      const diff = returnAngleDiff(angle, newAngle)
       const limit = 60
 
       indicator.innerHTML = `angle ${newAngle} diff ${diff} direction: ${control.duck.direction}`
@@ -252,53 +232,38 @@ function init() {
           offset: offsetPosition(control.duck),
         })
       
-        const nAngle = elAngle(offsetPosition(control.duck), control.target)
-        box.className = `duck box waddle ${directionConversions[nearestN(nAngle, 45)]}`
-
-        
         // TODO adjusting this bit alters how much duck moves while waddling
+        const nAngle = elAngle(offsetPosition(control.duck), control.target)
         moveDuck(getOffsetPos({ 
           x: control.duck.x, 
           y: control.duck.y,
           distance: 50, 
-          angle: nAngle - 90
+          angle: nAngle
         }), control.duck)
         control.target = getOffsetPos({ 
           x: control.duck.x, 
           y: control.duck.y,
           distance: 100, 
-          angle: nAngle - 90
+          angle: nAngle
         })
+
+        const n2Angle = elAngle(offsetPosition(control.duck), control.target)
+        control.duck.el.className = `duck waddle ${directionConversions[nearestN(n2Angle, 45)]}`
+
       } else {
         const angle =  elAngle(offsetPosition(control.duck), { x, y })
-        box.className = `duck box waddle ${directionConversions[nearestN(angle, 45)]}`
+        control.duck.el.className = `duck waddle ${directionConversions[nearestN(angle, 45)]}`
         moveDuck({ x, y }, control.duck)
         positionMarker(4, control.duck)  
 
-
-        //* get offsetPos seems to be 90 degrees off, so perhaps apply the adjustment within the function
         control.target = getOffsetPos({ 
           x: control.duck.x, 
           y: control.duck.y,
           distance: 50, 
-          angle: angle - 90
+          angle
         })
         positionMarker(5, control.target)  
-
-
-        ;[
-          { 
-            el: document.querySelector('.beak'), 
-            boundary: document.querySelector('.duck-head'),
-          },
-        ].forEach(item => {
-            moveWithinBound({
-              el: item.el,
-              boundary: item.boundary,
-              pos: control.duck,
-              buffer: item.buffer || { x: 5, y: 5 } 
-            })
-          })
+        animateDuck(control.duck)
 
       }
     }, 600)
@@ -318,7 +283,7 @@ function init() {
   //   x: pos2.x, 
   //   y: pos2.y,
   //   distance: 100, 
-  //   angle: elAngle(pos1, pos2) - 90
+  //   angle: elAngle(pos1, pos2)
   // }))  
 
   // indicator.innerHTML = elAngle(pos1, pos2)

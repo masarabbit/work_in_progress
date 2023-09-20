@@ -31,7 +31,18 @@ p, h1, h2, h3, h4 {
 }
 
 
-.box {
+.duck,
+.duckling,
+.duck div,
+.duckling div,
+.duck div:after,
+.duckling div:after {
+  background-size: calc(var(--w) * 2px) calc(var(--h) * 2px) !important; 
+  background-repeat: no-repeat !important;
+  image-rendering: pixelated;
+}
+
+.duck {
   position: absolute;
   transition: 1s;
   --w: 20;
@@ -49,7 +60,7 @@ p, h1, h2, h3, h4 {
 
 
 
-.small-box {
+.duck-neck-base {
   position: absolute;
   /* border: 1px solid blue; */
   width: 20px;
@@ -62,7 +73,24 @@ p, h1, h2, h3, h4 {
 }
 
 
-.b {
+.up .duck-neck-base{
+  --y: 0px;
+}
+
+.right .duck-neck-base{
+  --x: 20px; 
+}
+
+.down .duck-neck-base{
+  --y: 8px;
+}
+
+.left .duck-neck-base{
+  --x: 0px;
+}
+
+
+.duck-tail {
   position: absolute;
   --w: 6;
   --h: 7;
@@ -77,51 +105,21 @@ p, h1, h2, h3, h4 {
   z-index: -10;
 }
 
-.up .small-box{
-  --y: 0px;
-}
-
-.right .small-box{
-  --x: 20px; 
-}
-
-.down .small-box{
-  --y: 8px;
-}
-
-.left .small-box{
-  --x: 0px;
-}
-
-
-
-.up .b {
+.up .duck-tail {
   --y: -4px;
   /* border: 1px solid blue; */
 }
 
-.right .b {
+.right .duck-tail {
   --x: 0px; 
 }
 
-.down .b {
+.down .duck-tail {
   --y: -8px;
 }
 
-.left .b {
+.left .duck-tail {
   --x: 28px;
-}
-
-
-.duck,
-.duckling,
-.duck div,
-.duckling div,
-.duck div:after,
-.duckling div:after {
-  background-size: calc(var(--w) * 2px) calc(var(--h) * 2px) !important; 
-  background-repeat: no-repeat !important;
-  image-rendering: pixelated;
 }
 
 
@@ -131,7 +129,7 @@ p, h1, h2, h3, h4 {
   background-color: white;
   width: 16px;
   height: 16px;
-  transition: 1s;
+  transition: 0.8s;
 }
 
 .duck-head {
@@ -153,9 +151,8 @@ p, h1, h2, h3, h4 {
   width: calc(var(--w) * 2px);
   height: calc(var(--h) * 2px);
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAFCAYAAAB8ZH1oAAAAAXNSR0IArs4c6QAAACtJREFUGFdjZICCPyei/sPYyDSLxTJGEB9M4FIE0wBSzEhIEUwx8SYS60YAP7UTI/Omy/EAAAAASUVORK5CYII=);
-  transition: 1s;
+  transition: 0.7s;
 }
-
 
 .duck .legs {
   position: absolute;
@@ -166,19 +163,65 @@ p, h1, h2, h3, h4 {
   justify-content: space-between;
   left: 8px;
   bottom: -8px;
-  z-index: 2;
+  z-index: -1;
   transition: 1s;
 }
 
 .duck .leg {
+  position: relative;
   background-color: #ffdd45;
-  /* z-index: 1; */
   height: 14px;
   width: 2px;
 }
 
+
+.leg:after {
+  position: absolute;
+  content: '';
+  height: 7px;
+  width: 4px;
+  background-color: #ffdd45;
+  left: -1px;
+  bottom: 0px;
+  transform-origin: bottom center;
+  transform: rotate(var(--angle));
+  --angle: 180deg;
+}
+
+.up .leg:after {
+  --angle: 0deg;
+}
+
+.up.right .leg:after{
+  --angle: 45deg;
+}
+
+.right .leg:after {
+  --angle: 90deg;
+}
+
+.down.right .leg:after {
+  --angle: 135deg;
+}
+
+.down .leg:after {
+  --angle: 180deg;
+}
+
+.down.left .leg:after {
+  --angle: 225deg;
+}
+
+.left .leg:after {
+  --angle: 270deg;
+}
+
+.up.left .leg:after {
+  --angle: 315deg;
+}
+
 .duck.waddle .leg {
-  animation: waddle 0.8s infinite;
+  animation: waddle 0.3s infinite;
 }
 
 .leg:nth-child(1) {
@@ -200,9 +243,9 @@ p, h1, h2, h3, h4 {
   }
 }
 
-.up .legs {
+/* .up .legs {
   z-index: -1;
-}
+} */
 
 .duck.left .legs,
 .duck.right .legs {
@@ -210,6 +253,8 @@ p, h1, h2, h3, h4 {
   left: 10px;
 }
 
+
+/* */
 
 .sign {
   position: absolute;
@@ -258,7 +303,9 @@ a:hover {
 }
 
 
-/* .red { 
+
+
+.red { 
   background-color: rgb(223, 74, 41); 
 }
 .blue { 
@@ -267,16 +314,14 @@ a:hover {
 .yellow {
   background-color: yellow; 
 }
-
 .pink {
   background-color: hotpink; 
 }
-
 .green { 
   background-color: rgb(88, 236, 127); 
 }
 .purple {
   background-color: purple; 
 }
- */
+
 
