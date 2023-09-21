@@ -58,16 +58,14 @@ p, h1, h2, h3, h4 {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAOCAYAAAAvxDzwAAAAAXNSR0IArs4c6QAAAFRJREFUOE9jZMAC/v///x+bOLoYIyMjI4YYsgCxBuEzGG4DuYbBDIe5FmwgpYYhG0p9A6nlOrgrR6CBgz+WYbFDaeSgJGxKDUXO0xiZm5QwxVY4AADV9Tf/s/CuJAAAAABJRU5ErkJggg==);
 }
 
-
-
 .duck-neck-base {
   position: absolute;
   /* border: 1px solid blue; */
-  width: 20px;
-  height: 20px;
-  transition: 1s;
+  width: 16px;
+  height: 16px;
+  transition: 0.5s;
   transform: translate(var(--x), var(--y));
-  --x: 10px;
+  --x: 12px;
   --y: 4px;
   z-index: 2;
 }
@@ -78,15 +76,15 @@ p, h1, h2, h3, h4 {
 }
 
 .right .duck-neck-base{
-  --x: 20px; 
+  --x: 17px; 
 }
 
 .down .duck-neck-base{
-  --y: 8px;
+  --y: 6px;
 }
 
 .left .duck-neck-base{
-  --x: 0px;
+  --x: 4px;
 }
 
 
@@ -126,23 +124,114 @@ p, h1, h2, h3, h4 {
 .duck-neck {
   position: absolute;
   /* border: rgb(217, 0, 255) 1px solid; */
+  /* background-color: white; */
   background-color: white;
   width: 16px;
   height: 16px;
   transition: 0.8s;
+  bottom: 0;
 }
+
+/* .waddle .duck-neck {
+  height: 18px;
+} */
+
 
 .duck-head {
   position: absolute;
   /* border: rgb(0, 255, 229) 1px solid; */
-  --w: 16;
-  --h: 12; 
+  --w: 18;
+  --h: 14; 
   width: calc(var(--w) * 2px);
   height: calc(var(--h) * 2px);
-  margin-top: -22px;
+  margin-top: calc(var(--h) * -2px + 4px);
   margin-left: calc(var(--w) * -0.5px);
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAYAAABr5z2BAAAAAXNSR0IArs4c6QAAAERJREFUOE9jZEAD/////48uhsxnZGRkROHDOIQ0ohsKMwhsGqmaYYaBDGEkVzPckFEDGCgPRIqjkSoJCTmVEYpW9KQMAM+9L/Xc3EboAAAAAElFTkSuQmCC);
+  /* background-color: red; */
 }
+
+.down.left .duck-head,
+.down.right .duck-head {
+  --w: 18;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAOCAYAAAAi2ky3AAAAAXNSR0IArs4c6QAAAIZJREFUOE9jZMAB/v///x+XHEickZGREVkehQOSIGQAuuEwA1EMItUQmKEgw+AGkWsI3DAYY3AalGUqwTDt9AuckYVPHiWMqGYQvnRDSA7uoj8norAmQGbzpYTMACdOsEG4DIGZgM8weIIkZAguw7BmEUKGsVgsw8hKGFkFJoDLMGIMAZkBAMw7Q/doX4nxAAAAAElFTkSuQmCC);
+  margin-left: -12px;
+}
+
+.up.left .duck-head,
+.up.right .duck-head {
+  --w: 18;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAOCAYAAAAi2ky3AAAAAXNSR0IArs4c6QAAAHJJREFUOE9jZICCPyei/sPYyDSLxTJGbOLoYmBFuAyBKSbGMEZshjCbLyXoCEZGRhSXYriIGEOQbYEZCDcV5DJSDYEZCDIMbtD///+xBjZBP0IVjBpEOKSoH0YgO8mNOZTohzmeVMMwEiR6KBAyED2LAADvVzf3c6EKwQAAAABJRU5ErkJggg==);
+  margin-left: -12px;
+}
+
+.down .duck-head {
+  --w: 16;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAOCAYAAAAmL5yKAAAAAXNSR0IArs4c6QAAAIhJREFUOE9jZEAD/////48uhsxnZGRkROHDOIQ0ohsKMwhsGqmaYYaBDGEkVzPckMFlQJapBMO00y/wRQIDuhqUMKDYALxW45DEGo1/T0ZjVc5svhRFHByN6AkJl2aYOpghKAkJJvnnRBTeZAxTx2KxDG4xSroGKSBkCLJmkHoMA/AZgq4ZpBYAuRxJ96lyL4MAAAAASUVORK5CYII=);
+  margin-left: -8px;
+}
+
+.up .duck-head {
+  --w: 16;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAOCAYAAAAmL5yKAAAAAXNSR0IArs4c6QAAAGlJREFUOE9jZMAC/pyI+o9NnMViGSO6OIYALs0wjeiGoBgA0sxsvhSb5XCxvyejGZANgRvw//9/rM7GZRojIyNYL5ggVTPMUJAhjORqhhsyagAD5YFIcTTCooPU2EBJSMipjZBBMI0wPQAGdjr3NNfLrgAAAABJRU5ErkJggg==);
+  margin-left: -8px;
+}
+
+.left .duck-head,
+.right .duck-head {
+  --h: 14;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAOCAYAAAAi2ky3AAAAAXNSR0IArs4c6QAAAH5JREFUOE9jZMAB/v///x+XHEickZGREVkehQOSIGQAuuEwA1EMItUQmKEgw+AGkWsI3DAYg24GZZlKMEw7/QJn+BPtNaIN+nMiCmt0M5svxZcK4HJgF+EyBKaKGMMYCRlCjGHw6CdkGD4XYSRIUsOIYBYhKmSxKMLIa+QaBAATkDX3yAijpQAAAABJRU5ErkJggg==);
+  margin-left: -8px;
+}
+
+.right .duck-head {
+  transform: scale(-1, 1);
+  margin-left: -8px !important;
+}
+
+.duck-head .eyes {
+  position: absolute;
+  /* border: 1px solid red; */
+  --eye-w: 24px;
+  left: calc((var(--w) * 2px - var(--eye-w)) / 2);
+  top: 10px;
+  width: var(--eye-w);
+  /* height: 10px; */
+  display: flex;
+  justify-content: space-between;
+  transition: 0.5s top left;
+  overflow: hidden;
+}
+
+.eye {
+  background-color: rgb(133, 42, 6);
+  width: 3px;
+  height: 6px;
+}
+
+.up .eyes {
+  display: none;
+}
+/* 
+.up.right .eye {
+  left: 100px;
+} */
+/* 
+.left .eyes {
+  left: 0;
+} 
+
+
+.right .eyes {
+  left: calc((var(--w) * 2px) - var(--eye-w));
+} 
+
+
+
+.down .eyes {
+  top: 10px;
+} */
+
+
 
 .duck-head .beak {
   position: absolute;
@@ -253,6 +342,24 @@ p, h1, h2, h3, h4 {
   left: 10px;
 }
 
+.duckling-target {
+  position: absolute;
+  background-color: #fff945;
+  width: 12px;
+  height: 12px;
+  transition: 1.8s;
+}
+
+.duckling {
+  position: absolute;
+  background: rgb(234, 7, 192);
+
+  width: 30px;
+  height: 30px;
+  color: white;
+  transition: 0.5s;
+}
+
 
 /* */
 
@@ -304,7 +411,7 @@ a:hover {
 
 
 
-
+/* 
 .red { 
   background-color: rgb(223, 74, 41); 
 }
@@ -324,4 +431,4 @@ a:hover {
   background-color: purple; 
 }
 
-
+ */
