@@ -63,7 +63,7 @@ p, h1, h2, h3, h4 {
   /* border: 1px solid blue; */
   width: 16px;
   height: 16px;
-  transition: 0.5s;
+  transition: 0.3s;
   transform: translate(var(--x), var(--y));
   --x: 12px;
   --y: 4px;

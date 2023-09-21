@@ -203,6 +203,13 @@ function init() {
   //   })
   // }
 
+  window.addEventListener('click', e => {
+    control.cursor.x = e.pageX
+    control.cursor.y = e.pageY
+
+    positionMarker(0, control.cursor)
+  })
+
   window.addEventListener('mousemove', e => {
     control.cursor.x = e.pageX
     control.cursor.y = e.pageY
