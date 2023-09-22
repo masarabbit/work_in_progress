@@ -299,7 +299,7 @@ function init() {
       })
       moveDuck({ x, y }, duckling)
       const angle = elAngle(offsetPosition(duckling), control.ducklingTargets[i])
-      duckling.el.className = `duckling duck waddle ${directionConversions[nearestN(angle, 45)]}`
+      duckling.el.className = `duckling waddle ${directionConversions[nearestN(angle, 45)]}`
       
     }, 300)
   })
