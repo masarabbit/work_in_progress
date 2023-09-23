@@ -4,7 +4,7 @@ function init() {
   const wrapper = document.querySelector('.wrapper')
   const marker = document.querySelectorAll('.marker')
   const indicator = document.querySelector('.indicator')
-  const addDucklingButton = document.querySelector('.add-duckling')
+  const createDucklingBtn = document.querySelector('.create-duckling')
 
   const data = {
     interval: null,
@@ -143,9 +143,6 @@ function init() {
     positionMarker(0, data.cursor)
   }
 
-  ;['click', 'mousemove'].forEach(action => window.addEventListener(action, updateCursorPos))
-
-
   const returnAngleDiff = ({ angleA, angleB }) => {
     const diff1 = Math.abs(angleA - angleB)
     const diff2 = 360 - diff1
@@ -238,19 +235,19 @@ function init() {
       }
       setNewTargetAndDirection(fullDistance)
 
-      const diff = returnAngleDiff({
+      const howMuchMotherDuckNeedsToTurn = returnAngleDiff({
         angleA: elAngle(offsetPosition(data.duck), data.target),
         angleB: elAngle(offsetPosition(data.duck), data.newTarget)
       })
-      const limit = 60
+      const maxAngleMotherDuckCanTurn = 60
 
-      // determine how much the duck turns and move. 
-      // If angle difference is too large, turn and move a bit less
-      if (diff > limit) {
-        turnMotherDuckAndUpdateDirection({ diff, limit })
-      } else {
-        moveMotherDuckTowardsTarget()
-      }
+      howMuchMotherDuckNeedsToTurn > maxAngleMotherDuckCanTurn
+        ? turnMotherDuckAndUpdateDirection({ 
+            diff: howMuchMotherDuckNeedsToTurn, 
+            limit: maxAngleMotherDuckCanTurn 
+          })
+        : moveMotherDuckTowardsTarget()
+
     }, 500)
   }
 
@@ -338,7 +335,9 @@ function init() {
 
 
   // set up
-  addDucklingButton.addEventListener('click', ()=> {
+  ;['click', 'mousemove'].forEach(action => window.addEventListener(action, updateCursorPos))
+
+  createDucklingBtn.addEventListener('click', ()=> {
     createDuckling()
 
     clearInterval(data.interval)

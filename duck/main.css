@@ -326,7 +326,7 @@ p, h1, h2, h3, h4 {
   animation: waddle 0.1s infinite;
 }
 
-button.add-duckling {
+button.create-duckling {
   position: fixed;
   bottom: 30px;
   right: 30px;
@@ -344,7 +344,7 @@ button.add-duckling {
   z-index: 100;
 }
 
-button.add-duckling:hover {
+button.create-duckling:hover {
   border: 2px solid white;
   width: calc(var(--size) + 2px);
   height: calc(var(--size) + 2px);
@@ -399,9 +399,6 @@ a:hover {
   z-index: 100;
   display: none; /* uncomment this bit to see marker */
 }
-
-
-
 
 .red { 
   background-color: rgb(223, 74, 41); 
