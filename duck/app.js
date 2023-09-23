@@ -1,193 +1,76 @@
 
-function init() { 
-
-  // TODO add collision logic for the ducklings
-  // TODO add eyes
-  // TODO add logic to limit how much the duck walks (currently just based on 1s)
-  // TODO make leg webbed
-
-  // TODO waddle should trigger every interval until the duck reach the target.
-
-  const elements = {
-    duck: document.querySelector('.duck'),
-    ducklingTargets: document.querySelectorAll('.duckling-target'),
-    ducklings: document.querySelectorAll('.duckling'),
-
-    indicator: document.querySelector('.indicator'),
-    marker: document.querySelectorAll('.marker'),
-  }
+function init() {
+  
+  const wrapper = document.querySelector('.wrapper')
+  const marker = document.querySelectorAll('.marker')
+  const indicator = document.querySelector('.indicator')
+  let ducklingTargets = document.querySelectorAll('.duckling-target')
+  let ducklings = document.querySelectorAll('.duckling')
+  const addDucklingButton = document.querySelector('.add-duckling')
 
   const px = num => `${num}px`
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
   const degToRad = deg => deg / (180 / Math.PI)
   const nearestN = (x, n) => x === 0 ? 0 : (x - 1) + Math.abs(((x - 1) % n) - n)
+  const overlap = (a, b, buffer) =>{
+    const bufferToApply = buffer || 20
+    return Math.abs(a - b) < bufferToApply
+  }
 
   const positionMarker = (i, pos) => {
-    elements.marker[i].style.left = px(pos.x)
-    elements.marker[i].style.top = px(pos.y)
+    marker[i].style.left = px(pos.x)
+    marker[i].style.top = px(pos.y)
   }
-
 
   const directionConversions = {
-    360: 'up',
-    45: 'up right',
-    90: 'right',
-    135: 'down right',
-    180: 'down',
-    225: 'down left',
-    270: 'left',
-    315: 'up left',
+    360: 'up', 45: 'up right', 90: 'right', 135: 'down right', 180: 'down', 225: 'down left', 270: 'left', 315: 'up left',
   }
 
 
-  const setStyles = ({ el, h, w, x, y, deg }) =>{
-    if (h) el.style.height = h
-    if (w) el.style.width = w
+  const offsetPosition = data => {
+    return {
+      x: data.x + data.offset.x,
+      y: data.y + data.offset.y,
+    }
+  }
+
+  const checkCollision = ({ a, b, buffer }) =>{
+    return overlap(a.x, b.x, buffer) && overlap(a.y, b.y, buffer)
+  }
+
+
+  const setStyles = ({ el, x, y, deg }) => {
     el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0}) rotate(${deg || 0}deg)`
 
     el.style.zIndex = y
   }
 
-
-  const control = {
-    target: {
-      x: 0,
-      y: 0,
-    },
-    cursor: {
-      x: null,
-      y: null,
-    },
-    duck: {
-      el: elements.duck,
-      x: 0,
-      y: 0,
-      angle: null,
-      offset: 24,
-      neck: {
-        el: document.querySelector('.duck-head-wrapper'),
-        angle: 0
-      },
-      body: {
-        el: elements.duck.childNodes[1],
-        angle: 0
-      },
-      tail: {
-        el: document.querySelector('.duck-tail'),
-        angle: 0
-      }
-
-    },
-    ducklingTargets: [ // ? this could be set with function too.
-      {
-        el: elements.ducklingTargets[0],
-        x: null,
-        y: null,
-        angle: null,
-        timer: null,
-        offset: 6,
-      },
-      {
-        el: elements.ducklingTargets[1],
-        x: null,
-        y: null,
-        angle: null,
-        timer: null,
-        offset: 6,
-      },
-      {
-        el: elements.ducklingTargets[2],
-        x: null,
-        y: null,
-        angle: null,
-        timer: null,
-        offset: 6,
-      },
-    ],
-    ducklings: [ // ? this could be set with function too.
-    {
-      el: elements.ducklings[0],
-      x: null,
-      y: null,
-      angle: null,
-      timer: null,
-      offset: 6,
-    },
-    {
-      el: elements.ducklings[1],
-      x: null,
-      y: null,
-      angle: null,
-      timer: null,
-      offset: 6,
-    },
-    {
-      el: elements.ducklings[2],
-      x: null,
-      y: null,
-      angle: null,
-      timer: null,
-      offset: 6,
-    },
-  ]
-  }
-
-
-  const getValueWithinBound = ({ value, min, max, buffer }) => {
-    return value = value < (min - buffer)
-    ? min - buffer
-    : value > (max + buffer)
-    ? max + buffer
-    : value
-  }
-
-//   function rotatePoint2D(nRadians, nX, nY) {
-//     var nSin = Math.sin(nRadians);
-//     var nCos = Math.cos(nRadians);
-//     var point2D = new createjs.Point();
-//     point2D.x = nCos * nX - nSin * nY;
-//     point2D.y = nSin * nX + nCos * nY;
-//     return point2D;
-// 　}
-
-
-
-const rotateCoord = ({ deg, x, y, offset }) => {
-  const rad = degToRad(deg)
-  const nX = x - offset.x
-  const nY = y - offset.y
-  const nSin = Math.sin(rad)
-  const nCos = Math.cos(rad)
-  return {
-    x: Math.round((nCos * nX - nSin * nY) + offset.x),
-    y: Math.round((nSin * nX + nCos * nY) + offset.y)
-  }
-}
-
-
-  const moveWithinBound = ({ el, boundary, pos, buffer }) => {
-    const { left: hX, top: hY, width, height } = boundary.getBoundingClientRect()
-
-    setStyles({ 
-      el, 
-      x: getValueWithinBound({
-          value: pos.x - (el.clientWidth / 2),
-          min: hX,
-          max: hX + width - el.clientWidth,
-          buffer: buffer.x
-        }) - hX, 
-      y: getValueWithinBound({
-          value: pos.y - (el.clientHeight / 2),
-          min: hY,
-          max: hY + height - el.clientHeight,
-          buffer: buffer.y
-        }) - hY, 
+  const moveDucklings = ({ x, y }) => {
+    control.ducklingTargets.forEach((duckling, i) => {
+      clearTimeout(duckling.timer)
+      duckling.timer = setTimeout(() => {
+        moveDuck(duckling, getOffsetPos({
+          x, y,
+          angle: control.duck.angle + 180,
+          distance: 60 + (80 * i)
+        }))
+      }, 150)
     })
   }
 
+  const moveDuck = (duck, { x, y }) => {
+    updateData(duck, { x, y })
+    setStyles(duck)
+  }
 
-  const elAngle = el =>{
-    const { x, y } = control.cursor
+  const moveMotherDuck = ({ x, y }) => {
+    moveDuck(control.duck, { x, y })
+    moveDucklings({ x, y })
+  }
+
+
+  const elAngle = (el, pos) => {
+    const { x, y } = pos
     const angle = radToDeg(Math.atan2(el.y - y, el.x - x)) - 90
     const adjustedAngle = angle < 0 ? angle + 360 : angle
     return nearestN(adjustedAngle, 1)
@@ -199,71 +82,77 @@ const rotateCoord = ({ deg, x, y, offset }) => {
     })
   }
 
+  const control = {
+    interval: null,
+    target: { x: 0, y: 0, },
+    cursor: { x: 0, y: 0, },
+    duck: {
+      x: 0,
+      y: 0,
+      angle: 0,
+      direction: '',
+      offset: { x: 20, y: 14, },
+      el: document.querySelector('.duck'),
+      direction: 'down',
+    },
+    ducklingTargets: [
+      { el: ducklingTargets[0], x: 0, y: 0, timer: null, offset: 6 },
+      { el: ducklingTargets[1], x: 0, y: 0, timer: null, offset: 6 },
+      { el: ducklingTargets[2], x: 0, y: 0, timer: null, offset: 6 },
+      { el: ducklingTargets[3], x: 0, y: 0, timer: null, offset: 6 },
+    ],
+    ducklings: [ // ? this could be set with function too.
+      { el: ducklings[0], x: 0, y: 0, angle: 0, direction: 'down', interval: null, offset: { x: 20, y: 14 }, hit: false },
+      { el: ducklings[1], x: 0, y: 0, angle: 0, direction: 'down', interval: null, offset: { x: 20, y: 14 }, hit: false },
+      { el: ducklings[2], x: 0, y: 0, angle: 0, direction: 'down', interval: null, offset: { x: 20, y: 14 }, hit: false },
+      { el: ducklings[3], x: 0, y: 0, angle: 0, direction: 'down', interval: null, offset: { x: 20, y: 14 }, hit: false },
+    ]
+  }
+
+
+
+  const { x, y } = control.duck.el.getBoundingClientRect()
+  updateData(control.duck, { x, y })
+
+
+
+  const rotateCoord = ({ deg, x, y, offset }) => {
+    const rad = degToRad(deg)
+    const nX = x - offset.x
+    const nY = y - offset.y
+    const nSin = Math.sin(rad)
+    const nCos = Math.cos(rad)
+    return {
+      x: Math.round((nCos * nX - nSin * nY) + offset.x),
+      y: Math.round((nSin * nX + nCos * nY) + offset.y)
+    }
+  }
+
+
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
 
 
   const getOffsetPos = ({ x, y, distance, angle }) => {
     return {
-      x: x + (distance * Math.cos(degToRad(angle))),
-      y: y + (distance * Math.sin(degToRad(angle)))
+      x: x + (distance * Math.cos(degToRad(angle - 90))),
+      y: y + (distance * Math.sin(degToRad(angle - 90)))
     }
   }
 
-
-
-  // https://mathwords.net/naibunzahyo
 
   const getNewPosBasedOnTarget = ({ start, target, distance: d, fullDistance }) => {
     const { x: aX, y: aY } = start
     const { x: bX, y: bY } = target
-    
-    const leftD = fullDistance - d
+
+    const remainingD = fullDistance - d
     return {
-      x: Math.round(((leftD * aX) + (d * bX)) / fullDistance),
-      y: Math.round(((leftD * aY) + (d * bY)) / fullDistance)
+      x: Math.round(((remainingD * aX) + (d * bX)) / fullDistance),
+      y: Math.round(((remainingD * aY) + (d * bY)) / fullDistance)
     }
   }
 
-  const moveDucklings = ({ x, y }) => {
-    //TODO the position needs to be altered based on where the mother actually is
-    control.ducklingTargets.forEach((duckling, i) => {
-      clearTimeout(duckling.timer)
-      duckling.timer = setTimeout(()=> {
-        moveDuck(getOffsetPos({
-          x, y, 
-          angle: control.duck.angle + 90, 
-          distance: 60 + (50 * i)
-        }), duckling)
-      }, (i + 1) * 150)
-    })
-  } 
 
-  const moveDuck = ({ x, y }, duck) => {
-    updateData(duck, {
-      x: x - duck.offset, 
-      y: y - duck.offset,
-    })
-    setStyles(duck)
-  }
-
-  const moveMotherDuck = ({ x, y }) => {
-    moveDuck({ x, y }, control.duck)
-    moveDucklings({ x, y })
-  }
-
-  window.addEventListener('click', e => {
-    control.target = {
-      x: e.pageX,
-      y: e.pageY
-    }
-    positionMarker(0, {
-      x: e.pageX,
-      y: e.pageY
-    })
-  })
-
-  const getDirection = ({ pos, facing, target }) =>{
-    // https://qiita.com/tydesign/items/d41ac74b5effd87141b8
+  const getDirection = ({ pos, facing, target }) => {
     const dx2 = facing.x - pos.x
     const dy1 = pos.y - target.y
     const dx1 = target.x - pos.x
@@ -272,169 +161,263 @@ const rotateCoord = ({ deg, x, y, offset }) => {
     return dx2 * dy1 > dx1 * dy2 ? 'anti-clockwise' : 'clockwise'
   }
 
-
-  const animateDuck = () => {
-    console.log('1', control.duck.angle)
-    // TODO turn 1 bit at a time?
-    updateData(control.duck, {
-      angle: elAngle(control.duck),
-    })
-  
-    console.log('2', control.duck.angle)
-
-    // setStyles({
-    //   el: control.duck.body.el,
-    //   deg: elAngle(control.duck) + 180
-    // })
-
-    // setStyles({
-    //   el: control.duck.tail.el,
-    //   deg: elAngle(control.duck) + 180 * -1
-    // })
-
-    // setStyles({
-    //   el: control.duck.neck.el,
-    //   deg: elAngle(control.duck)
-    // })
-    // setStyles({
-    //   el: control.duck.neck.el.childNodes[1],
-    //   deg: -elAngle(control.duck)
-    // })
-    
-    elements.indicator.innerHTML = directionConversions[nearestN(control.duck.angle, 45)]
-    control.duck.el.className = `duck ${directionConversions[nearestN(control.duck.angle, 45)]} waddle`
-
-    //TODO temp
-    // TODO maybe this should track things diffrently
-    ;[
-      { 
-        el: document.querySelector('.beak'), 
-        boundary: document.querySelector('.duck-head'),
-      },
-    ].forEach(item => {
-        moveWithinBound({
-          el: item.el,
-          boundary: item.boundary,
-          pos: control.duck,
-          buffer: item.buffer || { x: 5, y: 5 } 
-        })
-      })
-
-  }
-
-  window.addEventListener('mousemove', e => {
+  const updateCursorPos = e => {
     control.cursor.x = e.pageX
     control.cursor.y = e.pageY
 
-    positionMarker(0, {
-      x: e.pageX,
-      y: e.pageY
-    })
-  })
+    positionMarker(0, control.cursor)
+  }
+
+  ;['click', 'mousemove'].forEach(action => window.addEventListener(action, updateCursorPos))
 
 
-  // const checkBoundaryAndUpdatePos = (x, y, data) => {
-  //   const buffer = 50
-  //   const checkBoundaryAndUpdate = (p, n, elem) => {
-  //     data.xy[p] = n > (body[elem] - buffer)
-  //       ? body[elem] - randomShift()
-  //       : n < buffer
-  //         ? randomShift()
-  //         : n
-  //   }      
-  //   checkBoundaryAndUpdate('x', x, 'clientWidth')
-  //   checkBoundaryAndUpdate('y', y, 'clientHeight')
-    
-  //   setMargin(data.bot, data.xy.x, data.xy.y)
-  // }
+
+  const returnAngleDiff = (angleA, angleB) => {
+    const diff1 = Math.abs(angleA - angleB)
+    const diff2 = 360 - diff1
+
+    return diff1 > diff2 ? diff2 : diff1
+  }
+
+  const getDirectionClass = angle => {
+    return directionConversions[nearestN(angle, 45)]
+  }
+
 
   const triggerMovement = () => {
+    control.interval = setInterval(() => {
+      const fullDistance = distanceBetween(offsetPosition(control.duck), control.cursor)
 
-    setInterval(()=> {
-      const fullDistance = distanceBetween(control.duck, control.cursor)
-
-      if (!fullDistance || fullDistance < 100) {
+      if (!fullDistance || fullDistance < 80) {
         control.duck.el.classList.remove('waddle')
-
-        // TODO can even stop interval at this point
         return
-      }  
+      }
+
+      const distanceToMove = fullDistance > 80 ? 80 : fullDistance
 
       const { x, y } = getNewPosBasedOnTarget({
-        distance: 100,
+        distance: distanceToMove,
         fullDistance,
-        start: control.duck,
+        start: offsetPosition(control.duck),
         target: control.cursor
       })
 
-      const direction = getDirection({
-        pos: control.duck,
+      control.duck.direction = getDirection({
+        pos: offsetPosition(control.duck),
         facing: control.target,
-        target: { x, y },
+        target: { x, y }
       })
 
-      console.log('1.5', direction)
+      positionMarker(3, offsetPosition(control.duck))
+      positionMarker(2, control.target)
+      positionMarker(1, { x, y })
 
+      const angle = elAngle(offsetPosition(control.duck), control.target)
+      const newAngle = elAngle(offsetPosition(control.duck), { x, y })
+      const diff = returnAngleDiff(angle, newAngle)
+      const limit = 60
 
-      control.target = rotateCoord({
-        deg: {
-          'clockwise': 30,
-          'anti-clockwise': -30
-        }[direction],
-        x, y,
-        offset: control.duck
-      })
-      // control.target = { x, y }
+      // indicator.innerHTML = `angle ${newAngle} diff ${diff} direction: ${control.duck.direction}`
 
-
-      moveMotherDuck(control.target)
-  
-      positionMarker(1, control.target)
-      positionMarker(2, { x, y })
-
-    
-      animateDuck(control.target)
-    }, 1000)
-    
-    control.ducklings.forEach((duckling, i) => {
-      setInterval(()=> {
-        const fullDistance = distanceBetween(duckling, control.ducklingTargets[i])
-
-        // const otherDucks = control.ducklings.map((ducklings, n) => {
-        //   return i !== n ? ducklings : control.duck
-        // })
-        
-        // const distanceFromOthers = otherDucks.map(otherDuck => distanceBetween(duckling, otherDuck))
-
-        // console.log(i, distanceFromOthers)
-
-        if (
-          !fullDistance 
-          || fullDistance < 40
-          ) {
-          // control.duck.el.classList.remove('waddle')
-          // TODO add logic to make it move around?
-          return
-        }  
-        const { x, y } = getNewPosBasedOnTarget({
-          distance: 30,
-          fullDistance,
-          start: duckling,
-          target: control.ducklingTargets[i]
+      if (diff > limit) {
+        control.target = rotateCoord({
+          deg: {
+            'clockwise': diff > limit ? limit : diff,
+            'anti-clockwise': diff > limit ? -limit : -diff
+          }[control.duck.direction],
+          x: control.target.x,
+          y: control.target.y,
+          offset: offsetPosition(control.duck),
         })
-        moveDuck({ x, y }, duckling)
-        
-        // console.log(fullDistance)
-      }, 300)
-    })
-  
+
+
+        const angle = elAngle(offsetPosition(control.duck), control.target)
+        moveMotherDuck(getOffsetPos({
+          x: control.duck.x,
+          y: control.duck.y,
+          distance: 50,
+          angle
+        }), control.duck)
+        control.target = getOffsetPos({
+          x: control.duck.x,
+          y: control.duck.y,
+          distance: 100,
+          angle
+        })
+
+        const n2Angle = elAngle(offsetPosition(control.duck), control.target)
+        updateData(control.duck, { angle: n2Angle, direction: getDirectionClass(n2Angle) })
+        control.duck.el.className = `duck waddle ${control.duck.direction}`
+
+        indicator.innerHTML = `duck waddle ${control.duck.direction}`
+
+      } else {
+        const angle = elAngle(offsetPosition(control.duck), { x, y })
+        const direction = getDirectionClass(angle)
+        control.duck.el.className = `duck waddle ${direction}`
+
+        indicator.innerHTML = `duck waddle ${direction}`
+        moveMotherDuck({ x, y }, control.duck)
+        positionMarker(4, control.duck)
+
+        control.target = getOffsetPos({
+          x: control.duck.x,
+          y: control.duck.y,
+          distance: 50,
+          angle
+        })
+        updateData(control.duck, { angle, direction })
+        positionMarker(5, control.target)
+
+      }
+    }, 500)
   }
 
   triggerMovement()
 
-  // TODO getOffSetPos isn't the right way to get this answer
+  setInterval(() => {
+    control.ducklings.forEach((duckling, i) => {
+      if (duckling.hit) return
+      const fullDistance = distanceBetween(duckling, control.ducklingTargets[i])
+  
+      if (!fullDistance || fullDistance < 40) {
+        duckling.el.classList.remove('waddle')
+        return
+      }
+      moveDuck(duckling, getNewPosBasedOnTarget({
+        distance: 30,
+        fullDistance,
+        start: duckling,
+        target: control.ducklingTargets[i]
+      }))
+      const angle = elAngle(offsetPosition(duckling), control.ducklingTargets[i])
+      updateData(duckling, { angle, direction: getDirectionClass(angle) })
+      duckling.el.className = `duckling waddle ${duckling.direction}`
+    })
+  }, 300)
+
+  setInterval(() => {
+    control.ducklings.forEach(duckling => {
+      const { x, y } = duckling.el.getBoundingClientRect()
+      if (checkCollision({ 
+        a: control.duck, 
+        b: { x, y },
+        buffer: 40  
+      })) {
+        duckling.el.classList.add('hit')
+        duckling.hit = true
+  
+        const { direction } = duckling
+        const x = direction.includes('right') 
+          ? -20 
+          : direction.includes('left') 
+          ? 20
+          : 0
+  
+        const y = direction.includes('up') 
+          ? 20 
+          : direction.includes('down')
+          ? -20
+          : 0 
+  
+        moveDuck(duckling, {
+          x: duckling.x + x, 
+          y: duckling.y + y, 
+        })
+  
+        setTimeout(()=> {
+          duckling.el.classList.remove('hit')
+          duckling.hit = false
+        }, 900)
+      }
+    })
+  }, 100)
+
+
+
+  addDucklingButton.addEventListener('click', ()=> {
+    const newDucklingTarget = document.createElement('div')
+    newDucklingTarget.classList.add('duckling-target')
+    const newDuckling = document.createElement('div')
+    newDuckling.classList.add('duckling')
+    newDuckling.innerHTML = `
+      <div class="neck-base">
+        <div class="neck">
+          <div class="head">
+          </div>
+        </div>
+      </div>
+      <div class="tail"></div>
+      <div class="body"></div>
+      <div class="legs">
+        <div class="leg"></div>
+        <div class="leg"></div>
+      </div>`
+
+    ;[newDucklingTarget, newDuckling].forEach(ele => wrapper.appendChild(ele))
+
+    ducklingTargets = document.querySelectorAll('.duckling-target')
+    ducklings = document.querySelectorAll('.duckling')
+    control.ducklings.push({ el: newDuckling, x: 0, y: 0, angle: 0, direction: 'down', interval: null, offset: { x: 20, y: 14 }, hit: false },)
+    control.ducklingTargets.push({ el: newDucklingTarget, x: 0, y: 0, timer: null, offset: 6 })
+
+    clearInterval(control.interval)
+    triggerMovement()
+  })
+
+
+  // TODO test code indicates that getOffsetPos needs adjustment to get the right position
+  // const pos1 = { x: 100, y: 200 }
+  // const pos2 = { x: 120, y: 200 }
+  // positionMarker(1, pos1)  
+
+  // positionMarker(2, pos2)  
+
+  // positionMarker(3, getOffsetPos({ 
+  //   x: pos2.x, 
+  //   y: pos2.y,
+  //   distance: 100, 
+  //   angle: elAngle(pos1, pos2)
+  // }))  
+
+  // indicator.innerHTML = elAngle(pos1, pos2)
+
+  // TODO update duck styling
+
+
+  //* test code
+  // indicator.innerHTML = ['up', 'up right', 'right', 'down right', 'down', 'down left', 'left', 'up left', 'hit'].map(d => `<button class="direction-b">${d}</button>`).join('')
+
+  // document.querySelectorAll('.direction-b').forEach(b => {
+  //   if(b.innerHTML ==='hit') {
+  //     b.addEventListener('click', ()=> {
+  //       const direction = 'left down'
+  //       const x = direction.includes('right') 
+  //         ? -50 
+  //         : direction.includes('left') 
+  //         ? 50
+  //         : 0
+  //       const y = direction.includes('up') 
+  //         ? 50 
+  //         : direction.includes('down')
+  //         ? -50
+  //         : 0 
+  //       ducklings[0].className = `duckling duck ${direction} hit`
+  //       console.log('direction', direction)
+  //       moveDuck(control.ducklings[0], {
+  //         x: control.ducklings[0].x + x, 
+  //         y: control.ducklings[0].y + y, 
+  //       })
+  //     })
+  //   }else {
+  //     b.addEventListener('click', ()=> {
+  //       control.duck.el.className = `duck waddle ${b.innerHTML}`
+  //       ducklings[0].className = `duckling duck waddle ${b.innerHTML}`
+  //     })
+  //   }
+  // })
 
 }
-  
+
 window.addEventListener('DOMContentLoaded', init)
 
