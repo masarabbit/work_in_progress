@@ -8,15 +8,15 @@ function init() {
 
   const data = {
     interval: null,
-    target: { x: 0, y: 0, },
-    newTarget: { x: 0, y: 0, },
-    cursor: { x: 0, y: 0, },
+    target: { x: 0, y: 0 },
+    newTarget: { x: 0, y: 0 },
+    cursor: { x: 0, y: 0 },
     duck: {
       x: 0,
       y: 0,
       angle: 0,
       direction: '',
-      offset: { x: 20, y: 14, },
+      offset: { x: 20, y: 14 },
       el: document.querySelector('.duck'),
       direction: 'down',
     },
