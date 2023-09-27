@@ -378,10 +378,6 @@ a:hover {
   display: none; /* uncomment this bit to see development info */
 }
 
-.d-none {
-  display: none;
-}
-
 .indicator {
   position: fixed;
   top: 10px;
