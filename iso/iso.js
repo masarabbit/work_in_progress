@@ -39,9 +39,17 @@
       h: px(9 * settings.row),
     })
     elements.canvas.ctx().imageSmoothingEnabled = false
+    let shade = '#c2c2c2'
     
     new Array(settings.column * settings.row).fill('').forEach((_, i) => {
       const offset = calcY(i) % 2 == 0 ? 0 : 18
+
+      shade = shade === '#c2c2c2' ? '#ffffff' : '#c2c2c2'
+      elements.canvas.ctx().fillStyle = shade
+      elements.canvas.ctx().fillRect( calcX(i) * 36 - offset, 
+      calcY(i) * 9, // overlapping one square
+      36, 10)
+
       elements.canvas.ctx().drawImage(
         elements.line, 
         calcX(i) * 36 - offset, 

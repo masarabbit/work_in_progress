@@ -8,6 +8,7 @@ function init() {
     shoulders: document.querySelectorAll('.shoulder'),
     elbows: document.querySelectorAll('.elbow'),
     waist: document.querySelector('.belly-joint'),
+    ears: document.querySelectorAll('.ear-joint'),
   }
 
   const poses = {
@@ -17,6 +18,8 @@ function init() {
       { el: parts.elbows[0], deg: 40 },
       { el: parts.shoulders[1], deg: -65 },
       { el: parts.elbows[1], deg: -40 },
+      { el: parts.ears[0], deg: -10 },
+      { el: parts.ears[1], deg: 10 },
     ],
     leftArmUp: [
       { el: parts.neck, deg: 10 },
@@ -25,6 +28,8 @@ function init() {
       { el: parts.shoulders[1], deg: -50 },
       { el: parts.elbows[1], deg: 65 },
       { el: parts.waist, deg: 5 },
+      { el: parts.ears[0], deg: -15 },
+      { el: parts.ears[1], deg: -15 },
     ],
     rightArmUp: [
       { el: parts.neck, deg: -10 },
@@ -33,6 +38,8 @@ function init() {
       { el: parts.shoulders[1], deg: -100 },
       { el: parts.elbows[1], deg: -45 },
       { el: parts.waist, deg: -5 },
+      { el: parts.ears[0], deg: 15 },
+      { el: parts.ears[1], deg: 15 },
     ],
     bothArmsUp: [
       { el: parts.shoulders[0], deg: 120 },
