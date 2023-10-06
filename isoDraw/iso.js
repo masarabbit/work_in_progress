@@ -1,6 +1,8 @@
 
   function init() { 
 
+    // TODO add guidelines to canvas background
+
     const elements = {
       canvas: {
         el: document.querySelector('canvas'),
@@ -126,7 +128,7 @@
 
       const x = sX - left
       const y = sY - top
-      state.cells = state.cells.filter(c => !(c.x === x && c.y === y))
+      state.cells = state.cells.filter(c => c.x !== x || c.y !== y)
       state.cells.push({
         img: 'stair',
         x, y
