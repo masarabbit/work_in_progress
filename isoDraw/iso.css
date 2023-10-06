@@ -30,6 +30,7 @@ p, h1, h2, h3, h4 {
 }
 
 canvas {
+  /* position: absolute; */
   border: 1px solid white;
   /* background-color: white; */
   margin-bottom: 20px;
@@ -51,4 +52,23 @@ textarea {
   height: 100px;
   overflow-y: scroll;
   border: 0px;
+}
+
+.stamp {
+  position: absolute;
+  top: 0;
+  left: 0;
+  --w: 36;
+  --h: 36;
+  width: calc(var(--w) * 2px);
+  height: calc(var(--h) * 2px);
+  opacity: 0.5;
+  border: 1px solid hotpink;
+  pointer-events: none;
+}
+
+.stamp img {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
 }

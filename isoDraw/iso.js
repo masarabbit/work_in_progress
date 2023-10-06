@@ -14,7 +14,8 @@
       blank: document.querySelector('.blank'),
       btn: document.querySelector('button'),
       indicator: document.querySelector('.indicator'),
-      cellData: document.querySelector('.cells')
+      cellData: document.querySelector('.cells'),
+      stamp: document.querySelector('.stamp')
     }
 
     const state = {
@@ -46,6 +47,13 @@
       canvas.setAttribute('height', h || w)
     }
 
+    const setStyles = ({ el, h, w, x, y }) =>{
+      if (h) el.style.height = h
+      if (w) el.style.width = w
+      el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0})`
+    }
+    
+
     resizeCanvas({
       canvas: elements.canvas.el,
       w: px(36 * (settings.column - 1) * settings.factor),
@@ -54,7 +62,7 @@
     elements.canvas.ctx().imageSmoothingEnabled = false
     let shade = '#c2c2c2'
     
-    state.cells = new Array(settings.column * settings.row).fill('blank')
+    // state.cells = new Array(settings.column * settings.row).fill('blank')
     elements.cellData.value = state.cells
 
     const updateCanvas = () => {
@@ -69,14 +77,23 @@
       //     calcY(rI) * (9 * factor) - (9 * factor), // overlapping one square
       //     (36 * factor), (37 * factor))
       // })
-      state.cells.forEach((c, i) => {
-        const { factor } = settings
-        const offset = calcY(i) % 2 === 0 ? 0 : (18 * factor)
+      // state.cells.forEach((c, i) => {
+      //   const { factor } = settings
+      //   const offset = calcY(i) % 2 === 0 ? 0 : (18 * factor)
   
+      //   elements.canvas.ctx().drawImage(
+      //     elements[c], 
+      //     calcX(i) * (36 * factor) - offset,
+      //     calcY(i) * (9 * factor) - (9 * factor), // overlapping one square
+      //     (36 * factor), (37 * factor))
+      // })
+
+      state.cells.forEach(c => {
+        const { factor } = settings
+        // const offset = calcY(i) % 2 === 0 ? 0 : (18 * factor)
         elements.canvas.ctx().drawImage(
-          elements[c], 
-          calcX(i) * (36 * factor) - offset,
-          calcY(i) * (9 * factor) - (9 * factor), // overlapping one square
+          elements[c.img], 
+          c.x, c.y,
           (36 * factor), (37 * factor))
       })
     }
@@ -90,21 +107,33 @@
       link.click()
     })
 
-    elements.canvas.el.addEventListener('click', e => {
+    elements.canvas.el.addEventListener('click', () => {
+      // const { left, top } = elements.canvas.el.getBoundingClientRect()
+      // const w = settings.factor * 36
+      // const h = settings.factor * 9
+
+      // const y = nearestN(e.pageY - top, h) / h
+      // const isEven = y % 2 === 0
+      // const offsetX = isEven ? w / 2 : 0
+      // const x = nearestN((e.pageX - left) + offsetX, w) / w
+      // const adjust = isEven ? y / 2 : (y - 1) / 2
+      // const isNum = x => typeof x === 'number'
+
+      // const index = x + ((y - 1) * settings.column) - adjust - 1
+      // elements.indicator.innerHTML = `${x} ${y} ${y % 2} [${index}]`
       const { left, top } = elements.canvas.el.getBoundingClientRect()
-      const w = settings.factor * 36
-      const h = settings.factor * 9
+      const { x: sX, y: sY } = elements.stamp.getBoundingClientRect()
 
-      const y = nearestN(e.pageY - top, h) / h
-      const isEven = y % 2 === 0
-      const offsetX = isEven ? w / 2 : 0
-      const x = nearestN((e.pageX - left) + offsetX, w) / w
-      const adjust = isEven ? y / 2 : (y - 1) / 2
-
-      const index = x + ((y - 1) * settings.column) - adjust - 1
-      elements.indicator.innerHTML = `${x} ${y} ${y % 2} [${index}]`
-
-      state.cells[index] = 'stair'
+      const x = sX - left
+      const y = sY - top
+      state.cells = state.cells.filter(c => !(c.x === x && c.y === y))
+      state.cells.push({
+        img: 'stair',
+        x, y
+      })
+      state.cells.sort((a, b) => a.y - b.y)
+      elements.cellData.value = state.cells.map(c => `${c.img}.${c.x}-${c.y}`)
+      elements.indicator.innerHTML = state.cells.length
       updateCanvas()
 
     })
@@ -115,10 +144,22 @@
 
     // state.cells[56] = 'stair'
     // state.cells[32] = 'stair' // TODO 32 isn't showing, so probably not mapping out properly
-    state.cells[53] = 'stair'
+    // state.cells[53] = 'stair'
     
 
-    updateCanvas()
+    // updateCanvas()
+
+    window.addEventListener('mousemove', e => {
+      const { left, top } = elements.canvas.el.getBoundingClientRect()
+      // const cellD = 18 * 2
+      const cX = 18 * 2
+      const cY = 9 * 2
+      setStyles({
+        el: elements.stamp,
+        x: nearestN(e.pageX - left - window.scrollX, cX) - cX + left,
+        y: nearestN(e.pageY - top - window.scrollY, cY) - cY + top
+      })
+    })
   }
   
   window.addEventListener('DOMContentLoaded', init)
