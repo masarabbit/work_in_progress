@@ -73,6 +73,14 @@ textarea {
   image-rendering: pixelated;
 }
 
+.stamp::after {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  content: attr(data-coord);
+  color: hotpink;
+}
+
 .palette {
   border: 1px solid hotpink;
 }
