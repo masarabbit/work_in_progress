@@ -17,17 +17,13 @@
       btn: document.querySelector('button'),
       indicator: document.querySelector('.indicator'),
       cellData: document.querySelector('.cells'),
-      stamp: document.querySelector('.stamp')
+      stamp: document.querySelector('.stamp'),
+      palette: document.querySelector('palette')
     }
 
     const state = {
       cells: []
     }
-
-    // const settings = {
-    //   column: 21, //this is always one more than how many you want
-    //   row: 90
-    // }
 
 
     const settings = {
@@ -68,28 +64,6 @@
     elements.cellData.value = state.cells
 
     const updateCanvas = () => {
-      // [...state.cells].reverse().forEach((c, i) => {
-      //   const rI = state.cells.length - i - 1
-      //   const { factor } = settings
-      //   const offset = calcY(rI) % 2 === 0 ? 0 : (18 * factor)
-  
-      //   elements.canvas.ctx().drawImage(
-      //     elements[c], 
-      //     calcX(rI) * (36 * factor) - offset,
-      //     calcY(rI) * (9 * factor) - (9 * factor), // overlapping one square
-      //     (36 * factor), (37 * factor))
-      // })
-      // state.cells.forEach((c, i) => {
-      //   const { factor } = settings
-      //   const offset = calcY(i) % 2 === 0 ? 0 : (18 * factor)
-  
-      //   elements.canvas.ctx().drawImage(
-      //     elements[c], 
-      //     calcX(i) * (36 * factor) - offset,
-      //     calcY(i) * (9 * factor) - (9 * factor), // overlapping one square
-      //     (36 * factor), (37 * factor))
-      // })
-
       state.cells.forEach(c => {
         const { factor } = settings
         // const offset = calcY(i) % 2 === 0 ? 0 : (18 * factor)
@@ -110,19 +84,6 @@
     })
 
     elements.canvas.el.addEventListener('click', () => {
-      // const { left, top } = elements.canvas.el.getBoundingClientRect()
-      // const w = settings.factor * 36
-      // const h = settings.factor * 9
-
-      // const y = nearestN(e.pageY - top, h) / h
-      // const isEven = y % 2 === 0
-      // const offsetX = isEven ? w / 2 : 0
-      // const x = nearestN((e.pageX - left) + offsetX, w) / w
-      // const adjust = isEven ? y / 2 : (y - 1) / 2
-      // const isNum = x => typeof x === 'number'
-
-      // const index = x + ((y - 1) * settings.column) - adjust - 1
-      // elements.indicator.innerHTML = `${x} ${y} ${y % 2} [${index}]`
       const { left, top } = elements.canvas.el.getBoundingClientRect()
       const { x: sX, y: sY } = elements.stamp.getBoundingClientRect()
 
@@ -137,19 +98,9 @@
       elements.cellData.value = state.cells.map(c => `${c.img}.${c.x}-${c.y}`)
       elements.indicator.innerHTML = state.cells.length
       updateCanvas()
-
     })
 
-    // state.cells[0] = 'stair'
 
-    // state.cells[22] = 'stair'
-
-    // state.cells[56] = 'stair'
-    // state.cells[32] = 'stair' // TODO 32 isn't showing, so probably not mapping out properly
-    // state.cells[53] = 'stair'
-    
-
-    // updateCanvas()
 
     window.addEventListener('mousemove', e => {
       const { left, top } = elements.canvas.el.getBoundingClientRect()
