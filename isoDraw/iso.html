@@ -8,20 +8,28 @@
 
 </head>
 <body>
+
   <div class="wrapper">
+    <nav>
+      <div class="input-wrap">
+        <label>layer<span>/</span><span class="max">0</span></label>
+        <input class="layer no input" placeholder="layer" value="0" />
+      </div>
+    </nav>
     <!-- <img class="line d-none" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAASCAYAAAAzI3woAAAAAXNSR0IArs4c6QAAAJNJREFUSEvF1EsOgCAMBFB7/0PXoNYI0f6mIGs6eSlhaKs5fMUQGocGHBDm00N0x6Vzs4MdZNwKAouCVEgFzAsKQRCYBYIgGdgXqBQSgY2gqRAPTEBLIRqsgVh6BC01dL7VRfdkf8nIKq5VsCdEtqt++1mwN4gLJJeqYBokBEJhHkgKFIVFIBDIgmUgJaARhkAkaweAHkUSEBu2+wAAAABJRU5ErkJggg==" alt=""> -->
     <img class="line d-none" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAlCAYAAAAqXEs9AAAAAXNSR0IArs4c6QAAALxJREFUWEft1EsOgCAMBFB7/0NjUDFCtEM/IIu6rdSXKZa2xR5azLMFCE0kEoqEUAKoHncoEkIJoHrcoUgIJYDqcYdmJZSuD5kTtzY4ICmdHqK7nbqv9mAFacdggUlBLMQD1gsSQSwwBDJBNLAvkCtEAmtBQyE9sAKaCuFgGZTKHkFbdHQ9r4tqZH/JCC2uWbAnpKTP/vajYG+QLlB5yQvGQUQgK6wHogJJYRKICYRgGogLqIVZIK4gz4W5A878RSWBK6cSAAAAAElFTkSuQmCC" alt="">
-    <img class="cube d-none" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAlCAYAAAAqXEs9AAAAAXNSR0IArs4c6QAAAR1JREFUWEft2MESwiAMBFD5/4/GoRUmUmCTbFoP4rWSvi6RMU2vmE/+lElsObbAAcn59KTUyrnrehd+QfpUGJgVtIREwLQgE4SBIRAF8cBmoFCIBdaDboVoYBX0KGQFK6BczxH2UGPXl+PiANVCv4KJc+sE9SftU7AKkfcfbln/RXYrZj3TP3jbslki0TBUD4Lqk6FCKEHtejXIC9NCZH3Xzx7dCF2fJWpOCDWnF0InhGCop25LSBYu6bDnF71lG2Tphb1lKK2d0F8ndEzDciRGaYyuMz0kJ92wqcMDGo3cYXOZBbSa/cMmVw1I8xICgdpAgnpsBdJA2l8QYwNPm38EskC8oGliEuSBsKALTCDKNW0rXDbIvbCrFPaO8Q2E4usT3uthmwAAAABJRU5ErkJggg==">
-    <img class="stair d-none" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAlCAYAAAAqXEs9AAAAAXNSR0IArs4c6QAAAUtJREFUWEfF11ESgyAMBNBy/0PjoIYRSsgmG9t+dUbEZwKrlk/Or97TFHY6doITUuvlKaVPF543euIAmavCwLygLUSBua6BDo5AxIde42q7sQhDkGlNWdcYCNpgCtJLcy1yCpQCyQClQlhQlZ5boSbb2Tve07bSNNaFrONaDkUC8wRNJf5KXm9FtPFIYA4gDfZSK5e7bwmS55JVmWgrdw/iECgKQQLTBWIhSBxAoCwIDZIJrLXk3Qz3DeYvai9kHr8KTLVlzzdAK1eiFVzl0hb0j8CEQGxrPBV0gX4RmKkgNh7a+SkgFvJcEhQoC0KD3gzMlpbwGyO6qJldKfGd+k4daKX6DU7BGIj1VUnBgDdM9VvN+oiDYK0ySBqXx8NLQ1ugvqHan91DdgdCIFbLtBtYVkyrkAcSBS0rNoMiEBY0wKSdDCQLZG0o9/EDEKlBLgROJT4AAAAASUVORK5CYII=">
     <img class="blank d-none" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAlCAYAAAAqXEs9AAAAAXNSR0IArs4c6QAAAFFJREFUWEft0rERADAIxDDYf2lGUEvhtN9wineevX12z3SQfiShhCSgvYYSkoD2GkpIAtprKCEJaK+hhCSgvYYSkoD2GkpIAtprKCEJaH/X0AGjMwAmgVZCxgAAAABJRU5ErkJggg==">
     <canvas></canvas>
-    
+
     <div class="buttons">
-      <button>download</button>
-      <button>add layer</button>
+      <button class="btn" data-action="download">download</button>
+      <button class="btn" data-action="add-layer">add layer</button>
     </div>
 
-    <textarea class="cells" spellcheck="false"></textarea>  
+    <div class="layers">
+      <textarea class="cells" data-index="0" spellcheck="false"></textarea>  
+    </div>
+
     <div class="palette"></div>
   </div>
   

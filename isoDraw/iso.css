@@ -7,7 +7,7 @@ body {
   padding: 0;
   margin: 0;
   font-family: sans-serif;
-  background-color: rgb(205, 205, 205);
+  background-color: #e8e8e8;
 }
 
 p, h1, h2, h3, h4 {
@@ -27,17 +27,38 @@ p, h1, h2, h3, h4 {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  padding-top: 40px;
+}
+
+.indicator {
+  position: fixed;
+  width: 100px;
+  right: 0;
+  text-align: right;
 }
 
 canvas {
   /* position: absolute; */
-  border: 1px solid white;
-  /* background-color: white; */
+  /* border: 1px solid white; */
+  background-color: white;
   margin-bottom: 20px;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAASCAYAAAAzI3woAAAAAXNSR0IArs4c6QAAAKFJREFUSEvVlV0OgCAMg+UW3P90u4VmJCS44Oh+NOirrP1S7CxHwkNEJ8vUWktULiQgQTLAXEAr49V7LUUTkNXIep5BISCP8JiCZV4FsgghHzOiNwVCBhGApzOa/g3obRAJOPNrQF+DaGCFYTIWWuQK+yyz7JeQt55Zichfzt4tQ1oQSQYpz782dTQxJBHpASVkBfOAdA8X0Lg3xpZEQLrmBW2qi8o7oh63AAAAAElFTkSuQmCC);
+  --m: 2;
+  --w: 36px;
+  --h: 18px;
+  background-repeat: repeat 0 0;
+  background-size: calc(var(--w) * var(--m)) calc(var(--h) * var(--m)) !important; 
+  image-rendering: pixelated;
+
 }
 
 .d-none {
   display: none;
+}
+
+.layers {
+  width: 100%;
+  max-width: 700px;
 }
 
 textarea {
@@ -49,7 +70,7 @@ textarea {
   font-size: 12px;
   color: #2f0244;
   overflow-wrap: break-word;
-  height: 100px;
+  height: 20px;
   overflow-y: scroll;
   border: 0px;
 }
@@ -63,7 +84,8 @@ textarea {
   width: calc(var(--w) * 2px);
   height: calc(var(--h) * 2px);
   opacity: 0.5;
-  border: 1px solid hotpink;
+  /* border: 1px solid hotpink; */
+  background-color: hotpink;
   pointer-events: none;
 }
 
@@ -92,5 +114,44 @@ textarea {
 }
 
 .palette > img:hover {
+  border: 1px solid hotpink;
+}
+
+input {
+  background-color: white;
+  color: black;
+  border: 0;
+  height: 20px;
+}
+
+.input-wrap label {
+  border: 0;
+  font-size: 10px;
+  height: 11px;
+  padding: 0;
+  margin: -1px 0 1px 0;
+  text-align: left;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrap label:hover {
+  background-color: transparent;
+  color: white;
+}
+
+.input {
+  width: 80px;
+  padding: 9.5px 10px;
+}
+
+.input.no {
+  width: 50px;
+}
+
+nav {
+  position: fixed;
+  top:0;
+  width: 100%;
   border: 1px solid hotpink;
 }

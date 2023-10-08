@@ -3,7 +3,6 @@ import { tiles } from './data.js'
 function init() { 
 
   // TODO add guidelines to canvas background
-  // TODO how to control layers? might need more canvas layers (either make cells array of arrays, or object with multiple keys, each one for each level). Or, could be same canvas but higher layer gets drawn later.
   // TODO add eraser (filter if x and y matches)
 
   const elements = {
@@ -17,27 +16,43 @@ function init() {
     cube: document.querySelector('.cube'),
     stair: document.querySelector('.stair'),
     blank: document.querySelector('.blank'),
-    btn: document.querySelector('button'),
+    btns: document.querySelectorAll('.btn'),
     indicator: document.querySelector('.indicator'),
-    cellData: document.querySelector('.cells'),
+    cellData: document.querySelectorAll('.cells'),
     stamp: document.querySelector('.stamp'),
-    palette: document.querySelector('.palette')
+    palette: document.querySelector('.palette'),
+    max: document.querySelector('.max'),
+    layers: document.querySelector('.layers'),
+  }
+
+
+  const input = {
+    layer: document.querySelector('.layer'),
   }
 
   const state = {
-    cells: []
+    cells: [[]]
   }
+
+  Object.keys(input).forEach(key => {
+    input[key].addEventListener('change', ()=> {
+      if (state.cells.length > input[key].value) settings[key] = +input[key].value
+      input[key].value = settings[key]
+      console.log(settings, state.cells)
+    })
+  })
 
 
   const settings = {
     column: 11, //this is always one more than how many you want
     row: 30,
     factor: 2,
-    tile: 'stair'
+    tile: 'stair',
+    layer: 0
   }
 
-  const calcX = i => i % settings.column
-  const calcY = i => Math.floor(i / settings.column)
+  // const calcX = i => i % settings.column
+  // const calcY = i => Math.floor(i / settings.column)
   const nearestN = (n, denom) =>{
     return n === 0 ? 0 : (n - 1) + Math.abs(((n - 1) % denom) - denom)
   }
@@ -62,46 +77,43 @@ function init() {
     h: px(9 * settings.row * settings.factor),
   })
   elements.canvas.ctx().imageSmoothingEnabled = false
-  let shade = '#c2c2c2'
-  
-  // state.cells = new Array(settings.column * settings.row).fill('blank')
-  elements.cellData.value = state.cells
+
 
   const updateCanvas = () => {
-    state.cells.forEach(c => {
+    state.cells.forEach(layer => {
       const { factor } = settings
-      // const offset = calcY(i) % 2 === 0 ? 0 : (18 * factor)
+      layer.forEach(c => {
+        // const offset = calcY(i) % 2 === 0 ? 0 : (18 * factor)
       elements.canvas.ctx().drawImage(
-        elements[c.img], 
+        Array.from(document.querySelectorAll('.palette-tile')).find(tile => tile.dataset.id === c.img),
         c.x * factor, 
         c.y * factor, 
         (36 * factor), (37 * factor))
+      })
     })
   }
   
 
 
-  elements.btn.addEventListener('click', ()=> {
-    const link = document.createElement('a')
-    link.download = `iso_${new Date().getTime()}.png`
-    link.href = elements.canvas.el.toDataURL()
-    link.click()
-  })
+
 
   elements.canvas.el.addEventListener('click', () => {
     const { left, top } = elements.canvas.el.getBoundingClientRect()
     const { x: sX, y: sY } = elements.stamp.getBoundingClientRect()
+    const { factor, layer } = settings
 
-    const x = (sX - left) / settings.factor
-    const y = (sY - top) / settings.factor
-    state.cells = state.cells.filter(c => c.x !== x || c.y !== y)
-    state.cells.push({
+    console.log('layer', layer, elements.cellData, settings)
+
+    const x = (sX - left) / factor
+    const y = (sY - top) / factor
+    state.cells[layer] = state.cells[layer].filter(c => c.x !== x || c.y !== y)
+    state.cells[layer].push({
       img: settings.tile,
       x, y
     })
-    state.cells.sort((a, b) => a.y - b.y)
-    elements.cellData.value = state.cells.map(c => `${c.img}.${c.x}-${c.y}`)
-    elements.indicator.innerHTML = state.cells.length
+    state.cells[layer].sort((a, b) => a.y - b.y)
+    elements.cellData[layer].value = state.cells[layer].map(c => `${c.img}.${c.x}-${c.y}`)
+    elements.indicator.innerHTML = state.cells[layer].length
     updateCanvas()
   })
   
@@ -113,7 +125,6 @@ function init() {
 
   paletteTiles.forEach(tile => {
     tile.addEventListener('click', () => {
-      console.log('test', tile.dataset)
       settings.tile = tile.dataset.id
     })
   })
@@ -122,8 +133,9 @@ function init() {
     const { left, top, width, height } = elements.canvas.el.getBoundingClientRect()
     const { pageX: pX, pageY: pY } = e
 
-    elements.stamp.classList[pX < left || pY < top || pX > (left + width) || pY > (top + height) ? 'add' : 'remove']('d-none')
-    // const cellD = 18 * 2
+    elements.stamp.classList[
+      pX < left || pY < top || pX > (left + width) || pY > (top + height) ? 'add' : 'remove'
+    ]('d-none')
     const cX = 18 * 2
     const cY = 9 * 2
     const x = nearestN(pX - left - window.scrollX, cX) - cX + left
@@ -132,9 +144,41 @@ function init() {
       el: elements.stamp,
       x, y
     })
-    elements.stamp.setAttribute('data-coord', `${x - left}-${y - top}`)
+    elements.stamp.setAttribute('data-coord', `${x - left}-${y - top}`) // TODO this might not be in sync
     elements.stamp.innerHTML = `<img src="${tiles[settings.tile]}">`
   })
+
+  const download = () => {
+    const link = document.createElement('a')
+    link.download = `iso_${new Date().getTime()}.png`
+    link.href = elements.canvas.el.toDataURL()
+    link.click()
+  }
+
+  const addBtnAction = (btn, actionName, action) => {
+    if (btn.dataset.action === actionName) {
+      btn.addEventListener('click', action)
+    }
+  }
+
+  elements.btns.forEach(btn => {
+    addBtnAction(btn, 'download', download)
+    addBtnAction(btn, 'add-layer', ()=> {
+      state.cells.push([])
+      elements.max.innerHTML = state.cells.length - 1
+      // <textarea class="cells" data-index="1" spellcheck="false"></textarea> 
+      const cellsInput = Object.assign(document.createElement('textarea'), {
+        value: state.cells.length - 1,
+        className: 'cells',
+        spellcheck: false,
+      })
+      cellsInput.setAttribute('data-index', state.cells.length - 1)
+      elements.layers.appendChild(cellsInput)
+      elements.cellData = document.querySelectorAll('.cells')
+    })
+  })
+
+
 }
 
 window.addEventListener('DOMContentLoaded', init)
