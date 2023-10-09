@@ -1,23 +1,6 @@
-import { elements, tiles, settings } from './data.js'
+import { elements, input, tiles, settings, state } from './data.js'
 
 function init() { 
-  
-  // TODO add ways to download layers into one sheet
-
-  const input = {
-    layer: document.querySelector('.layer'),
-  }
-
-  const state = {
-    cells: [[]]
-  }
-
-  Object.keys(input).forEach(key => {
-    input[key].addEventListener('change', ()=> {
-      if (state.cells.length > input[key].value) settings[key] = +input[key].value
-      input[key].value = settings[key]
-    })
-  })
 
   const nearestN = (n, denom) =>{
     return n === 0 ? 0 : (n - 1) + Math.abs(((n - 1) % denom) - denom)
@@ -36,15 +19,6 @@ function init() {
     el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0})`
   }
 
-
-  resizeCanvas({
-    canvas: elements.canvas.el,
-    w: px(36 * (settings.column - 1) * settings.factor),
-    h: px(9 * settings.row * settings.factor),
-  })
-  elements.canvas.ctx().imageSmoothingEnabled = false
-
-
   const updateCanvas = () => {
     const { width, height } = elements.canvas.el
     elements.canvas.ctx().clearRect(0, 0, width, height)
@@ -60,7 +34,34 @@ function init() {
       })
     })
   }
+
+  const download = () => {
+    const link = document.createElement('a')
+    link.download = `iso_${new Date().getTime()}.png`
+    link.href = elements.canvas.el.toDataURL()
+    link.click()
+  }
   
+  const downloadTextFile = () =>{
+    const data = new Blob([JSON.stringify(state.cells, null, 1)], { type: 'text/rtf' })
+    const url = window.URL.createObjectURL(data)
+    elements.downloadTextLink.download = `iso_draw_cells_${new Date().getTime()}.txt`
+    elements.downloadTextLink.href = url
+    elements.downloadTextLink.click()
+  }
+  
+
+
+
+
+  // setup
+
+  resizeCanvas({
+    canvas: elements.canvas.el,
+    w: px(36 * (settings.column - 1) * settings.factor),
+    h: px(9 * settings.row * settings.factor),
+  })
+  elements.canvas.ctx().imageSmoothingEnabled = false
 
   elements.canvas.el.addEventListener('click', () => {
     const { left, top } = elements.canvas.el.getBoundingClientRect()
@@ -81,7 +82,8 @@ function init() {
     }
 
     elements.cellData[layer].value = state.cells[layer].map(c => `${c.img}.${c.x}-${c.y}`)
-    elements.indicator.innerHTML = state.cells[layer].length
+
+    // elements.indicator.innerHTML = state.cells[layer].length
     updateCanvas()
   })
   
@@ -94,6 +96,14 @@ function init() {
   paletteTiles.forEach(tile => {
     tile.addEventListener('click', () => {
       settings.tile = tile.dataset.id
+      elements.stamp.innerHTML = `<img src="${tiles[settings.tile]}">`
+    })
+  })
+
+  Object.keys(input).forEach(key => {
+    input[key].addEventListener('change', ()=> {
+      if (state.cells.length > input[key].value) settings[key] = +input[key].value
+      input[key].value = settings[key]
     })
   })
 
@@ -117,16 +127,7 @@ function init() {
       'data-coord', 
       `${(x - left - window.scrollX) / settings.factor}-${(y - top - window.scrollY) / settings.factor}`
       )
-    elements.stamp.innerHTML = `<img src="${tiles[settings.tile]}">`
-  })
-
-  const download = () => {
-    const link = document.createElement('a')
-    link.download = `iso_${new Date().getTime()}.png`
-    link.href = elements.canvas.el.toDataURL()
-    link.click()
-  }
-
+    })
 
 
   elements.btns.forEach(btn => {
@@ -150,7 +151,11 @@ function init() {
       elements.layers.appendChild(cellsInput)
       elements.cellData = document.querySelectorAll('.cells')
       settings.layer = state.cells.length - 1
-      input.layer.value = settings.layer  
+      input.layer.value = settings.layer 
+      
+      // TODO possibly break this out to another function
+      settings.erase = false
+      elements.stamp.classList[settings.erase ? 'add' : 'remove']('erase-mode')
     })
     addBtnAction('layer-up', ()=> {
       settings.layer = settings.layer < state.cells.length - 1 
@@ -168,6 +173,7 @@ function init() {
       settings.erase = !settings.erase
       elements.stamp.classList[settings.erase ? 'add' : 'remove']('erase-mode')
     })
+    addBtnAction('download-data', downloadTextFile)
   })
 
 

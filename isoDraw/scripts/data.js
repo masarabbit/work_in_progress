@@ -16,6 +16,11 @@ const elements = {
   palette: document.querySelector('.palette'),
   max: document.querySelector('.max'),
   layers: document.querySelector('.layers'),
+  downloadTextLink: document.querySelector('.download-text-link'),
+}
+
+const input = {
+  layer: document.querySelector('.layer'),
 }
 
 const tiles = {
@@ -32,8 +37,14 @@ const settings = {
   erase: false,
 }
 
+const state = {
+  cells: [[]]
+}
+
 export {
   elements,
+  input,
   tiles,
-  settings
+  settings,
+  state,
 }
