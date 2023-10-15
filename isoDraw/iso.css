@@ -79,10 +79,11 @@ textarea {
   position: absolute;
   top: 0;
   left: 0;
-  --w: 36;
-  --h: 36;
-  width: calc(var(--w) * 2px);
-  height: calc(var(--h) * 2px);
+  --w: 36px;
+  --h: 36px;
+  --m: 2;
+  width: calc(var(--w) * var(--m));
+  height: calc(var(--h) * var(--m));
   opacity: 0.5;
   /* border: 1px solid hotpink; */
   background-color: hotpink;
