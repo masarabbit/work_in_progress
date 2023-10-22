@@ -11,6 +11,8 @@ function init() {
   const resizeCanvas = ({ canvas, w, h }) =>{
     canvas.setAttribute('width', w)
     canvas.setAttribute('height', h || w)
+
+    elements.canvas.ctx().imageSmoothingEnabled = false
   }
 
   const setStyles = ({ el, h, w, x, y }) =>{
@@ -30,7 +32,7 @@ function init() {
         Array.from(document.querySelectorAll('.palette-tile')).find(tile => tile.dataset.id === c.img),
         c.x * factor, 
         c.y * factor, 
-        (36 * factor), (37 * factor))
+        (36 * factor), (36 * factor))
       })
     })
   }
@@ -61,7 +63,7 @@ function init() {
     w: px(36 * (settings.column - 1) * settings.factor),
     h: px(9 * settings.row * settings.factor),
   })
-  elements.canvas.ctx().imageSmoothingEnabled = false
+
 
   elements.canvas.el.addEventListener('click', () => {
     const { left, top } = elements.canvas.el.getBoundingClientRect()
@@ -93,6 +95,11 @@ function init() {
 
   const paletteTiles = document.querySelectorAll('.palette-tile')
 
+  settings.tile = 'cube'
+  elements.stamp.innerHTML = `<img src="${tiles.cube}">`
+
+  elements.stamp.style.setProperty('--m', settings.factor)
+
   paletteTiles.forEach(tile => {
     tile.addEventListener('click', () => {
       settings.tile = tile.dataset.id
@@ -100,10 +107,29 @@ function init() {
     })
   })
 
+
+  // ? maybe this could be done with inputs instead of having individual ones
   Object.keys(input).forEach(key => {
     input[key].addEventListener('change', ()=> {
-      if (state.cells.length > input[key].value) settings[key] = +input[key].value
-      input[key].value = settings[key]
+      if ((state.cells.length > input[key].value) && (key === 'layer')) {
+        settings[key] = +input[key].value
+        input[key].value = settings[key]
+      }
+
+      if (['factor', 'column', 'row'].includes(key)) {
+        settings[key] = +input[key].value
+        if (key === 'factor') {
+          elements.stamp.style.setProperty('--m', settings.factor)
+          elements.canvas.el.style.setProperty('--m', settings.factor)
+        } 
+        resizeCanvas({
+          canvas: elements.canvas.el,
+          w: px(36 * (settings.column - 1) * settings.factor),
+          h: px(9 * settings.row * settings.factor),
+        })
+
+        updateCanvas()
+      }
     })
   })
 
@@ -114,8 +140,8 @@ function init() {
     const { left, top } = elements.canvas.el.getBoundingClientRect()
     const { pageX: pX, pageY: pY } = e
 
-    const cX = 18 * 2
-    const cY = 9 * 2
+    const cX = 18 * settings.factor
+    const cY = 9 * settings.factor
     const x = nearestN(pX - left - window.scrollX, cX) - cX + left + window.scrollX
     const y = nearestN(pY - top - window.scrollY, cY) - cY + top + window.scrollY
     setStyles({

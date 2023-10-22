@@ -129,6 +129,10 @@ input {
   height: 20px;
 }
 
+.input-wrap {
+  margin-right: 5px;
+}
+
 .input-wrap label {
   border: 0;
   font-size: 10px;
