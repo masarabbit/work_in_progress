@@ -1,5 +1,8 @@
 import { elements, input, tiles, settings, state } from './data.js'
 
+// maybe could have draw mode? (continuous draw)
+// upload drawData
+
 function init() { 
 
   const nearestN = (n, denom) =>{
@@ -24,6 +27,14 @@ function init() {
   const updateCanvas = () => {
     const { width, height } = elements.canvas.el
     elements.canvas.ctx().clearRect(0, 0, width, height)
+
+    resizeCanvas({
+      canvas: elements.canvas.el,
+      w: px(36 * (settings.column - 1) * settings.factor),
+      h: px(9 * settings.row * settings.factor),
+    })
+
+    elements.canvas.el.style.backgroundPositionY = px(-settings.factor)
 
     state.cells.forEach(layer => {
       const { factor } = settings
@@ -58,12 +69,8 @@ function init() {
 
   // setup
 
-  resizeCanvas({
-    canvas: elements.canvas.el,
-    w: px(36 * (settings.column - 1) * settings.factor),
-    h: px(9 * settings.row * settings.factor),
-  })
 
+  updateCanvas()
 
   elements.canvas.el.addEventListener('click', () => {
     const { left, top } = elements.canvas.el.getBoundingClientRect()
@@ -122,11 +129,6 @@ function init() {
           elements.stamp.style.setProperty('--m', settings.factor)
           elements.canvas.el.style.setProperty('--m', settings.factor)
         } 
-        resizeCanvas({
-          canvas: elements.canvas.el,
-          w: px(36 * (settings.column - 1) * settings.factor),
-          h: px(9 * settings.row * settings.factor),
-        })
 
         updateCanvas()
       }
