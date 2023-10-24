@@ -49,6 +49,8 @@ function init() {
     ],
   }
 
+  const px = num => `${num}px`
+
   poses.neutral = Object.keys(parts).map(part => {
     return parts[part].length
       ? Array.from(parts[part]).map(p => {
