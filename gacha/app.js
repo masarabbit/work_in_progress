@@ -2,18 +2,18 @@
 function init() { 
 
   const elements = {
-    // body: document.querySelector('.wrapper'),
+    body: document.querySelector('.wrapper'),
     // wrapper: document.querySelector('.wrapper'),
     gachaMachine: document.querySelector('.gacha-machine')
     // indicator: document.querySelector('.indicator'),
   }
 
-  const capsuleSeeds = new Array(2).fill('')
+  const capsuleSeeds = new Array(4).fill('')
   const px = num => `${num}px`
 
   const setStyles = ({ el, x, y, deg }) =>{
     el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0}) rotate(${deg || 0}deg)`
-    // el.style.zIndex = y
+    el.style.zIndex = y
   }
 
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.cX - b.cX), 2) + Math.pow((a.cY - b.cY), 2)))
@@ -24,9 +24,29 @@ function init() {
 
   const capsules = document.querySelectorAll('.capsule')
 
-  capsules.forEach(c => {
-  
-  })
+
+  const getNewPosBasedOnTarget = ({ start, target, distance: d, fullDistance }) => {
+    const { x: aX, y: aY } = start
+    const { x: bX, y: bY } = target
+
+    const remainingD = fullDistance - d
+    return {
+      x: Math.round(((remainingD * aX) + (d * bX)) / fullDistance),
+      y: Math.round(((remainingD * aY) + (d * bY)) / fullDistance)
+    }
+  }
+
+  const checkBoundaryAndUpdatePos = ({ x, y, data }) =>{
+    const lowerLimit = 0
+    const upperLimit = 64
+
+    if (x > lowerLimit && x < (elements.gachaMachine.clientWidth - upperLimit)){
+      data.x = x
+    } 
+    if (y > lowerLimit && y < (elements.gachaMachine.clientHeight - upperLimit)){
+      data.y = y
+    }
+  }
 
   const { left, top, width, height } = elements.gachaMachine.getBoundingClientRect()
 
@@ -41,55 +61,80 @@ function init() {
       el: c,
       deg: 0,
       x: x - left, 
-      y: y - top + (i * 64),
+      y: y - top,
+      id: i
+      // x: x - left + i * 200, 
+      // y: y - top + i * 200, 
     }
     data.cX = data.x - 32
     data.cY = data.y - 32
 
     return data
   })
+  
 
   capsuleData.forEach(c => setStyles(c))
+
+  const moveApart = ({ a, b, distance }) => {
+    const fullDistance = distanceBetween(capsuleData[a], capsuleData[b])
+
+    const { x: aX, y: aY } = getNewPosBasedOnTarget({
+      start: capsuleData[a],
+      target: capsuleData[b],
+      distance,
+      fullDistance,
+    })
+
+    checkBoundaryAndUpdatePos({
+      x: aX, y: aY,
+      data: capsuleData[a]
+    })
+  
+    const { x: bX, y: bY } = getNewPosBasedOnTarget({
+      start: capsuleData[b],
+      target: capsuleData[a],
+      distance,
+      fullDistance,
+    })
+
+    checkBoundaryAndUpdatePos({
+      x: bX, y: bY,
+      data: capsuleData[b]
+    })
+  }
+
 
   setInterval(()=> {
     capsuleData.forEach((c, i) => {
       c.el.style.transition = '0.2s'
-      const data = {
-        ...c, 
-        el: c.el,
-        // deg: c.y + 10 < (height - 64)
-        //       ? c.deg + 10
-        //       : c.deg,
-        y: c.y + 10 < (height - 64)
-            ? c.y + 10 
-            : c.y,
-      }
-      data.cX = data.x - 32
-      data.cY = data.y - 32
-      capsuleData[i] = data
+
+      checkBoundaryAndUpdatePos({
+        x: c.x + 2, // TODO if I could set these according to gravity and velocity, then this would be work
+        // TODO or, adjust this based on where and how the capsules hit each other
+        y: c.y + 10,
+        data: capsuleData[i]
+      })
+      capsuleData[i].cX = capsuleData[i].x - 32
+      capsuleData[i].cY = capsuleData[i].y - 32
+      capsuleData[i].deg = capsuleData[i].deg + 10
 
       capsuleData.forEach((capsuleToCheck, cI) => {
-        if (cI !== i) console.log(distanceBetween(c, capsuleToCheck))
-        if (cI !== i && (distanceBetween(c, capsuleToCheck) < 32)) {
-          // console.log('test')
-          // capsuleData[i].x = capsuleData[i].x + 10
+        // if (cI !== i) console.log(distanceBetween(c, capsuleToCheck))
+        if (cI !== i && (distanceBetween(c, capsuleToCheck) < 64)) {
+          // console.log('hit')
+          moveApart({
+            a: c.id, 
+            b: capsuleToCheck.id,
+            distance: -16
+          })
         }
       })
 
-      // Need to check collision before updating
       setStyles(capsuleData[i])
-
-
     })
-  
   }, 100)
 
-  // setTimeout(()=>{
-  //   capsuleData.forEach(c => {
-
-  //   })
-  // }, 600)
-  console.log('test', capsules)
+  console.log('test', capsuleData)
 
 }
   
