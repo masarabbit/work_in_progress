@@ -38,7 +38,7 @@ p, h1, h2, h3, h4 {
 .gacha-machine {
   border: 1px solid hotpink;
   width: 350px;
-  height: 250px;
+  height: 550px;
 }
 
 .capsule {
@@ -50,6 +50,10 @@ p, h1, h2, h3, h4 {
   width: calc(var(--w) * var(--m));
   height: calc(var(--h) * var(--m));
   /* transition: 1s; */
+}
+
+.capsule.hit {
+  background-color: hotpink;
 }
 
 

@@ -7,7 +7,7 @@ function init() {
     // indicator: document.querySelector('.indicator'),
   }
 
-  const capsuleSeeds = new Array(2).fill('')
+  const capsuleSeeds = new Array(7).fill('')
   const px = num => `${num}px`
   const randomN = max => Math.ceil(Math.random() * max)
 
@@ -28,9 +28,6 @@ function init() {
   const getNewPosBasedOnTarget = ({ start, target, distance: d, fullDistance }) => {
     const { x: aX, y: aY } = start
     const { x: bX, y: bY } = target
-    // let d = fullDistance / 2
-    // if (d < 1) return { x: aX, y: aY }
-    // d = d * -1
 
     const remainingD = fullDistance - d
     return {
@@ -44,25 +41,38 @@ function init() {
     const upperLimit = 64
 
     if (x > lowerLimit && x < (elements.gachaMachine.clientWidth - upperLimit)){
+      data.prevX = data.x
       data.x = x
       data.cX = x + 32
+      data.deg =  data.deg + data.prevX > data.x ? -10 : 10
     } 
     if (y > lowerLimit && y < (elements.gachaMachine.clientHeight - upperLimit 
-    //   && 
-    //   !capsuleData.some(c => {
-    //   return c.id !== data.id && distanceBetween(c, data) < 64
-    // })
     )){
-      data.prevY = data.y
-      data.y = y
-      data.cY = y + 32
+      if (capsuleData.some(c => c.touchEdge && c.id !== data.id && distanceBetween(c, data) < 64)) {
+        data.el.classList.add('hit')
+        data.touchEdge = true
+        // data.y =   data.prevY
+      } else {
+        data.touchEdge = false
+        data.el.classList.remove('hit')
+
+        data.prevY = data.y
+        data.y = y
+        data.cY = data.y + 32
+      }
+
+    } else {
+      data.touchEdge = true
+      data.el.classList.add('hit')
     }
   }
 
   const { left, top, width, height } = elements.gachaMachine.getBoundingClientRect()
 
   const moveApart = ({ a, b, distance, fullDistance }) => {
-    const { x: aX, y: aY } = getNewPosBasedOnTarget({
+    const { x: aX, 
+      // y: aY 
+    } = getNewPosBasedOnTarget({
       start: capsuleData[a],
       target: capsuleData[b],
       distance,
@@ -84,11 +94,11 @@ function init() {
     const data = {
       el: c,
       deg: 0,
-      x: x - left, 
+      // x: x - left, 
       // y: y - top,
       id: i,
-      // x: x - left + i * 40, 
-      y: y - top + i * 100, 
+      x: x - left + randomN(500), 
+      y: y - top + randomN(500), 
     }
     data.cX = data.x + 32
     data.cY = data.y + 32
@@ -100,45 +110,45 @@ function init() {
   capsuleData.forEach(c => setStyles(c))
 
   const updateMotion = ({ a, b }) => {
-    if (capsuleData[a].cY > capsuleData[b].cY) {
+    if (capsuleData[a].y < capsuleData[b].y) {
+      // console.log('test', capsuleData[a], capsuleData[b])
       const fullDistance = distanceBetween(capsuleData[a], capsuleData[b])
-      const direction = capsuleData[a].cX + (randomN(10))> capsuleData[b].cX + (randomN(10))
+      const direction = capsuleData[a].cX  > capsuleData[b].cX
         ? 'right'
         : 'left'
 
       const directionObj = {
-        right: -10,
-        left: 10
-      }
-
-      const rotateObj = {
         right: 10,
         left: -10
       }
 
-      const { x: aX } = getNewPosBasedOnTarget({
-        start: capsuleData[a],
-        target: capsuleData[b],
-        distance: directionObj[direction],
+      // const rotateObj = {
+      //   right: 10,
+      //   left: -10
+      // }
+
+      // const { x: aX } = getNewPosBasedOnTarget({
+      //   start: capsuleData[a],
+      //   target: capsuleData[b],
+      //   distance: directionObj[direction] * 10,
+      //   fullDistance: 1000,
+      // })
+
+      // console.log('hit', aX)
+
+      // checkBoundaryAndUpdatePos({
+      //   x: capsuleData[a].x + directionObj[direction],
+      //   data: capsuleData[a]
+      // })
+
+      moveApart({
+        a, b,
+        distance: directionObj[direction] * 2,
         fullDistance,
       })
 
-      checkBoundaryAndUpdatePos({
-        x: aX,
-        y: fullDistance < 65 ? capsuleData[a].prevY : capsuleData[a].y,
-        data: capsuleData[a]
-      })
+      // capsuleData[a].deg = capsuleData[a].deg + rotateObj[direction]
 
-      capsuleData[a].deg = capsuleData[a].deg + rotateObj[direction]
-
-      if (fullDistance < 32) {
-        console.log('test')
-        moveApart({
-          a, b,
-          distance: directionObj[direction],
-          fullDistance,
-        })
-      }
     }
   }
 
@@ -155,7 +165,7 @@ function init() {
       // capsuleData[i].cY = capsuleData[i].y + 32
 
       capsuleData.forEach((capsuleToCheck, cI) => {
-        if (cI !== i && (distanceBetween(c, capsuleToCheck) < 64)) {
+        if (cI !== i && c.touchEdge && (distanceBetween(c, capsuleToCheck) < 64)) {
           updateMotion({
             a: c.id, 
             b: capsuleToCheck.id,
@@ -165,7 +175,7 @@ function init() {
 
       setStyles(capsuleData[i])
     })
-  }, 100)
+  }, 50)
 
 
 }
