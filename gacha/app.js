@@ -25,9 +25,14 @@ function init() {
   const capsules = document.querySelectorAll('.capsule')
 
 
-  const getNewPosBasedOnTarget = ({ start, target, distance: d, fullDistance }) => {
+  const getNewPosBasedOnTarget = ({ start, target, 
+    // distance: d, 
+    fullDistance }) => {
     const { x: aX, y: aY } = start
     const { x: bX, y: bY } = target
+    let d = fullDistance / 2
+    if (d < 1) return
+    d = d * -1
 
     const remainingD = fullDistance - d
     return {
@@ -41,7 +46,9 @@ function init() {
     const upperLimit = 64
 
     if (x > lowerLimit && x < (elements.gachaMachine.clientWidth - upperLimit)){
+      const prevX = data.x
       data.x = x
+      data.deg = prevX < x ? data.deg - 10 : data.deg + 10 
     } 
     if (y > lowerLimit && y < (elements.gachaMachine.clientHeight - upperLimit)){
       data.y = y
@@ -62,9 +69,9 @@ function init() {
       deg: 0,
       x: x - left, 
       y: y - top,
-      id: i
-      // x: x - left + i * 200, 
-      // y: y - top + i * 200, 
+      id: i,
+      // x: x - left + i * 64, 
+      // y: y - top + i * 64, 
     }
     data.cX = data.x - 32
     data.cY = data.y - 32
@@ -75,13 +82,15 @@ function init() {
 
   capsuleData.forEach(c => setStyles(c))
 
-  const moveApart = ({ a, b, distance }) => {
+  const moveApart = ({ a, b, 
+    // distance 
+  }) => {
     const fullDistance = distanceBetween(capsuleData[a], capsuleData[b])
 
     const { x: aX, y: aY } = getNewPosBasedOnTarget({
       start: capsuleData[a],
       target: capsuleData[b],
-      distance,
+      // distance,
       fullDistance,
     })
 
@@ -90,17 +99,17 @@ function init() {
       data: capsuleData[a]
     })
   
-    const { x: bX, y: bY } = getNewPosBasedOnTarget({
-      start: capsuleData[b],
-      target: capsuleData[a],
-      distance,
-      fullDistance,
-    })
+    // const { x: bX, y: bY } = getNewPosBasedOnTarget({
+    //   start: capsuleData[b],
+    //   target: capsuleData[a],
+    //   // distance,
+    //   fullDistance,
+    // })
 
-    checkBoundaryAndUpdatePos({
-      x: bX, y: bY,
-      data: capsuleData[b]
-    })
+    // checkBoundaryAndUpdatePos({
+    //   x: bX, y: bY,
+    //   data: capsuleData[b]
+    // })
   }
 
 
@@ -116,7 +125,7 @@ function init() {
       })
       capsuleData[i].cX = capsuleData[i].x - 32
       capsuleData[i].cY = capsuleData[i].y - 32
-      capsuleData[i].deg = capsuleData[i].deg + 10
+      // capsuleData[i].deg = capsuleData[i].deg + 10
 
       capsuleData.forEach((capsuleToCheck, cI) => {
         // if (cI !== i) console.log(distanceBetween(c, capsuleToCheck))
@@ -125,7 +134,7 @@ function init() {
           moveApart({
             a: c.id, 
             b: capsuleToCheck.id,
-            distance: -16
+            // distance: -16
           })
         }
       })
