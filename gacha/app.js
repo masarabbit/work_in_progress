@@ -1,22 +1,101 @@
 
 function init() { 
 
+  const settings = {
+    capsuleNo: 1,
+  }
+
+  const vector = {
+    x: 0,
+    y: 0,
+    pos: function() {
+      return {
+        x: this.x,
+        y: this.y
+      }
+    },
+    create: function(x, y) {
+      const obj = Object.create(this)
+      obj.setPos({ x, y })
+      return obj
+    },
+    set: function(elem, n) {
+      this[elem] = n
+    },
+    setPos: function({ x, y }) {
+      this.set('x', x)
+      this.set('y', y)
+    },
+    get: function(elem) {
+      return this[elem]
+    },
+    setAngle: function(angle) {
+      const length = this.magnitude()
+      this.setPos({
+        x: Math.cos(angle) * length,
+        y: Math.sin(angle) * length
+      })
+    },
+    getAngle: function() {
+      return Math.atan2(this.y, this.x)
+    },
+    setLength: function(length) {
+      const angle = this.getAngle()
+      this.setPos({
+        x: Math.cos(angle) * length,
+        y: Math.sin(angle) * length
+      })
+    },
+    magnitude: function() {
+      return Math.sqrt(this.x * this.x + this.y * this.y)
+    },
+    add: function(v2) {
+      return vector.create(this.x + v2.get('x'), this.y + v2.get('y'))
+    },
+    subtract: function(v2) {
+      return vector.create(this.x - v2.get('x'), this.y - v2.get('y'))
+    },
+    multiply: function(n) {
+      return vector.create(this.x * n, this.y * n)
+    },
+    divide: function(n) {
+      return vector.create(this.x / n, this.y / n)
+    },
+    addTo: function(v2) {
+      this.x += v2.get('x')
+      this.y += v2.get('y')
+    },
+    subtractFrom: function(v2) {
+      this.x -= v2.get('x')
+      this.y -= v2.get('y')
+    },
+    multiplyBy: function(n) {
+      this.x *= n
+      this.y *= n
+    },
+    divideBy: function(n) {
+      this.x /= n
+      this.y /= n
+    },
+  }
+
   const elements = {
     body: document.querySelector('.wrapper'),
     gachaMachine: document.querySelector('.gacha-machine')
     // indicator: document.querySelector('.indicator'),
   }
 
-  const capsuleSeeds = new Array(7).fill('')
+  const capsuleSeeds = new Array(settings.capsuleNo).fill('')
   const px = num => `${num}px`
   const randomN = max => Math.ceil(Math.random() * max)
+  const degToRad = deg => deg / (180 / Math.PI)
 
   const setStyles = ({ el, x, y, deg }) =>{
     el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0}) rotate(${deg || 0}deg)`
     el.style.zIndex = y
   }
 
-  const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.cX - b.cX), 2) + Math.pow((a.cY - b.cY), 2)))
+  const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
 
   elements.gachaMachine.innerHTML = capsuleSeeds.map(() => {
     return `<div class="capsule pix"></div>`
@@ -25,138 +104,76 @@ function init() {
   const capsules = document.querySelectorAll('.capsule')
 
 
-  const getNewPosBasedOnTarget = ({ start, target, distance: d, fullDistance }) => {
-    const { x: aX, y: aY } = start
-    const { x: bX, y: bY } = target
-
-    const remainingD = fullDistance - d
-    return {
-      x: Math.round(((remainingD * aX) + (d * bX)) / fullDistance),
-      y: Math.round(((remainingD * aY) + (d * bY)) / fullDistance)
-    }
-  }
-
-  const checkBoundaryAndUpdatePos = ({ x, y, data }) =>{
-    const lowerLimit = 0
-    const upperLimit = 64
-
-    if (x > lowerLimit && x < (elements.gachaMachine.clientWidth - upperLimit)){
-      data.prevX = data.x
-      data.x = x
-      data.cX = x + 32
-      data.deg = data.deg + data.prevX > data.x ? -10 : 10
-    } 
-    if (y > lowerLimit && y < (elements.gachaMachine.clientHeight - upperLimit 
-    )){
-      if (capsuleData.some(c => c.touchEdge && c.id !== data.id && distanceBetween(c, data) < 64)) {
-        data.el.classList.add('hit')
-        data.touchEdge = true
-      } else {
-        data.el.classList.remove('hit')
-        data.touchEdge = false
-
-        data.prevY = data.y
-        data.y = y
-        data.cY = data.y + 32
-      }
-
-    } else {
-      data.touchEdge = true
-      data.el.classList.add('hit')
-    }
-  }
-
   const { left, top, width, height } = elements.gachaMachine.getBoundingClientRect()
 
-  const moveApart = ({ a, b, distance, fullDistance }) => {
-    const { x: aX, y: aY } = getNewPosBasedOnTarget({
-      start: capsuleData[a],
-      target: capsuleData[b],
-      distance,
-      fullDistance,
-    })
-
-    checkBoundaryAndUpdatePos({
-      x: aX, 
-      y: aY,
-      data: capsuleData[a]
-    })
-  }
-
-  
 
   const capsuleData = Array.from(capsules).map((c, i) => {
     const { x, y } = c.getBoundingClientRect()
 
+    const offset = 32
+
     const data = {
+      ...vector,
       el: c,
       deg: 0,
-      // x: x - left, 
-      // y: y - top,
       id: i,
-      x: x - left + randomN(300), 
-      y: y - top + randomN(500), 
     }
-    data.cX = data.x + 32
-    data.cY = data.y + 32
+    data.setPos({
+      x: x - left + offset, 
+      y: y - top + offset,
+    })
+    // data.setPos({
+    //   x: x - left + randomN(300), 
+    //   y: y - top + randomN(200), 
+    // })
+    data.velocity = data.create(0, 0)
+    data.velocity.setLength(2)
+    data.velocity.setAngle(degToRad(90))
+    // console.log(data.velocity.get('x'))
 
     return data
   })
+
+
   
 
   capsuleData.forEach(c => setStyles(c))
 
-  const updateMotion = ({ a, b }) => {
-    if (capsuleData[a].y < capsuleData[b].y) {
-      // console.log('test', capsuleData[a], capsuleData[b])
-      const fullDistance = distanceBetween(capsuleData[a], capsuleData[b])
-      const direction = capsuleData[a].x > capsuleData[b].x
-        ? 'right'
-        : 'left'
 
-      const directionObj = {
-        right: 10,
-        left: -10
-      }
-
-      checkBoundaryAndUpdatePos({
-        x: capsuleData[a].x + directionObj[direction],
-        data: capsuleData[a]
-      })
-
-      if (fullDistance < 40) {
-        moveApart({
-          a, b,
-          distance: directionObj[direction] * 3,
-          fullDistance,
-        })
-      }
-
-    }
-  }
-
+  const collisionDamper = 0.5
 
   setInterval(()=> {
     capsuleData.forEach((c, i) => {
       c.el.style.transition = '0.2s'
 
-      checkBoundaryAndUpdatePos({
-        y: c.y + 10,
-        data: capsuleData[i]
-      })
+      // // checkBoundaryAndUpdatePos({
+      // //   y: c.y + 10,
+      // //   data: capsuleData[i]
+      // // })
 
-      capsuleData.forEach((capsuleToCheck, cI) => {
-        if (cI !== i && c.touchEdge && (distanceBetween(c, capsuleToCheck) < 64)) {
-          updateMotion({
-            a: c.id, 
-            b: capsuleToCheck.id,
-          })
-        }
-      })
+      // let newY = c.y + 10
+
+      // if (newY > (height - 64)) {
+      //   newY -= 50
+      // }
+
+      // capsuleData[i].y = newY
+
+      c.addTo(c.velocity)
+
+
+      // capsuleData.forEach((capsuleToCheck, cI) => {
+      //   if (cI !== i && c.touchEdge && (distanceBetween(c, capsuleToCheck) < 64)) {
+      //     updateMotion({
+      //       a: c.id, 
+      //       b: capsuleToCheck.id,
+      //     })
+      //   }
+      // })
 
       setStyles(capsuleData[i])
     })
-  }, 40)
+  }, 100)
 
 
 }

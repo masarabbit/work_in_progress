@@ -38,36 +38,18 @@ p, h1, h2, h3, h4 {
 .gacha-machine {
   border: 1px solid hotpink;
   width: 350px;
-  height: 400px;
+  height: 550px;
 }
 
 .capsule {
-  border: 1px solid red;
   position: absolute;
-  /* background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAGRJREFUOE9jZMAE/7GIIQsx4uLANKIowGMBWB1MMUgzIY3oZoH1gDSRoxlm2P9RAxjgYUAg6nFLgwPx4TZJsgyQ93oOjvthYADI/yR7A+R/WFKGJ0sQg1CAQjXC8xG2DERSdgYAL7spB3kjk2oAAAAASUVORK5CYII=); */
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAGRJREFUOE9jZMAE/7GIIQsx4uLANKIowGMBWB1MMUgzIY3oZoH1gDSRoxlm2P9RAxjgYUAg6nFLgwPx4TZJsgyQ93oOjvthYADI/yR7A+R/WFKGJ0sQg1CAQjXC8xG2DERSdgYAL7spB3kjk2oAAAAASUVORK5CYII=);
   --m: 2;
   --w: 32px;
   --h: 32px;
-  --offset: -2;
-  width: 0;
-  height: 0;
-  /* width: calc(var(--w) * var(--m));
-  height: calc(var(--h) * var(--m)); */
-  /* background-position: calc(var(--w) * -1) calc(var(--h) * -1); */
-  /* transition: 1s; */
-}
-
-.capsule::after {
-  position: absolute;
-  content: '';
-  background-size: calc(var(--w) * var(--m)) calc(var(--h) * var(--m)) !important; 
-  background-repeat: no-repeat !important;
-  image-rendering: pixelated;
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAGRJREFUOE9jZMAE/7GIIQsx4uLANKIowGMBWB1MMUgzIY3oZoH1gDSRoxlm2P9RAxjgYUAg6nFLgwPx4TZJsgyQ93oOjvthYADI/yR7A+R/WFKGJ0sQg1CAQjXC8xG2DERSdgYAL7spB3kjk2oAAAAASUVORK5CYII=);
   width: calc(var(--w) * var(--m));
   height: calc(var(--h) * var(--m));
-  left: calc((var(--w) * var(--m)) / var(--offset));
-  top: calc((var(--h) * var(--m)) / var(--offset));
+  /* transition: 1s; */
 }
 
 /* .capsule.hit {

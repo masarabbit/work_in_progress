@@ -9,7 +9,7 @@ const vector = {
 		return obj
 	},
 
-  get: function (elem) {
+  get: function(elem) {
     return this[elem]
   },
 
@@ -65,7 +65,7 @@ const vector = {
 
 	multiplyBy: function(n) {
 		this.x *= n
-		this.y *= Navigator
+		this.y *= n
 	},
 
 	divideBy: function(n) {
