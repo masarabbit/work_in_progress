@@ -298,7 +298,12 @@ function init() {
           // c2.accelerate(c.acceleration)
           // console.log(c.id, c.acceleration)
 
-          c.velocity.multiplyBy(c.bounce)
+          // c.velocity.multiplyBy(c.bounce)
+          // c.velocity.multiplyBy(0.55)
+          c.velocity.multiplyBy(0.5)
+          c2.velocity.addTo(c.velocity)
+
+        
         
 
           // moveApart({
