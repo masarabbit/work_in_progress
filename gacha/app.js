@@ -2,13 +2,14 @@
 function init() { 
 
   const settings = {
-    capsuleNo: 14,
+    capsuleNo: 8,
+    lineNo: 1,
   }
 
   const vector = {
     x: 0,
     y: 0,
-    pos: function() {
+    xY: function() {
       return {
         x: this.x,
         y: this.y
@@ -16,39 +17,32 @@ function init() {
     },
     create: function(x, y) {
       const obj = Object.create(this)
-      obj.setPos({ x, y })
+      obj.x = x
+      obj.y = y
       return obj
     },
     set: function(elem, n) {
       this[elem] = n
     },
-    setPos: function({ x, y }) {
-      this.set('x', x)
-      this.set('y', y)
+    setXy: function({ x, y }) {
+      this.x = x
+      this.y = y
     },
     get: function(elem) {
       return this[elem]
     },
     setAngle: function(angle) {
       const length = this.magnitude()
-      this.setPos({
-        x: Math.cos(angle) * length,
-        y: Math.sin(angle) * length
-      })
-      // this.x = Math.cos(angle) * length
-      // this.y = Math.sin(angle) * length
+      this.x = Math.cos(angle) * length
+      this.y = Math.sin(angle) * length
     },
     getAngle: function() {
       return Math.atan2(this.y, this.x)
     },
     setLength: function(length) {
       const angle = this.getAngle()
-      this.setPos({
-        x: Math.cos(angle) * length,
-        y: Math.sin(angle) * length
-      })
-      // this.x = Math.cos(angle) * length
-      // this.y = Math.sin(angle) * length
+      this.x = Math.cos(angle) * length
+      this.y = Math.sin(angle) * length
     },
     magnitude: function() {
       return Math.sqrt(this.x * this.x + this.y * this.y)
@@ -81,8 +75,9 @@ function init() {
       this.x /= n
       this.y /= n
     },
-
   }
+
+
 
   const elements = {
     body: document.querySelector('.wrapper'),
@@ -91,12 +86,15 @@ function init() {
   }
 
   const capsuleSeeds = new Array(settings.capsuleNo).fill('')
+  const lineSeeds = new Array(settings.lineNo).fill('')
   const px = num => `${num}px`
   const randomN = max => Math.ceil(Math.random() * max)
   const degToRad = deg => deg / (180 / Math.PI)
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
 
-  const setStyles = ({ el, x, y, deg }) =>{
+  const setStyles = ({ el, x, y, w, h, deg }) =>{
+    if (h) el.style.height = h
+    if (w) el.style.width = w
     el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0}) rotate(${deg || 0}deg)`
     el.style.zIndex = y
   }
@@ -104,6 +102,8 @@ function init() {
   const angleTo = ({ a, b }) => {
     return Math.atan2(b.y - a.y, b.x - a.x)
   }
+
+
 
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
 
@@ -113,27 +113,65 @@ function init() {
   //   return Math.sqrt((x * x) + (y * y))
   // }
 
-  elements.gachaMachine.innerHTML = capsuleSeeds.map(() => {
-    return `<div class="capsule pix"></div>`
-  }).join('')
-
-  const capsules = document.querySelectorAll('.capsule')
 
 
-  const { left, top, width, height } = elements.gachaMachine.getBoundingClientRect()
+
+  const { 
+    left, top, 
+    width, height } = elements.gachaMachine.getBoundingClientRect()
 
   // const width = window.innerWidth
   // const height = window.innerHeight
 
+  const lineData = lineSeeds.map((_, i) => {
+    return {
+      start: {
+        x: 10,
+        y: 200,
+      },
+      end: {
+        x: 300,
+        y: 300 
+      },
+      id: i
+    }
+  })
+
+
+  elements.gachaMachine.innerHTML = capsuleSeeds.map(() => {
+    return `<div class="capsule pix"></div>`
+  }).join('') + lineData.map(() => {
+    return`<div class="line-start"><div class="line"></div></div><div class="line-end"></div>`
+  }).join('') + '<div class="marker"></div>'
+
+  const capsules = document.querySelectorAll('.capsule')
+  const lineStarts = document.querySelectorAll('.line-start')
+  const lines = document.querySelectorAll('.line')
+  const lineEnds = document.querySelectorAll('.line-end')
+  const marker = document.querySelector('.marker')
+
+  lineData.forEach((l, i) => {
+    setStyles({ 
+      el: lineStarts[i], 
+      x: l.start.x, y: l.start.y,
+      deg: radToDeg(angleTo({
+        a: l.start,
+        b: l.end,
+      })) 
+    })
+    l.length = distanceBetween(l.start, l.end)
+    setStyles({ el: lines[i], w: px(l.length) })
+    setStyles({ el: lineEnds[i], x: l.end.x, y: l.end.y })
+
+  })
+
 
   const capsuleData = Array.from(capsules).map((c, i) => {
-    // const { x, y } = c.getBoundingClientRect()
-
     const data = {
       ...vector,
       el: c,
-      deg: 0,
       id: i,
+      deg: 0,
       mass: 1,
       radius: 32,
       bounce: -0.3, // this reduces the velocity gradually
@@ -145,21 +183,21 @@ function init() {
     // data.velocity.setAngle(-Math.PI / 2)
     data.velocity.setAngle(degToRad(90))
 
-    data.setPos({
+    data.setXy({
       x: randomN(width - 32), 
       y: randomN(height - 32), 
     })
 
 
     // if (i === 0) {
-    //   data.setPos({
+    //   data.setXy({
     //     x: width / 2 + 200, 
     //     y: height / 2, 
     //   })
     // } 
 
     // if (i === 1) {
-    //   data.setPos({
+    //   data.setXy({
     //     x: width / 2, 
     //     y: height / 2, 
     //   })
@@ -176,29 +214,29 @@ function init() {
   })
 
 
-  window.addEventListener('keydown', e => {
-    const dir = {
-      ArrowRight: ['x', 0.1],
-      ArrowLeft: ['x', -0.1],
-      ArrowUp: ['y', -0.1],
-      ArrowDown: ['y', 0.1]
-    }
-    if (dir[e.key]?.length) {
-      capsuleData[0].acceleration.set(dir[e.key][0],(dir[e.key][1]))
-    }
-  })
+  // window.addEventListener('keydown', e => {
+  //   const dir = {
+  //     ArrowRight: ['x', 0.1],
+  //     ArrowLeft: ['x', -0.1],
+  //     ArrowUp: ['y', -0.1],
+  //     ArrowDown: ['y', 0.1]
+  //   }
+  //   if (dir[e.key]?.length) {
+  //     capsuleData[0].acceleration.set(dir[e.key][0],(dir[e.key][1]))
+  //   }
+  // })
 
-  window.addEventListener('keyup', e => {
-    const dir = {
-      ArrowRight: ['x', 0],
-      ArrowLeft: ['x', 0],
-      ArrowUp: ['y', 0],
-      ArrowDown: ['y', 0]
-    }
-    if (dir[e.key]?.length) {
-      capsuleData[0].acceleration.set(dir[e.key][0],(dir[e.key][1]))
-    }
-  })
+  // window.addEventListener('keyup', e => {
+  //   const dir = {
+  //     ArrowRight: ['x', 0],
+  //     ArrowLeft: ['x', 0],
+  //     ArrowUp: ['y', 0],
+  //     ArrowDown: ['y', 0]
+  //   }
+  //   if (dir[e.key]?.length) {
+  //     capsuleData[0].acceleration.set(dir[e.key][0],(dir[e.key][1]))
+  //   }
+  // })
 
   const gravitateTo = ({ a, b }) => {
     const gravity = vector.create(0, 0)
@@ -224,18 +262,6 @@ function init() {
     }
   }
 
-  const moveApart = ({ a, b, distance, fullDistance }) => {
-    const { x: aX, y: aY } = getNewPosBasedOnTarget({
-      start: a,
-      target: b,
-      distance,
-      fullDistance,
-    })
-
-    a.setPos({ x: aX, y: aY })
-  }
-
-  
 
   capsuleData.forEach(c => {
     c.el.addEventListener('click', ()=> {
@@ -244,7 +270,9 @@ function init() {
     setStyles(c)
   })
 
-
+    const dotProduct = ({ a, b }) => {
+      return (a.x * b.x) + (a.y * b.y)
+    }
   
 
   setInterval(()=> {
@@ -284,22 +312,38 @@ function init() {
       // }
 
       // https://www.youtube.com/watch?v=NZHzgXFKfuY
-      if (c.get('x') + c.radius > width) {
+      if (c.x + c.radius > width) {
         c.set('x', width - c.radius)
-        c.velocity.set('x', c.velocity.get('x') * c.bounce)
+        c.velocity.set('x', c.velocity.x * c.bounce)
       }
-      if (c.get('x') - c.radius < 0) {
+      if (c.x - c.radius < 0) {
         c.set('x', c.radius)
-        c.velocity.set('x', c.velocity.get('x') * c.bounce)
+        c.velocity.set('x', c.velocity.x * c.bounce)
       }
-      if (c.get('y') + c.radius > height) {
+      if (c.y + c.radius > height) {
         c.set('y', height - c.radius)
-        c.velocity.set('y', c.velocity.get('y') * c.bounce)
+        c.velocity.set('y', c.velocity.y * c.bounce)
       }
-      if (c.get('y') - c.radius < 0) {
+      if (c.y - c.radius < 0) {
         c.set('y', c.radius)
-        c.velocity.set('y', c.velocity.get('y') * c.bounce)
+        c.velocity.set('y', c.velocity.y * c.bounce)
       }
+
+      // const line = lineData[0]
+      // const ca = capsuleData[0]
+      // const x1 = line.end.x - line.start.x
+      // const y1 = line.end.y - line.start.y
+  
+      // const x2 = ca.x - line.start.x
+      // const y2 = ca.y - line.start.y
+
+      // console.log('test', x1, y1, x2, y2)
+
+      // setStyles({
+      //   el: marker,
+      //   x: x1 + x2,
+      //   y: y1 + y2
+      // })
 
       capsuleData.forEach(c2 =>{
         if (c.id === c2.id) return
@@ -309,39 +353,110 @@ function init() {
           // c.velocity.addTo(c.velocity)
           const overlap = distanceBetweenCapsules - (c.radius * 2)
 
-          moveApart({
-            a: c,
-            b: c2,
-            distance: overlap / 2, 
-            fullDistance: distanceBetweenCapsules
-          })
-
-          // - radToDeg(c2.getAngle())
-
-          // c.deg = radToDeg(angleTo({ a:c, b: c2 }))
-
+          c.setXy(
+            getNewPosBasedOnTarget({
+              start: c,
+              target: c2,
+              distance: overlap / 2, 
+              fullDistance: distanceBetweenCapsules
+            })
+          )
         }
       })
 
 
-      if (Math.abs(c.prevX - c.x)) c.deg += Math.abs(c.prevX - c.x) * 2
-      // c.acceleration.x = Math.abs(prevX - c.x) * 0.2
+      if (Math.abs(c.prevX - c.x)) {
+        // rotate capsule
+        c.deg += Math.abs(c.prevX - c.x) * 2
+      }
+
       if (Math.abs(c.prevX - c.x) < 3 && Math.abs(c.prevY - c.y) < 3) {
-        c.velocity.setPos({
+        c.velocity.setXy({
           x: 0,
           y: 0,
         })
-        // c.acceleration.setPos({
-        //   x: 0,
-        //   y: 0,
-        // })
       }
-      // if (c.id === 0) console.log(c)
+
+
+
+
+      lineData.forEach(line => {
+        // const capsuleToStart = distanceBetween(c, line.start)
+        // const capsuleToEnd = distanceBetween(c, line.end )
+        // if ((capsuleToStart + capsuleToEnd) <= line.length) {
+   
+        // const dot = ((c.x - line.start.x) * (line.end.x - line.start.x)) + ((c.y - line.start.y) * (line.end.y - line.start.y)) / Math.pow(line.length, 2)
+        // const closestXy = {
+        //   x: line.start.x + (dot * (line.end.x - line.start.x)),
+        //   y: line.start.y + (dot * (line.end.y - line.start.y))
+        // }
+        // // const fullDistance = distanceBetween(c, closetXy)
+
+        
+
+        // setStyles({
+        //   el: marker,
+        //   x: px(closestXy.x),
+        //   y: px(closestXy.y)
+        // })
+
+        // console.log('check', closestXy)
+        
+
+        // if (fullDistance < (c.radius * 2)) {
+        //   // c.velocity.multiplyBy(-0.6)
+
+        //   const overlap = fullDistance - (c.radius * 2)
+        //   c.setXy(
+        //     getNewPosBasedOnTarget({
+        //       start: c,
+        //       target: closetXy,
+        //       distance: overlap / 2, 
+        //       fullDistance
+        //     })
+        //   )
+        // }
+      // }
+
+      })
+
+
+      
       setStyles(capsuleData[i])
     })
 
 
   }, 30)
+
+
+  // window.addEventListener('mousemove', e => {
+  //   const check = {
+  //     x: e.pageX - left,
+  //     y: e.pageY - top
+  //   }
+  //   setStyles({
+  //     el: marker,
+  //     x: check.x,
+  //     y: check.y
+  //   })
+
+  //   // if (angleTo({ a: lineData[0].start, b: check }) < 0 || angleTo({ a: lineData[0].end, b: check }) < 0) {
+  //   //   marker.classList.add('hit')
+  //   // } else {
+  //   //   marker.classList.remove('hit')
+  //   // }
+
+
+
+
+    
+
+  //   if (dotProduct({ a:lineData[0].start, b: check}) > 0 && dotProduct({ a:lineData[0].end, b: check}) > 0) {
+  //     marker.classList.add('hit')
+  //   } else {
+  //     marker.classList.remove('hit')
+  //   }
+  // })
 
 
 }
