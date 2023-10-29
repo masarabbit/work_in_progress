@@ -2,7 +2,7 @@
 function init() { 
 
   const settings = {
-    capsuleNo: 2,
+    capsuleNo: 8,
   }
 
   const vector = {
@@ -94,6 +94,7 @@ function init() {
   const px = num => `${num}px`
   const randomN = max => Math.ceil(Math.random() * max)
   const degToRad = deg => deg / (180 / Math.PI)
+  const radToDeg = rad => Math.round(rad * (180 / Math.PI))
 
   const setStyles = ({ el, x, y, deg }) =>{
     el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0}) rotate(${deg || 0}deg)`
@@ -139,25 +140,30 @@ function init() {
       friction: 0.97
     }
 
-    data.velocity = data.create(0, 0)  //? velocity is another vector
+    data.velocity = data.create(randomN(1), randomN(1))  //? velocity is another vector
     data.velocity.setLength(10)
     // data.velocity.setAngle(-Math.PI / 2)
-    data.velocity.setAngle(degToRad(90))
+    data.velocity.setAngle(degToRad(randomN(360)))
+
+    data.setPos({
+      x: randomN(width - 32), 
+      y: randomN(height - 32), 
+    })
 
 
-    if (i === 0) {
-      data.setPos({
-        x: width / 2 + 200, 
-        y: height / 2, 
-      })
-    } 
+    // if (i === 0) {
+    //   data.setPos({
+    //     x: width / 2 + 200, 
+    //     y: height / 2, 
+    //   })
+    // } 
 
-    if (i === 1) {
-      data.setPos({
-        x: width / 2, 
-        y: height / 2, 
-      })
-    } 
+    // if (i === 1) {
+    //   data.setPos({
+    //     x: width / 2, 
+    //     y: height / 2, 
+    //   })
+    // } 
 
     //? acceleration is another vector. 
     // this one is like gravity
@@ -198,7 +204,7 @@ function init() {
     const gravity = vector.create(0, 0)
     const d = distanceBetween(a, b)
 
-    // b.mass = 20000
+    b.mass = 20000
 
     gravity.setLength(b.mass / (d * d))
     gravity.setAngle(angleTo({ a, b }))
@@ -206,35 +212,33 @@ function init() {
     a.velocity.addTo(gravity)
   }
 
+
+  const getNewPosBasedOnTarget = ({ start, target, distance: d, fullDistance }) => {
+    const { x: aX, y: aY } = start
+    const { x: bX, y: bY } = target
+
+    const remainingD = fullDistance - d
+    return {
+      x: Math.round(((remainingD * aX) + (d * bX)) / fullDistance),
+      y: Math.round(((remainingD * aY) + (d * bY)) / fullDistance)
+    }
+  }
+
+  const moveApart = ({ a, b, distance, fullDistance }) => {
+    const { x: aX, y: aY } = getNewPosBasedOnTarget({
+      start: a,
+      target: b,
+      distance,
+      fullDistance,
+    })
+
+    a.setPos({ x: aX, y: aY })
+  }
+
   
 
   capsuleData.forEach(c => setStyles(c))
 
-
-  // const getNewPosBasedOnTarget = ({ start, target, distance: d, fullDistance }) => {
-  //   const { x: aX, y: aY } = start
-  //   const { x: bX, y: bY } = target
-
-  //   const remainingD = fullDistance - d
-  //   return {
-  //     x: Math.round(((remainingD * aX) + (d * bX)) / fullDistance),
-  //     y: Math.round(((remainingD * aY) + (d * bY)) / fullDistance)
-  //   }
-  // }
-
-  // const moveApart = ({ a, b, distance, fullDistance }) => {
-  //   const { x: aX, y: aY } = getNewPosBasedOnTarget({
-  //     start: a,
-  //     target: b,
-  //     distance,
-  //     fullDistance,
-  //   })
-
-  //   a.setPos({
-  //     x: aX,
-  //     y: aY
-  //   })
-  // }
 
 
 
@@ -292,32 +296,31 @@ function init() {
       capsuleData.forEach((c2, cI) => {
         if (c.id === cI) return
 
-        if (distanceBetween(c, c2) < (c.radius * 2)) {
-          // console.log('hit')
-          // c2.acceleration.multiplyBy(-1)
-          // c2.accelerate(c.acceleration)
-          // console.log(c.id, c.acceleration)
+        const distanceBetweenCapsules = distanceBetween(c, c2)
 
-          // c.velocity.multiplyBy(c.bounce)
-          // c.velocity.multiplyBy(0.55)
-          c.velocity.multiplyBy(0.5)
-          c2.velocity.addTo(c.velocity)
+        if (distanceBetweenCapsules < (c.radius * 2)) {
+          c.velocity.multiplyBy(-0.3)
+          // c.velocity.addTo(c.velocity)
+          const overlap = distanceBetweenCapsules - (c.radius * 2)
 
-        
-        
+          moveApart({
+            a: c,
+            b: c2,
+            distance: overlap / 2, 
+            fullDistance: distanceBetweenCapsules
+          })
 
-          // moveApart({
-          //   a: c,
-          //   b: c2,
-          //   distance: c.x > c2.x ? -10 : 10,
-          //   fullDistance: distanceBetween(c, c2)
-          // })
-      
+
+          // const angle = radToDeg(angleTo({ a:c, b: c2 }))
+          c.deg =  radToDeg(angleTo({ a:c, b: c2 })) -  radToDeg(angleTo({ a:c2, b: c }))
+          // - radToDeg(c2.getAngle())
+
+          // c.deg = radToDeg(angleTo({ a:c, b: c2 }))
 
         }
       })
-  
-
+      
+      // if (c.id === 0) console.log(c)
       setStyles(capsuleData[i])
     })
 
