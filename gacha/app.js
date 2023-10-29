@@ -2,7 +2,7 @@
 function init() { 
 
   const settings = {
-    capsuleNo: 8,
+    capsuleNo: 14,
   }
 
   const vector = {
@@ -136,14 +136,14 @@ function init() {
       id: i,
       mass: 1,
       radius: 32,
-      bounce: -0.9, // this reduces the velocity gradually
-      friction: 0.97
+      bounce: -0.3, // this reduces the velocity gradually
+      friction: 0.99
     }
 
-    data.velocity = data.create(randomN(1), randomN(1))  //? velocity is another vector
+    data.velocity = data.create(0, 1)  //? velocity is another vector
     data.velocity.setLength(10)
     // data.velocity.setAngle(-Math.PI / 2)
-    data.velocity.setAngle(degToRad(randomN(360)))
+    data.velocity.setAngle(degToRad(90))
 
     data.setPos({
       x: randomN(width - 32), 
@@ -167,7 +167,7 @@ function init() {
 
     //? acceleration is another vector. 
     // this one is like gravity
-    data.acceleration = data.create(0, 1)  
+    data.acceleration = data.create(0, 4)  
     // data.acceleration.setAngle(degToRad(270))
     data.accelerate = function(acceleration) {
       this.velocity.addTo(acceleration)
@@ -237,14 +237,22 @@ function init() {
 
   
 
-  capsuleData.forEach(c => setStyles(c))
+  capsuleData.forEach(c => {
+    c.el.addEventListener('click', ()=> {
+      console.log('test', c, Math.abs(c.prevX - c.x))
+    })
+    setStyles(c)
+  })
 
 
-
+  
 
   setInterval(()=> {
     capsuleData.forEach((c, i) => {
       c.el.style.transition = '0.05s'
+
+      c.prevX = c.x
+      c.prevY = c.y
 
       // if (i === 0) {
       //   gravitateTo({
@@ -293,13 +301,11 @@ function init() {
         c.velocity.set('y', c.velocity.get('y') * c.bounce)
       }
 
-      capsuleData.forEach((c2, cI) => {
-        if (c.id === cI) return
-
+      capsuleData.forEach(c2 =>{
+        if (c.id === c2.id) return
         const distanceBetweenCapsules = distanceBetween(c, c2)
-
         if (distanceBetweenCapsules < (c.radius * 2)) {
-          c.velocity.multiplyBy(-0.3)
+          c.velocity.multiplyBy(-0.6)
           // c.velocity.addTo(c.velocity)
           const overlap = distanceBetweenCapsules - (c.radius * 2)
 
@@ -310,22 +316,32 @@ function init() {
             fullDistance: distanceBetweenCapsules
           })
 
-
-          // const angle = radToDeg(angleTo({ a:c, b: c2 }))
-          c.deg =  radToDeg(angleTo({ a:c, b: c2 })) -  radToDeg(angleTo({ a:c2, b: c }))
           // - radToDeg(c2.getAngle())
 
           // c.deg = radToDeg(angleTo({ a:c, b: c2 }))
 
         }
       })
-      
+
+
+      if (Math.abs(c.prevX - c.x)) c.deg += Math.abs(c.prevX - c.x) * 2
+      // c.acceleration.x = Math.abs(prevX - c.x) * 0.2
+      if (Math.abs(c.prevX - c.x) < 3 && Math.abs(c.prevY - c.y) < 3) {
+        c.velocity.setPos({
+          x: 0,
+          y: 0,
+        })
+        // c.acceleration.setPos({
+        //   x: 0,
+        //   y: 0,
+        // })
+      }
       // if (c.id === 0) console.log(c)
       setStyles(capsuleData[i])
     })
 
 
-  }, 50)
+  }, 30)
 
 
 }
