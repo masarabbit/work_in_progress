@@ -2,7 +2,7 @@
 function init() { 
 
   const settings = {
-    capsuleNo: 8,
+    capsuleNo: 6,
     lineNo: 1,
   }
 
@@ -127,12 +127,20 @@ function init() {
     return {
       start: {
         x: 10,
-        y: 200,
+        y: 50,
       },
       end: {
-        x: 300,
+        x: 250,
         y: 300 
       },
+      // start: {
+      //   x: 300,
+      //   y: 200,
+      // },
+      // end: {
+      //   x: 600,
+      //   y: 300 
+      // },
       id: i
     }
   })
@@ -185,6 +193,7 @@ function init() {
 
     data.setXy({
       x: randomN(width - 32), 
+      // y: 0,
       y: randomN(height - 32), 
     })
 
@@ -329,21 +338,6 @@ function init() {
         c.velocity.set('y', c.velocity.y * c.bounce)
       }
 
-      // const line = lineData[0]
-      // const ca = capsuleData[0]
-      // const x1 = line.end.x - line.start.x
-      // const y1 = line.end.y - line.start.y
-  
-      // const x2 = ca.x - line.start.x
-      // const y2 = ca.y - line.start.y
-
-      // console.log('test', x1, y1, x2, y2)
-
-      // setStyles({
-      //   el: marker,
-      //   x: x1 + x2,
-      //   y: y1 + y2
-      // })
 
       capsuleData.forEach(c2 =>{
         if (c.id === c2.id) return
@@ -365,6 +359,41 @@ function init() {
       })
 
 
+      lineData.forEach(line => {
+
+        // this only works when velocity is from above
+        if ((c.x + c.radius > line.start.x) && (c.x - c.radius < line.end.x)) {
+          const dot = (((c.x - line.start.x) * (line.end.x - line.start.x)) + ((c.y - line.start.y) * (line.end.y - line.start.y))) / Math.pow(line.length, 2)
+          const closestXy = {
+            x: line.start.x + (dot * (line.end.x - line.start.x)),
+            y: line.start.y + (dot * (line.end.y - line.start.y))
+          }
+          const fullDistance = distanceBetween(c, closestXy)
+  
+          setStyles({
+            el: marker,
+            x: closestXy.x,
+            y: closestXy.y
+          })
+  
+          if (fullDistance < c.radius) {
+            c.velocity.multiplyBy(-0.6)
+  
+            const overlap = fullDistance - (c.radius)
+            c.setXy(
+              getNewPosBasedOnTarget({
+                start: c,
+                target: closestXy,
+                distance: overlap / 2, 
+                fullDistance
+              })
+            )
+          }
+        }
+
+      })
+
+
       if (Math.abs(c.prevX - c.x)) {
         // rotate capsule
         c.deg += Math.abs(c.prevX - c.x) * 2
@@ -378,47 +407,6 @@ function init() {
       }
 
 
-
-
-      lineData.forEach(line => {
-        // const capsuleToStart = distanceBetween(c, line.start)
-        // const capsuleToEnd = distanceBetween(c, line.end )
-        // if ((capsuleToStart + capsuleToEnd) <= line.length) {
-   
-        // const dot = ((c.x - line.start.x) * (line.end.x - line.start.x)) + ((c.y - line.start.y) * (line.end.y - line.start.y)) / Math.pow(line.length, 2)
-        // const closestXy = {
-        //   x: line.start.x + (dot * (line.end.x - line.start.x)),
-        //   y: line.start.y + (dot * (line.end.y - line.start.y))
-        // }
-        // // const fullDistance = distanceBetween(c, closetXy)
-
-        
-
-        // setStyles({
-        //   el: marker,
-        //   x: px(closestXy.x),
-        //   y: px(closestXy.y)
-        // })
-
-        // console.log('check', closestXy)
-        
-
-        // if (fullDistance < (c.radius * 2)) {
-        //   // c.velocity.multiplyBy(-0.6)
-
-        //   const overlap = fullDistance - (c.radius * 2)
-        //   c.setXy(
-        //     getNewPosBasedOnTarget({
-        //       start: c,
-        //       target: closetXy,
-        //       distance: overlap / 2, 
-        //       fullDistance
-        //     })
-        //   )
-        // }
-      // }
-
-      })
 
 
       
@@ -456,6 +444,14 @@ function init() {
   //   } else {
   //     marker.classList.remove('hit')
   //   }
+  // })
+
+
+  // window.addEventListener('mousemove', e=> {
+  //   capsuleData[0].setXy({
+  //     x: e.pageX - left,
+  //     y: e.pageY - top
+  //   })
   // })
 
 
