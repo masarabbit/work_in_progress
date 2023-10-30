@@ -3,22 +3,17 @@ function init() {
 
 
   const settings = {
-    capsuleNo: 10,
+    capsuleNo: 20,
     lineNo: 1,
     isTurningLever: false,
     leverPrevDeg: 0,
     leverDeg: 0,
+    rotate: 0
   }
 
   const vector = {
     x: 0,
     y: 0,
-    xY: function() {
-      return {
-        x: this.x,
-        y: this.y
-      }
-    },
     create: function(x, y) {
       const obj = Object.create(this)
       obj.x = x
@@ -31,9 +26,6 @@ function init() {
     setXy: function({ x, y }) {
       this.x = x
       this.y = y
-    },
-    get: function(elem) {
-      return this[elem]
     },
     setAngle: function(angle) {
       const length = this.magnitude()
@@ -52,34 +44,23 @@ function init() {
       return Math.sqrt(this.x * this.x + this.y * this.y)
     },
     add: function(v2) {
-      return this.create(this.x + v2.get('x'), this.y + v2.get('y'))
-    },
-    subtract: function(v2) {
-      return this.create(this.x - v2.get('x'), this.y - v2.get('y'))
+      return this.create(this.x + v2.x, this.y + v2.y)
     },
     multiply: function(n) {
       return this.create(this.x * n, this.y * n)
     },
-    divide: function(n) {
-      return this.create(this.x / n, this.y / n)
-    },
     addTo: function(v2) {
-      this.x += v2.get('x')
-      this.y += v2.get('y')
-    },
-    subtractFrom: function(v2) {
-      this.x -= v2.get('x')
-      this.y -= v2.get('y')
+      this.x += v2.x
+      this.y += v2.y
     },
     multiplyBy: function(n) {
       this.x *= n
       this.y *= n
     },
-    divideBy: function(n) {
-      this.x /= n
-      this.y /= n
-    },
   }
+
+
+  const capsuleSeeds = new Array(settings.capsuleNo).fill('')
 
   const rotateCoord = ({ angle, origin, x, y }) =>{
     const a = degToRad(angle)
@@ -91,17 +72,7 @@ function init() {
     }
   }
 
-  const elements = {
-    body: document.querySelector('.wrapper'),
-    gachaMachine: document.querySelector('.gacha-machine'),
-    lever: document.querySelector('.lever'),
-    leverHandles: document.querySelectorAll('.lever-handle'),
-    indicator: document.querySelector('.indicator'),
-    shakeButton: document.querySelector('.shake'),
-  }
 
-  const capsuleSeeds = new Array(settings.capsuleNo).fill('')
-  const lineSeeds = new Array(settings.lineNo).fill('')
   const px = num => `${num}px`
   const randomN = max => Math.ceil(Math.random() * max)
   const degToRad = deg => deg / (180 / Math.PI)
@@ -118,37 +89,84 @@ function init() {
   }
 
 
-  const { 
-    left, top, 
-    width, height } = elements.gachaMachine.getBoundingClientRect()
 
 
-  const lineData = lineSeeds.map((_, i) => {
-    return {
+  const lineData = [
+    {
       start: {
-        x: 10,
-        y: 50,
+        x: 80,
+        y: 370
       },
       end: {
-        x: 250,
-        y: 300
+        x: 312,
+        y: 330,
       },
-      id: i
+      id: 'flap'
+    },
+    {
+      start: {
+        x: 0,
+        y: 310
+      },
+      end: {
+        x: 100,
+        y: 360,
+      },
+      id: 'divider'
+    },
+    {
+      start: {
+        x: 0,
+        y: 340
+      },
+      end: {
+        x: 230,
+        y: 490,
+      },
+      id: 'slope'
     }
-  })
+  ]
 
+  const elements = {
+    body: document.querySelector('.wrapper'),
+    gachaMachine: document.querySelector('.gacha-machine'),
+    indicator: document.querySelector('.indicator'),
+    shakeButton: document.querySelector('.shake'),
+    releaseButton: document.querySelector('.release'),
+  }
+
+  const { width, height, top, left } = elements.gachaMachine.getBoundingClientRect()
 
   elements.gachaMachine.innerHTML = capsuleSeeds.map(() => {
     return `<div class="capsule pix"></div>`
   }).join('') + lineData.map(() => {
     return`<div class="line-start"><div class="line"></div></div><div class="line-end"></div>`
-  }).join('') + '<div class="marker"></div>'
+  }).join('') + '<div class="cover"></div><div class="cover right"></div> <div class="marker"></div>' + 
+  `<div class="lever-box">
+      <div class="circle">
+        <div class="lever">
+          <div class="lever-handle"></div>
+          <div class="lever-handle"></div>
+        </div>
+      </div>
+    </div>`
+
+  elements.circle = document.querySelector('.circle')
+  elements.lever = document.querySelector('.lever')
+  elements.leverHandles = document.querySelectorAll('.lever-handle')
+  elements.marker = document.querySelector('.marker')
 
   const capsules = document.querySelectorAll('.capsule')
   const lineStarts = document.querySelectorAll('.line-start')
   const lines = document.querySelectorAll('.line')
   const lineEnds = document.querySelectorAll('.line-end')
-  const marker = document.querySelector('.marker')
+
+  const { left: handleX, top: handleY } = elements.circle.getBoundingClientRect()
+  const handlePos = {
+    x: handleX - left + 80,
+    y: handleY - top + 80
+  }
+
 
   lineData.forEach((l, i) => {
     l.length = distanceBetween(l.start, l.end)
@@ -167,14 +185,16 @@ function init() {
   })
 
 
-  const capsuleData = Array.from(capsules).map((c, i) => {
+
+
+  let capsuleData = Array.from(capsules).map((c, i) => {
     const data = {
       ...vector,
       el: c,
       id: i,
       deg: 0,
       mass: 1,
-      radius: 32,
+      radius: 36,
       bounce: -0.3, // this reduces the velocity gradually
       friction: 0.99
     }
@@ -185,7 +205,7 @@ function init() {
 
     data.setXy({
       x: randomN(width - 32), 
-      y: randomN(height - 32), 
+      y: randomN(height - 200), 
     })
 
     //? acceleration is another vector. 
@@ -212,6 +232,14 @@ function init() {
   capsuleData.forEach(c => {
     c.el.addEventListener('click', ()=> {
       console.log('test', c, Math.abs(c.prevX - c.x))
+      if (
+        (c.x + c.radius) > 230 
+        && c.y + c.radius > (height - 80)
+        ) {
+          console.log('get!')
+          elements.gachaMachine.removeChild(c.el)
+          capsuleData = capsuleData.filter(capsule => capsule.id !== c.id)
+        }
     })
     setStyles(c)
   })
@@ -227,24 +255,6 @@ function init() {
       c.accelerate(c.acceleration)
       c.velocity.multiplyBy(c.friction)
       c.addTo(c.velocity)
-
-
-      if (c.x + c.radius > width) {
-        c.set('x', width - c.radius)
-        c.velocity.set('x', c.velocity.x * c.bounce)
-      }
-      if (c.x - c.radius < 0) {
-        c.set('x', c.radius)
-        c.velocity.set('x', c.velocity.x * c.bounce)
-      }
-      if (c.y + c.radius > height) {
-        c.set('y', height - c.radius)
-        c.velocity.set('y', c.velocity.y * c.bounce)
-      }
-      if (c.y - c.radius < 0) {
-        c.set('y', c.radius)
-        c.velocity.set('y', c.velocity.y * c.bounce)
-      }
 
       capsuleData.forEach(c2 =>{
         if (c.id === c2.id) return
@@ -276,12 +286,7 @@ function init() {
           }
           const fullDistance = distanceBetween(c, closestXy)
   
-          setStyles({
-            el: marker,
-            x: closestXy.x,
-            y: closestXy.y
-          })
-  
+
           if (fullDistance < c.radius) {
             c.velocity.multiplyBy(-0.6)
   
@@ -296,8 +301,25 @@ function init() {
             )
           }
         }
-
       })
+
+      const buffer = 5
+      if (c.x + (c.radius + buffer) > width) {
+        c.x = width - (c.radius + buffer)
+        c.velocity.set('x', c.velocity.x * c.bounce)
+      }
+      if (c.x - (c.radius + buffer) < 0) {
+        c.x = c.radius
+        c.velocity.set('x', c.velocity.x * c.bounce)
+      }
+      if (c.y + c.radius > height) {
+        c.y = height - c.radius
+        c.velocity.set('y', c.velocity.y * c.bounce)
+      }
+      if (c.y - c.radius < 0) {
+        c.y = c.radius
+        c.velocity.set('y', c.velocity.y * c.bounce)
+      }
 
       if (Math.abs(c.prevX - c.x) < 2 && Math.abs(c.prevY - c.y) < 2) {
         c.velocity.setXy({ x: 0, y: 0 })
@@ -308,44 +330,62 @@ function init() {
           c.deg += (c.x - c.prevX) * 2
         }
       }
+
       setStyles(capsuleData[i])
     })
   }, 30)
 
-
+  setStyles({
+    el: elements.marker,
+    x: handlePos.x,
+    y: handlePos.y
+  })
 
   elements.leverHandles.forEach(lever => {
-    console.log('test', lever)
     lever.addEventListener('mousedown', e => {
       settings.isTurningLever = true
       settings.leverDeg = radToDeg(angleTo({
         a: {
-          x: e.pageX,
-          y: e.pageY
+          x: e.pageX - left,
+          y: e.pageY - top
         },
-        b: {
-          x: 100,
-          y: 100
-        }
+        b: handlePos
       }))
+      settings.rotate = 0
     })
-    lever.addEventListener('mouseup', ()=> settings.isTurningLever = false)
-    lever.addEventListener('mouseout', ()=> settings.isTurningLever = false)
+
+    lever.addEventListener('mouseup', ()=> {
+      settings.isTurningLever = false
+      setStyles({
+        el: elements.lever,
+        deg: 0
+      })
+    })
+  })
+
+  elements.circle.addEventListener('mouseleave', ()=> {
+    settings.isTurningLever = false
+    setStyles({
+      el: elements.lever,
+      deg: 0
+    })
   })
 
   window.addEventListener('mousemove', e => {
     if (!settings.isTurningLever) return
 
+
     settings.prevLeverDeg = settings.leverDeg 
     const deg = radToDeg(angleTo({
-      a: { x: e.pageX, y: e.pageY },
-      b: { x: 100, y: 100 }
+      a: { x: e.pageX - left, y: e.pageY - top },
+      b: handlePos
     }))
     settings.leverDeg = deg
 
     const diff = settings.leverDeg - settings.prevLeverDeg
+    if (diff > 0) settings.rotate += diff
 
-    elements.indicator.innerHTML = `deg: ${deg} diff:${diff} leverDeg:${settings.leverDeg} prevLeverDeg:${settings.prevLeverDeg}`
+    elements.indicator.innerHTML = `rotate: ${settings.rotate} deg: ${deg} diff:${diff} leverDeg:${settings.leverDeg} prevLeverDeg:${settings.prevLeverDeg}`
     
 
     if (settings.prevLeverDeg === 0 || diff >= 1) {
@@ -353,41 +393,66 @@ function init() {
         el: elements.lever,
         deg: settings.prevLeverDeg + diff
       })
+    }
 
-
-      lineData[0].end = rotateCoord({ 
-        angle: diff, 
-        origin: lineData[0].start,
-        x: lineData[0].end.x,
-        y: lineData[0].end.y,
+    if (settings.rotate > 360) {
+      console.log('click')
+      setStyles({
+        el: elements.lever,
+        deg: 0
       })
-
-
-      // TODO this doesn't need to loop around if it's the only one
-      lineData.forEach((l, i) => {
-        setStyles({ 
-          el: lineStarts[i],
-          x: l.start.x, y: l.start.y,
-          deg: radToDeg(angleTo({
-            a: l.start,
-            b: l.end,
-          })) 
-        })
-        setStyles({ el: lines[i], w: px(l.length) })
-        setStyles({ el: lineEnds[i], x: l.end.x, y: l.end.y })
-      })
+      release()
+      settings.isTurningLever = false
     }
   })
 
+  const updateLine = () => {
+    setStyles({ 
+      el: lineStarts[0],
+      x: lineData[0].start.x, 
+      y: lineData[0].start.y,
+      deg: radToDeg(angleTo({
+        a: lineData[0].start,
+        b: lineData[0].end
+      })) 
+    })
 
-  // TODO shsake (can improve...)
-  elements.shakeButton.addEventListener('click', ()=> {
+    setStyles({ el: lines[0], w: px(lineData[0].length) })
+    setStyles({ el: lineEnds[0], x: lineData[0].end.x, y: lineData[0].end.y })
+  }
+
+  const shake = () => {
     capsuleData.forEach(c => {
-      c.velocity.setAngle(degToRad(randomN(360)))
-      c.velocity.setXy({ x: 10, y: 10})      
+      c.velocity.setAngle(degToRad(randomN(270)))
+      c.velocity.setXy({ x: 10, y: 10})        
       c.accelerate(c.acceleration)
     })
-  })
+  }
+
+
+  // TODO shsake (can improve...)
+  elements.shakeButton.addEventListener('click', shake)
+
+  const release = () => {
+    lineData[0].start = rotateCoord({ 
+      angle: -15, 
+      origin: lineData[0].end,
+      x: lineData[0].start.x,
+      y: lineData[0].start.y,
+    })
+    
+    updateLine()
+    shake()
+  
+
+    setTimeout(()=> {
+      lineData[0].start.x = 80
+      lineData[0].start.y = 370
+      updateLine()
+    }, 500)
+  }
+
+  elements.releaseButton.addEventListener('click', release)
 
 
 }
