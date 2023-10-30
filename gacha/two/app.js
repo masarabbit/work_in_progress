@@ -91,6 +91,8 @@ function init() {
     }
   }
 
+
+
   const elements = {
     body: document.querySelector('.wrapper'),
     gachaMachine: document.querySelector('.gacha-machine'),
@@ -106,9 +108,6 @@ function init() {
   const randomN = max => Math.ceil(Math.random() * max)
   const degToRad = deg => deg / (180 / Math.PI)
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
-  const angleTo = ({ a, b }) => Math.atan2(b.y - a.y, b.x - a.x)
-  const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
-
 
   const setStyles = ({ el, x, y, w, h, deg }) =>{
     if (h) el.style.height = h
@@ -117,11 +116,29 @@ function init() {
     el.style.zIndex = y
   }
 
+  const angleTo = ({ a, b }) => {
+    return Math.atan2(b.y - a.y, b.x - a.x)
+  }
+
+
+
+  const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
+
+  // const distanceBetween = (a, b) => {
+  //   const x = b.x - a.x
+  //   const y = b.y - a.y
+  //   return Math.sqrt((x * x) + (y * y))
+  // }
+
+
+
 
   const { 
     left, top, 
     width, height } = elements.gachaMachine.getBoundingClientRect()
 
+  // const width = window.innerWidth
+  // const height = window.innerHeight
 
   const lineData = lineSeeds.map((_, i) => {
     return {
@@ -164,6 +181,7 @@ function init() {
 
     setStyles({ el: lines[i], w: px(l.length) })
     setStyles({ el: lineEnds[i], x: l.end.x, y: l.end.y })
+
   })
 
 
@@ -181,21 +199,77 @@ function init() {
 
     data.velocity = data.create(0, 1)  //? velocity is another vector
     data.velocity.setLength(10)
+    // data.velocity.setAngle(-Math.PI / 2)
     data.velocity.setAngle(degToRad(90))
 
     data.setXy({
       x: randomN(width - 32), 
+      // y: 0,
       y: randomN(height - 32), 
     })
+
+
+    // if (i === 0) {
+    //   data.setXy({
+    //     x: width / 2 + 200, 
+    //     y: height / 2, 
+    //   })
+    // } 
+
+    // if (i === 1) {
+    //   data.setXy({
+    //     x: width / 2, 
+    //     y: height / 2, 
+    //   })
+    // } 
 
     //? acceleration is another vector. 
     // this one is like gravity
     data.acceleration = data.create(0, 4)  
+    // data.acceleration.setAngle(degToRad(270))
     data.accelerate = function(acceleration) {
       this.velocity.addTo(acceleration)
     }
     return data
   })
+
+
+  // window.addEventListener('keydown', e => {
+  //   const dir = {
+  //     ArrowRight: ['x', 0.1],
+  //     ArrowLeft: ['x', -0.1],
+  //     ArrowUp: ['y', -0.1],
+  //     ArrowDown: ['y', 0.1]
+  //   }
+  //   if (dir[e.key]?.length) {
+  //     capsuleData[0].acceleration.set(dir[e.key][0],(dir[e.key][1]))
+  //   }
+  // })
+
+  // window.addEventListener('keyup', e => {
+  //   const dir = {
+  //     ArrowRight: ['x', 0],
+  //     ArrowLeft: ['x', 0],
+  //     ArrowUp: ['y', 0],
+  //     ArrowDown: ['y', 0]
+  //   }
+  //   if (dir[e.key]?.length) {
+  //     capsuleData[0].acceleration.set(dir[e.key][0],(dir[e.key][1]))
+  //   }
+  // })
+
+  const gravitateTo = ({ a, b }) => {
+    const gravity = vector.create(0, 0)
+    const d = distanceBetween(a, b)
+
+    b.mass = 20000
+
+    gravity.setLength(b.mass / (d * d))
+    gravity.setAngle(angleTo({ a, b }))
+    
+    a.velocity.addTo(gravity)
+  }
+
 
   const getNewPosBasedOnTarget = ({ start, target, distance: d, fullDistance }) => {
     const { x: aX, y: aY } = start
@@ -216,6 +290,11 @@ function init() {
     setStyles(c)
   })
 
+    const dotProduct = ({ a, b }) => {
+      return (a.x * b.x) + (a.y * b.y)
+    }
+  
+
   setInterval(()=> {
     capsuleData.forEach((c, i) => {
       c.el.style.transition = '0.05s'
@@ -223,12 +302,36 @@ function init() {
       c.prevX = c.x
       c.prevY = c.y
 
+      // if (i === 0) {
+      //   gravitateTo({
+      //     a: capsuleData[0],
+      //     b: capsuleData[1]
+      //   })
+      // }
+
 
       c.accelerate(c.acceleration)
       c.velocity.multiplyBy(c.friction)
       c.addTo(c.velocity)
 
+      // appears from opposite side
+      // if (c.get('x') - c.radius > width) {
+      //   c.set('x', 0)
+      // }
 
+      // if (c.get('x') + c.radius < 0) {
+      //   c.set('x', width)
+      // }
+
+      // if (c.get('y') - c.radius > height) {
+      //   c.set('y', 0)
+      // }
+
+      // if (c.get('y') + c.radius < 0) {
+      //   c.set('y', height)
+      // }
+
+      // https://www.youtube.com/watch?v=NZHzgXFKfuY
       if (c.x + c.radius > width) {
         c.set('x', width - c.radius)
         c.velocity.set('x', c.velocity.x * c.bounce)
@@ -245,6 +348,7 @@ function init() {
         c.set('y', c.radius)
         c.velocity.set('y', c.velocity.y * c.bounce)
       }
+
 
       capsuleData.forEach(c2 =>{
         if (c.id === c2.id) return
@@ -267,6 +371,7 @@ function init() {
 
 
       lineData.forEach(line => {
+
         // this only works when velocity is from above
         if ((c.x + c.radius > line.start.x) && (c.x - c.radius < line.end.x)) {
           const dot = (((c.x - line.start.x) * (line.end.x - line.start.x)) + ((c.y - line.start.y) * (line.end.y - line.start.y))) / Math.pow(line.length, 2)
@@ -300,8 +405,18 @@ function init() {
       })
 
       if (Math.abs(c.prevX - c.x) < 2 && Math.abs(c.prevY - c.y) < 2) {
-        c.velocity.setXy({ x: 0, y: 0 })
-        c.setXy({ x: c.prevX, y: c.prevY })
+        c.velocity.setXy({
+          x: 0,
+          y: 0,
+        })
+        c.setXy({
+          x: c.prevX,
+          y: c.prevY,
+        })
+        // c.acceleration.setXy({
+        //   x: 0,
+        //   y: 0,
+        // })
       } else {
         if (Math.abs(c.prevX - c.x)) {
           // rotate capsule
@@ -338,8 +453,14 @@ function init() {
 
     settings.prevLeverDeg = settings.leverDeg 
     const deg = radToDeg(angleTo({
-      a: { x: e.pageX, y: e.pageY },
-      b: { x: 100, y: 100 }
+      a: {
+        x: e.pageX,
+        y: e.pageY
+      },
+      b: {
+        x: 100,
+        y: 100
+      }
     }))
     settings.leverDeg = deg
 
@@ -376,6 +497,8 @@ function init() {
         setStyles({ el: lines[i], w: px(l.length) })
         setStyles({ el: lineEnds[i], x: l.end.x, y: l.end.y })
       })
+
+
     }
   })
 
@@ -383,11 +506,22 @@ function init() {
   // TODO shsake (can improve...)
   elements.shakeButton.addEventListener('click', ()=> {
     capsuleData.forEach(c => {
+
+      // c.velocity.multiplyBy(1.5)
       c.velocity.setAngle(degToRad(randomN(360)))
       c.velocity.setXy({ x: 10, y: 10})      
       c.accelerate(c.acceleration)
     })
   })
+
+
+
+  // window.addEventListener('mousemove', e=> {
+  //   capsuleData[0].setXy({
+  //     x: e.pageX - left,
+  //     y: e.pageY - top
+  //   })
+  // })
 
 
 }
