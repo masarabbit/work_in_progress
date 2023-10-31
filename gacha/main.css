@@ -1,7 +1,7 @@
 
 * {
   box-sizing: border-box;
-  user-select: none;
+  /* user-select: none; */
 }
 
 body {
@@ -9,6 +9,7 @@ body {
   margin: 0;
   font-family: sans-serif;
   background-color: rgb(248, 219, 130);
+  overscroll-behavior: contain;
 }
 
 p, h1, h2, h3, h4 {
