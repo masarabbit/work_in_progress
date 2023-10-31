@@ -81,8 +81,7 @@ function init() {
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
 
 
-  const setStyles = ({ el, x, y, w, h, deg }) =>{
-    if (h) el.style.height = h
+  const setStyles = ({ el, x, y, w, deg }) =>{
     if (w) el.style.width = w
     el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0}) rotate(${deg || 0}deg)`
     el.style.zIndex = y
@@ -106,7 +105,7 @@ function init() {
     {
       start: {
         x: 0,
-        y: 310
+        y: 300
       },
       end: {
         x: 100,
@@ -117,7 +116,7 @@ function init() {
     {
       start: {
         x: 0,
-        y: 340
+        y: 300
       },
       end: {
         x: 230,
@@ -306,19 +305,19 @@ function init() {
       const buffer = 5
       if (c.x + (c.radius + buffer) > width) {
         c.x = width - (c.radius + buffer)
-        c.velocity.set('x', c.velocity.x * c.bounce)
+        c.velocity.x = c.velocity.x * c.bounce
       }
       if (c.x - (c.radius + buffer) < 0) {
         c.x = c.radius
-        c.velocity.set('x', c.velocity.x * c.bounce)
+        c.velocity.x = c.velocity.x * c.bounce
       }
       if (c.y + c.radius > height) {
         c.y = height - c.radius
-        c.velocity.set('y', c.velocity.y * c.bounce)
+        c.velocity.y = c.velocity.y * c.bounce
       }
       if (c.y - c.radius < 0) {
         c.y = c.radius
-        c.velocity.set('y', c.velocity.y * c.bounce)
+        c.velocity.y = c.velocity.y * c.bounce
       }
 
       if (Math.abs(c.prevX - c.x) < 2 && Math.abs(c.prevY - c.y) < 2) {
@@ -341,28 +340,40 @@ function init() {
     y: handlePos.y
   })
 
-  elements.leverHandles.forEach(lever => {
-    lever.addEventListener('mousedown', e => {
-      settings.isTurningLever = true
-      settings.leverDeg = radToDeg(angleTo({
-        a: {
-          x: e.pageX - left,
-          y: e.pageY - top
-        },
-        b: handlePos
-      }))
-      settings.rotate = 0
-    })
+  // const mouse = {
+  //   up: (t, e, a) => addEvents(t, e, a, ['mouseup', 'touchend']),
+  //   move: (t, e, a) => addEvents(t, e, a, ['mousemove', 'touchmove']),
+  //   down: (t, e, a) => addEvents(t, e, a, ['mousedown', 'touchstart']),
+  //   enter: (t, e, a) => addEvents(t, e, a, ['mouseenter', 'touchstart']),
+  //   leave: (t, e, a) => addEvents(t, e, a, ['mouseleave', 'touchmove'])
+  // }
 
-    lever.addEventListener('mouseup', ()=> {
-      settings.isTurningLever = false
-      setStyles({
-        el: elements.lever,
-        deg: 0
+  elements.leverHandles.forEach(lever => {
+    ;['mousedown', 'touchstart'].forEach(action => {
+      lever.addEventListener(action, e => {
+        settings.isTurningLever = true
+        settings.leverDeg = radToDeg(angleTo({
+          a: {
+            x: e.pageX - left,
+            y: e.pageY - top
+          },
+          b: handlePos
+        }))
+        settings.rotate = 0
+      })
+    })
+    ;['mouseup', 'touchend'].forEach(action => {
+      lever.addEventListener(action, ()=> {
+        settings.isTurningLever = false
+        setStyles({
+          el: elements.lever,
+          deg: 0
+        })
       })
     })
   })
 
+  // TODO possibly need touch alternative for mouseleave
   elements.circle.addEventListener('mouseleave', ()=> {
     settings.isTurningLever = false
     setStyles({
@@ -371,40 +382,40 @@ function init() {
     })
   })
 
-  window.addEventListener('mousemove', e => {
-    if (!settings.isTurningLever) return
+  ;['mousemove', 'touchmove'].forEach(action => {
+    window.addEventListener(action, e => {
+      if (!settings.isTurningLever) return
+  
+      settings.prevLeverDeg = settings.leverDeg 
+      const deg = radToDeg(angleTo({
+        a: { x: e.pageX - left, y: e.pageY - top },
+        b: handlePos
+      }))
+      settings.leverDeg = deg
+  
+      const diff = settings.leverDeg - settings.prevLeverDeg
 
-
-    settings.prevLeverDeg = settings.leverDeg 
-    const deg = radToDeg(angleTo({
-      a: { x: e.pageX - left, y: e.pageY - top },
-      b: handlePos
-    }))
-    settings.leverDeg = deg
-
-    const diff = settings.leverDeg - settings.prevLeverDeg
-    if (diff > 0) settings.rotate += diff
-
-    elements.indicator.innerHTML = `rotate: ${settings.rotate} deg: ${deg} diff:${diff} leverDeg:${settings.leverDeg} prevLeverDeg:${settings.prevLeverDeg}`
-    
-
-    if (settings.prevLeverDeg === 0 || diff >= 1) {
-      setStyles({
-        el: elements.lever,
-        deg: settings.prevLeverDeg + diff
-      })
-    }
-
-    if (settings.rotate > 360) {
-      console.log('click')
-      setStyles({
-        el: elements.lever,
-        deg: 0
-      })
-      release()
-      settings.isTurningLever = false
-    }
+      // elements.indicator.innerHTML = `rotate: ${settings.rotate} deg: ${deg} diff:${diff} leverDeg:${settings.leverDeg} prevLeverDeg:${settings.prevLeverDeg}`
+      
+      if (settings.prevLeverDeg === 0 || diff >= 1) {
+        setStyles({
+          el: elements.lever,
+          deg: settings.prevLeverDeg + diff
+        })
+      }
+  
+      if (diff > 0) settings.rotate += diff
+      if (settings.rotate > 360) {
+        setStyles({
+          el: elements.lever,
+          deg: 0
+        })
+        release()
+        settings.isTurningLever = false
+      }
+    }) 
   })
+
 
   const updateLine = () => {
     setStyles({ 
@@ -416,7 +427,6 @@ function init() {
         b: lineData[0].end
       })) 
     })
-
     setStyles({ el: lines[0], w: px(lineData[0].length) })
     setStyles({ el: lineEnds[0], x: lineData[0].end.x, y: lineData[0].end.y })
   }

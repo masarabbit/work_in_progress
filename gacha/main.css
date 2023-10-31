@@ -146,6 +146,7 @@ a:hover {
   width: 160px;
   height: 160px;
   z-index: 2;
+  opacity: 0.7;
 }
 
 .circle {
