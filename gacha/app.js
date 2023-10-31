@@ -5,9 +5,9 @@ function init() {
   const settings = {
     capsuleNo: 20,
     lineNo: 1,
-    isTurningLever: false,
-    leverPrevDeg: 0,
-    leverDeg: 0,
+    isTurningHandle: false,
+    handlePrevDeg: 0,
+    handleDeg: 0,
     rotate: 0,
     flapRotate: 0,
     slopeRotate: 0
@@ -95,10 +95,8 @@ function init() {
   const lineData = [
     {
       start: {
-        x: 80,
+        x: 100,
         y: 370,
-        defX: 80,
-        defY: 370,
       },
       end: {
         x: 312,
@@ -112,21 +110,23 @@ function init() {
         y: 300
       },
       end: {
-        x: 100,
-        y: 360,
+        x: 80,
+        y: 340,
       },
       id: 'divider'
     },
     {
+      // start: {
+      //   x: 40,
+      //   y: 340
+      // },
       start: {
-        x: 0,
-        y: 300
+        x: 70,
+        y: 350
       },
       end: {
         x: 230,
         y: 490,
-        defX: 230,
-        defY: 490,
       },
       id: 'slope'
     }
@@ -138,30 +138,31 @@ function init() {
     indicator: document.querySelector('.indicator'),
     shakeButton: document.querySelector('.shake'),
     releaseButton: document.querySelector('.release'),
+    circle: document.querySelector('.circle'),
+    handle: document.querySelector('.handle'),
   }
+
 
   const { width, height, top, left } = elements.gachaMachine.getBoundingClientRect()
 
-  elements.gachaMachine.innerHTML = capsuleSeeds.map(() => {
-    return `<div class="capsule pix"></div>`
-  }).join('') + lineData.map(() => {
-    return`<div class="line-start"><div class="line"></div></div><div class="line-end"></div>`
-  }).join('') + '<div class="cover"></div><div class="cover right"></div> <div class="marker"></div>' + 
-  `<div class="lever-box">
-      <div class="circle">
-        <div class="lever">
-          <div class="lever-handle"></div>
-          <div class="lever-handle"></div>
-        </div>
-      </div>
-    </div>`
+  capsuleSeeds.forEach(() => {
+    const capsule = Object.assign(document.createElement('div'), { className: 'capsule pix' })
+    elements.gachaMachine.appendChild(capsule)
+  })
+  lineData.forEach(() => {
+    const lineStart =  Object.assign(document.createElement('div'), { className: 'line-start' })
+    lineStart.appendChild(Object.assign(document.createElement('div'), { className: 'line' }),)
+    ;[
+      lineStart,
+      Object.assign(document.createElement('div'), { className: 'line-end' })
+    ].forEach(ele => {
+      elements.gachaMachine.appendChild(ele)
+    })
+  })
 
-  elements.circle = document.querySelector('.circle')
-  elements.lever = document.querySelector('.lever')
-  elements.leverHandles = document.querySelectorAll('.lever-handle')
-  elements.marker = document.querySelector('.marker')
 
-  const capsules = document.querySelectorAll('.capsule')
+  // elements.marker = document.querySelector('.marker')
+
   const lineStarts = document.querySelectorAll('.line-start')
   const lines = document.querySelectorAll('.line')
   const lineEnds = document.querySelectorAll('.line-end')
@@ -192,7 +193,7 @@ function init() {
 
 
 
-  let capsuleData = Array.from(capsules).map((c, i) => {
+  let capsuleData = Array.from(document.querySelectorAll('.capsule')).map((c, i) => {
     const data = {
       ...vector,
       el: c,
@@ -340,101 +341,89 @@ function init() {
     })
   }, 30)
 
-  setStyles({
-    el: elements.marker,
-    x: handlePos.x,
-    y: handlePos.y
-  })
 
-  // const mouse = {
-  //   up: (t, e, a) => addEvents(t, e, a, ['mouseup', 'touchend']),
-  //   move: (t, e, a) => addEvents(t, e, a, ['mousemove', 'touchmove']),
-  //   down: (t, e, a) => addEvents(t, e, a, ['mousedown', 'touchstart']),
-  //   enter: (t, e, a) => addEvents(t, e, a, ['mouseenter', 'touchstart']),
-  //   leave: (t, e, a) => addEvents(t, e, a, ['mouseleave', 'touchmove'])
-  // }
 
-  elements.leverHandles.forEach(lever => {
-    ;['mousedown', 'touchstart'].forEach(action => {
-      lever.addEventListener(action, e => {
-        settings.isTurningLever = true
-        settings.leverDeg = radToDeg(angleTo({
-          a: {
-            x: getPage(e, 'X') - left,
-            y: getPage(e, 'Y') - top
-          },
-          b: handlePos
-        }))
-        settings.rotate = 0
-      })
+  ;['mousedown', 'touchstart'].forEach(action => {
+    elements.handle.addEventListener(action, e => {
+      settings.isTurningHandle = true
+      settings.handleDeg = radToDeg(angleTo({
+        a: {
+          x: getPage(e, 'X') - left,
+          y: getPage(e, 'Y') - top
+        },
+        b: handlePos
+      }))
+      settings.rotate = 0
     })
-    ;['mouseup', 'touchend'].forEach(action => {
-      lever.addEventListener(action, ()=> {
-        settings.isTurningLever = false
-        setStyles({
-          el: elements.lever,
-          deg: 0
-        })
+  })
+  ;['mouseup', 'touchend'].forEach(action => {
+    elements.handle.addEventListener(action, ()=> {
+      settings.isTurningHandle = false
+      setStyles({
+        el: elements.handle,
+        deg: 0
       })
     })
   })
 
   // TODO possibly need touch alternative for mouseleave
   elements.circle.addEventListener('mouseleave', ()=> {
-    settings.isTurningLever = false
+    settings.isTurningHandle = false
     setStyles({
-      el: elements.lever,
+      el: elements.handle,
       deg: 0
     })
   })
 
   ;['mousemove', 'touchmove'].forEach(action => {
     window.addEventListener(action, e => {
-      if (!settings.isTurningLever) return
+      if (!settings.isTurningHandle) return
   
-      settings.prevLeverDeg = settings.leverDeg 
+      settings.prevHandleDeg = settings.handleDeg 
       const deg = radToDeg(angleTo({
         a: { x: getPage(e, 'X') - left, y: getPage(e, 'Y') - top },
         b: handlePos
       }))
-      settings.leverDeg = deg
+      settings.handleDeg = deg
   
-      const diff = settings.leverDeg - settings.prevLeverDeg
+      const diff = settings.handleDeg - settings.prevHandleDeg
 
-      // elements.indicator.innerHTML = `rotate: ${settings.rotate} deg: ${deg} diff:${diff} leverDeg:${settings.leverDeg} prevLeverDeg:${settings.prevLeverDeg}`
+      // elements.indicator.innerHTML = `rotate: ${settings.rotate} deg: ${deg} diff:${diff} leverDeg:${settings.handleDeg} prevHandleDeg:${settings.prevHandleDeg}`
       
-      if (settings.prevLeverDeg === 0 || diff >= 1) {
+      if (settings.prevHandleDeg === 0 || diff >= 1) {
         setStyles({
-          el: elements.lever,
-          deg: settings.prevLeverDeg + diff
+          el: elements.handle,
+          deg: settings.prevHandleDeg + diff
         })
       }
   
       if (diff > 0) settings.rotate += diff
       if (settings.rotate > 360) {
         setStyles({
-          el: elements.lever,
+          el: elements.handle,
           deg: 0
         })
         release()
-        settings.isTurningLever = false
+        settings.isTurningHandle = false
       }
     }) 
   })
 
 
-  const updateLine = () => {
-    setStyles({ 
-      el: lineStarts[0],
-      x: lineData[0].start.x, 
-      y: lineData[0].start.y,
-      deg: radToDeg(angleTo({
-        a: lineData[0].start,
-        b: lineData[0].end
-      })) 
+  const updateLines = () => {
+    lineData.forEach((l, i) => {
+      setStyles({ 
+        el: lineStarts[i],
+        x: l.start.x, 
+        y: l.start.y,
+        deg: radToDeg(angleTo({
+          a: l.start,
+          b: l.end
+        })) 
+      })
+      setStyles({ el: lines[i], w: px(l.length) })
+      setStyles({ el: lineEnds[i], x: l.end.x, y: l.end.y })
     })
-    setStyles({ el: lines[0], w: px(lineData[0].length) })
-    setStyles({ el: lineEnds[0], x: lineData[0].end.x, y: lineData[0].end.y })
   }
 
   const shake = () => {
@@ -446,45 +435,59 @@ function init() {
   }
 
   const openFlap = () => {
-    if (settings.flapRotate > -16) {
-      settings.flapRotate-= 1
+    if (settings.flapRotate > -20) {
+      settings.flapRotate-= 2
       lineData[0].start = rotateCoord({ 
-        angle: -1, 
+        angle: -2, 
         origin: lineData[0].end,
         x: lineData[0].start.x,
         y: lineData[0].start.y,
       })
+
+      lineData[2].start = rotateCoord({ 
+        angle: -4, 
+        origin: lineData[2].end,
+        x: lineData[2].start.x,
+        y: lineData[2].start.y,
+      })
       
-      updateLine()
+      updateLines()
 
       setTimeout(()=> {
         openFlap()
       }, 30)
     } else {
-      
       setTimeout(()=> {
- 
-        // updateLine()
         closeFlap()
-      }, 500)
+      }, 1000)
     }
   }
 
   const closeFlap = () => {
     if (settings.flapRotate < 0) {
-      settings.flapRotate+= 2
+      settings.flapRotate+= 1
       if (settings.flapRotate === 0) {
-        lineData[0].start.x = 80
+        lineData[0].start.x = 100
         lineData[0].start.y = 370
+
+        lineData[2].start.x = 70
+        lineData[2].start.y = 350
       } else {
         lineData[0].start = rotateCoord({ 
-          angle: 2, 
+          angle: 1, 
           origin: lineData[0].end,
           x: lineData[0].start.x,
           y: lineData[0].start.y,
         })
+
+        lineData[2].start = rotateCoord({ 
+          angle: 2, 
+          origin: lineData[2].end,
+          x: lineData[2].start.x,
+          y: lineData[2].start.y,
+        })
       }
-      updateLine()
+      updateLines()
 
       setTimeout(()=> {
         closeFlap()
@@ -497,16 +500,11 @@ function init() {
   elements.shakeButton.addEventListener('click', shake)
 
   const release = () => {
-    
     shake()
     settings.flapRotate = 0
-    
-
     setTimeout(()=> {
       openFlap()
     }, 30)
-
-
   }
 
   elements.releaseButton.addEventListener('click', release)
