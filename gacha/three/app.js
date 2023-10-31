@@ -8,9 +8,7 @@ function init() {
     isTurningLever: false,
     leverPrevDeg: 0,
     leverDeg: 0,
-    rotate: 0,
-    flapRotate: 0,
-    slopeRotate: 0
+    rotate: 0
   }
 
   const vector = {
@@ -81,7 +79,7 @@ function init() {
   const radToDeg = rad => Math.round(rad * (180 / Math.PI))
   const angleTo = ({ a, b }) => Math.atan2(b.y - a.y, b.x - a.x)
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
-  const getPage = (e, type) => e.type[0] === 'm' ? e[`page${type}`] : e.touches[0][`page${type}`]
+
 
   const setStyles = ({ el, x, y, w, deg }) =>{
     if (w) el.style.width = w
@@ -96,9 +94,7 @@ function init() {
     {
       start: {
         x: 80,
-        y: 370,
-        defX: 80,
-        defY: 370,
+        y: 370
       },
       end: {
         x: 312,
@@ -125,8 +121,6 @@ function init() {
       end: {
         x: 230,
         y: 490,
-        defX: 230,
-        defY: 490,
       },
       id: 'slope'
     }
@@ -360,8 +354,8 @@ function init() {
         settings.isTurningLever = true
         settings.leverDeg = radToDeg(angleTo({
           a: {
-            x: getPage(e, 'X') - left,
-            y: getPage(e, 'Y') - top
+            x: e.pageX - left,
+            y: e.pageY - top
           },
           b: handlePos
         }))
@@ -394,7 +388,7 @@ function init() {
   
       settings.prevLeverDeg = settings.leverDeg 
       const deg = radToDeg(angleTo({
-        a: { x: getPage(e, 'X') - left, y: getPage(e, 'Y') - top },
+        a: { x: e.pageX - left, y: e.pageY - top },
         b: handlePos
       }))
       settings.leverDeg = deg
@@ -445,68 +439,27 @@ function init() {
     })
   }
 
-  const openFlap = () => {
-    if (settings.flapRotate > -16) {
-      settings.flapRotate-= 1
-      lineData[0].start = rotateCoord({ 
-        angle: -1, 
-        origin: lineData[0].end,
-        x: lineData[0].start.x,
-        y: lineData[0].start.y,
-      })
-      
-      updateLine()
-
-      setTimeout(()=> {
-        openFlap()
-      }, 30)
-    } else {
-      
-      setTimeout(()=> {
- 
-        // updateLine()
-        closeFlap()
-      }, 500)
-    }
-  }
-
-  const closeFlap = () => {
-    if (settings.flapRotate < 0) {
-      settings.flapRotate+= 2
-      if (settings.flapRotate === 0) {
-        lineData[0].start.x = 80
-        lineData[0].start.y = 370
-      } else {
-        lineData[0].start = rotateCoord({ 
-          angle: 2, 
-          origin: lineData[0].end,
-          x: lineData[0].start.x,
-          y: lineData[0].start.y,
-        })
-      }
-      updateLine()
-
-      setTimeout(()=> {
-        closeFlap()
-      }, 30)
-    }
-  }
-
 
   // TODO shsake (can improve...)
   elements.shakeButton.addEventListener('click', shake)
 
   const release = () => {
+    lineData[0].start = rotateCoord({ 
+      angle: -15, 
+      origin: lineData[0].end,
+      x: lineData[0].start.x,
+      y: lineData[0].start.y,
+    })
     
+    updateLine()
     shake()
-    settings.flapRotate = 0
-    
+  
 
     setTimeout(()=> {
-      openFlap()
-    }, 30)
-
-
+      lineData[0].start.x = 80
+      lineData[0].start.y = 370
+      updateLine()
+    }, 500)
   }
 
   elements.releaseButton.addEventListener('click', release)
