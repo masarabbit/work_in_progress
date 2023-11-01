@@ -1,17 +1,14 @@
 
 function init() { 
 
-  //TODO adjust position for release
-  // add logic to open capsule
-  // add tutorial on how to operate
-  // add way to make inside visible
 
   const settings = {
     capsuleNo: 20,
+    lineNo: 1,
     isTurningHandle: false,
     handlePrevDeg: 0,
     handleDeg: 0,
-    handleRotate: 0,
+    rotate: 0,
     flapRotate: 0,
     slopeRotate: 0
   }
@@ -65,10 +62,12 @@ function init() {
   }
 
 
-  const rotateCoord = ({ angle, origin, coord }) =>{
+  const capsuleSeeds = new Array(settings.capsuleNo).fill('')
+
+  const rotateCoord = ({ angle, origin, x, y }) =>{
     const a = degToRad(angle)
-    const aX = coord.x - origin.x
-    const aY = coord.y - origin.y
+    const aX = x - origin.x
+    const aY = y - origin.y
     return {
       x: (aX * Math.cos(a)) - (aY * Math.sin(a)) + origin.x,
       y: (aX * Math.sin(a)) + (aY * Math.cos(a)) + origin.y,
@@ -91,20 +90,44 @@ function init() {
   }
 
 
+
+
   const lineData = [
     {
-      start: { x: 0, y: 280 },
-      end: { x: 160, y: 360 },
-      id: 'flap_1'
+      start: {
+        x: 100,
+        y: 370,
+      },
+      end: {
+        x: 312,
+        y: 330,
+      },
+      id: 'flap'
     },
     {
-      start: { x: 160, y: 360 },
-      end: { x: 320, y: 280, },
-      id: 'flap_2'
+      start: {
+        x: 0,
+        y: 300
+      },
+      end: {
+        x: 80,
+        y: 340,
+      },
+      id: 'divider'
     },
     {
-      start: { x: 70, y: 340 },
-      end: { x: 230, y: 490 },
+      // start: {
+      //   x: 40,
+      //   y: 340
+      // },
+      start: {
+        x: 70,
+        y: 350
+      },
+      end: {
+        x: 230,
+        y: 490,
+      },
       id: 'slope'
     }
   ]
@@ -122,7 +145,7 @@ function init() {
 
   const { width, height, top, left } = elements.gachaMachine.getBoundingClientRect()
 
-  new Array(settings.capsuleNo).fill('').forEach(() => {
+  capsuleSeeds.forEach(() => {
     const capsule = Object.assign(document.createElement('div'), { className: 'capsule pix' })
     elements.gachaMachine.appendChild(capsule)
   })
@@ -137,6 +160,8 @@ function init() {
     })
   })
 
+
+  // elements.marker = document.querySelector('.marker')
 
   const lineStarts = document.querySelectorAll('.line-start')
   const lines = document.querySelectorAll('.line')
@@ -166,6 +191,8 @@ function init() {
   })
 
 
+
+
   let capsuleData = Array.from(document.querySelectorAll('.capsule')).map((c, i) => {
     const data = {
       ...vector,
@@ -184,7 +211,7 @@ function init() {
 
     data.setXy({
       x: randomN(width - 32), 
-      y: randomN(height - 250), 
+      y: randomN(height - 200), 
     })
 
     //? acceleration is another vector. 
@@ -225,8 +252,11 @@ function init() {
 
   setInterval(()=> {
     capsuleData.forEach((c, i) => {
+      c.el.style.transition = '0.05s'
+
       c.prevX = c.x
       c.prevY = c.y
+
 
       c.accelerate(c.acceleration)
       c.velocity.multiplyBy(c.friction)
@@ -237,7 +267,7 @@ function init() {
         const distanceBetweenCapsules = distanceBetween(c, c2)
         if (distanceBetweenCapsules < (c.radius * 2)) {
           c.velocity.multiplyBy(-0.6)
-
+          // c.velocity.addTo(c.velocity)
           const overlap = distanceBetweenCapsules - (c.radius * 2)
 
           c.setXy(
@@ -262,6 +292,7 @@ function init() {
           }
           const fullDistance = distanceBetween(c, closestXy)
   
+
           if (fullDistance < c.radius) {
             c.velocity.multiplyBy(-0.6)
   
@@ -311,6 +342,7 @@ function init() {
   }, 30)
 
 
+
   ;['mousedown', 'touchstart'].forEach(action => {
     elements.handle.addEventListener(action, e => {
       settings.isTurningHandle = true
@@ -321,7 +353,7 @@ function init() {
         },
         b: handlePos
       }))
-      settings.handleRotate = 0
+      settings.rotate = 0
     })
   })
   ;['mouseup', 'touchend'].forEach(action => {
@@ -356,7 +388,7 @@ function init() {
   
       const diff = settings.handleDeg - settings.prevHandleDeg
 
-      // elements.indicator.innerHTML = `rotate: ${settings.handleRotate} deg: ${deg} diff:${diff} leverDeg:${settings.handleDeg} prevHandleDeg:${settings.prevHandleDeg}`
+      // elements.indicator.innerHTML = `rotate: ${settings.rotate} deg: ${deg} diff:${diff} leverDeg:${settings.handleDeg} prevHandleDeg:${settings.prevHandleDeg}`
       
       if (settings.prevHandleDeg === 0 || diff >= 1) {
         setStyles({
@@ -365,8 +397,8 @@ function init() {
         })
       }
   
-      if (diff > 0) settings.handleRotate += diff
-      if (settings.handleRotate > 365) {
+      if (diff > 0) settings.rotate += diff
+      if (settings.rotate > 380) {
         setStyles({
           el: elements.handle,
           deg: 0
@@ -405,22 +437,18 @@ function init() {
   const openFlap = () => {
     if (settings.flapRotate > -20) {
       settings.flapRotate-= 2
-      lineData[0].end = rotateCoord({ 
-        angle: 2, 
-        origin: lineData[0].start,
-        coord: lineData[0].end
-      })
-
-      lineData[1].start = rotateCoord({ 
+      lineData[0].start = rotateCoord({ 
         angle: -2, 
-        origin: lineData[1].end,
-        coord: lineData[1].start
+        origin: lineData[0].end,
+        x: lineData[0].start.x,
+        y: lineData[0].start.y,
       })
 
       lineData[2].start = rotateCoord({ 
         angle: -4, 
         origin: lineData[2].end,
-        coord: lineData[2].start
+        x: lineData[2].start.x,
+        y: lineData[2].start.y,
       })
       
       updateLines()
@@ -431,7 +459,7 @@ function init() {
     } else {
       setTimeout(()=> {
         closeFlap()
-      }, 800)
+      }, 1000)
     }
   }
 
@@ -439,29 +467,24 @@ function init() {
     if (settings.flapRotate < 0) {
       settings.flapRotate+= 1
       if (settings.flapRotate === 0) {
-        lineData[0].end.x = 160
-        lineData[0].end.y = 360
-
-        lineData[1].start.x = 160
-        lineData[1].start.y = 360
+        lineData[0].start.x = 100
+        lineData[0].start.y = 370
 
         lineData[2].start.x = 70
-        lineData[2].start.y = 340
+        lineData[2].start.y = 350
       } else {
-        lineData[0].end = rotateCoord({ 
-          angle: -1, 
-          origin: lineData[0].start,
-          coord: lineData[0].end
-        })
-        lineData[1].start = rotateCoord({ 
+        lineData[0].start = rotateCoord({ 
           angle: 1, 
-          origin: lineData[1].end,
-          coord: lineData[1].start
+          origin: lineData[0].end,
+          x: lineData[0].start.x,
+          y: lineData[0].start.y,
         })
+
         lineData[2].start = rotateCoord({ 
           angle: 2, 
           origin: lineData[2].end,
-          coord: lineData[2].start
+          x: lineData[2].start.x,
+          y: lineData[2].start.y,
         })
       }
       updateLines()
@@ -477,7 +500,7 @@ function init() {
   elements.shakeButton.addEventListener('click', shake)
 
   const release = () => {
-    // shake()
+    shake()
     settings.flapRotate = 0
     setTimeout(()=> {
       openFlap()
