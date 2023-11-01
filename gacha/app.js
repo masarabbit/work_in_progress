@@ -37,11 +37,8 @@ function init() {
       this.x = Math.cos(angle) * length
       this.y = Math.sin(angle) * length
     },
-    getAngle: function() {
-      return Math.atan2(this.y, this.x)
-    },
     setLength: function(length) {
-      const angle = this.getAngle()
+      const angle = Math.atan2(this.y, this.x)
       this.x = Math.cos(angle) * length
       this.y = Math.sin(angle) * length
     },
@@ -148,22 +145,22 @@ function init() {
     y: handleY - top + 80
   }
 
-
-  lineData.forEach((l, i) => {
-    l.length = distanceBetween(l.start, l.end)
-    l.deg = radToDeg(angleTo({
-      a: l.start,
-      b: l.end,
-    }))
-    setStyles({ 
-      el: lineStarts[i], 
-      x: l.start.x, y: l.start.y,
-      deg: l.deg
+  const updateLines = () => {
+    lineData.forEach((l, i) => {
+      l.length = distanceBetween(l.start, l.end)
+      setStyles({ 
+        el: lineStarts[i],
+        x: l.start.x, 
+        y: l.start.y,
+        deg: radToDeg(angleTo({
+          a: l.start,
+          b: l.end
+        })) 
+      })
+      setStyles({ el: lines[i], w: px(l.length) })
+      setStyles({ el: lineEnds[i], x: l.end.x, y: l.end.y })
     })
-
-    setStyles({ el: lines[i], w: px(l.length) })
-    setStyles({ el: lineEnds[i], x: l.end.x, y: l.end.y })
-  })
+  }
 
 
   let capsuleData = Array.from(document.querySelectorAll('.capsule')).map((c, i) => {
@@ -173,7 +170,7 @@ function init() {
       id: i,
       deg: 0,
       mass: 1,
-      radius: 36,
+      radius: 36, // actual radius should be 32, but setting it higher
       bounce: -0.3, // this reduces the velocity gradually
       friction: 0.99
     }
@@ -210,12 +207,11 @@ function init() {
 
   capsuleData.forEach(c => {
     c.el.addEventListener('click', ()=> {
-      console.log('test', c, Math.abs(c.prevX - c.x))
+      // console.log('test', c, Math.abs(c.prevX - c.x))
       if (
         (c.x + c.radius) > 230 
         && c.y + c.radius > (height - 80)
         ) {
-          console.log('get!')
           elements.gachaMachine.removeChild(c.el)
           capsuleData = capsuleData.filter(capsule => capsule.id !== c.id)
         }
@@ -252,13 +248,13 @@ function init() {
       })
 
 
-      lineData.forEach(line => {
+      lineData.forEach(l => {
         // this only works when velocity is from above
-        if ((c.x + c.radius > line.start.x) && (c.x - c.radius < line.end.x)) {
-          const dot = (((c.x - line.start.x) * (line.end.x - line.start.x)) + ((c.y - line.start.y) * (line.end.y - line.start.y))) / Math.pow(line.length, 2)
+        if ((c.x + c.radius > l.start.x) && (c.x - c.radius < l.end.x)) {
+          const dot = (((c.x - l.start.x) * (l.end.x - l.start.x)) + ((c.y - l.start.y) * (l.end.y - l.start.y))) / Math.pow(l.length, 2)
           const closestXy = {
-            x: line.start.x + (dot * (line.end.x - line.start.x)),
-            y: line.start.y + (dot * (line.end.y - line.start.y))
+            x: l.start.x + (dot * (l.end.x - l.start.x)),
+            y: l.start.y + (dot * (l.end.y - l.start.y))
           }
           const fullDistance = distanceBetween(c, closestXy)
   
@@ -334,7 +330,6 @@ function init() {
     })
   })
 
-  // TODO possibly need touch alternative for mouseleave
   elements.circle.addEventListener('mouseleave', ()=> {
     settings.isTurningHandle = false
     setStyles({
@@ -376,23 +371,6 @@ function init() {
       }
     }) 
   })
-
-
-  const updateLines = () => {
-    lineData.forEach((l, i) => {
-      setStyles({ 
-        el: lineStarts[i],
-        x: l.start.x, 
-        y: l.start.y,
-        deg: radToDeg(angleTo({
-          a: l.start,
-          b: l.end
-        })) 
-      })
-      setStyles({ el: lines[i], w: px(l.length) })
-      setStyles({ el: lineEnds[i], x: l.end.x, y: l.end.y })
-    })
-  }
 
   const shake = () => {
     capsuleData.forEach(c => {
@@ -485,6 +463,8 @@ function init() {
   }
 
   elements.releaseButton.addEventListener('click', release)
+
+  updateLines()
 
 
 }
