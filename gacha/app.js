@@ -398,7 +398,7 @@ function init() {
       }
   
       if (diff > 0) settings.rotate += diff
-      if (settings.rotate > 360) {
+      if (settings.rotate > 380) {
         setStyles({
           el: elements.handle,
           deg: 0
