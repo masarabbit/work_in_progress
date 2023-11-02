@@ -2,9 +2,8 @@
 function init() { 
 
   //TODO adjust position for release
-  // add logic to open capsule
   // add tutorial on how to operate
-  // add way to make inside visible
+  // add logic to update collection
 
   const settings = {
     capsuleNo: 20,
@@ -45,9 +44,6 @@ function init() {
     magnitude: function() {
       return Math.sqrt(this.x * this.x + this.y * this.y)
     },
-    add: function(v2) {
-      return this.create(this.x + v2.x, this.y + v2.y)
-    },
     multiply: function(n) {
       return this.create(this.x * n, this.y * n)
     },
@@ -62,13 +58,13 @@ function init() {
   }
 
 
-  const rotateCoord = ({ angle, origin, coord }) =>{
+  const rotatePoint = ({ angle, axis, point }) =>{
     const a = degToRad(angle)
-    const aX = coord.x - origin.x
-    const aY = coord.y - origin.y
+    const aX = point.x - axis.x
+    const aY = point.y - axis.y
     return {
-      x: (aX * Math.cos(a)) - (aY * Math.sin(a)) + origin.x,
-      y: (aX * Math.sin(a)) + (aY * Math.cos(a)) + origin.y,
+      x: (aX * Math.cos(a)) - (aY * Math.sin(a)) + axis.x,
+      y: (aX * Math.sin(a)) + (aY * Math.cos(a)) + axis.y,
     }
   }
 
@@ -84,25 +80,30 @@ function init() {
   const setStyles = ({ el, x, y, w, deg }) =>{
     if (w) el.style.width = w
     el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0}) rotate(${deg || 0}deg)`
-    el.style.zIndex = y
+    // el.style.zIndex = y
   }
-
 
   const lineData = [
     {
       start: { x: 0, y: 280 },
       end: { x: 160, y: 360 },
+      point: 'end', 
+      axis: 'start',
       id: 'flap_1'
     },
     {
       start: { x: 160, y: 360 },
       end: { x: 320, y: 280, },
+      point: 'start', 
+      axis: 'end',
       id: 'flap_2'
     },
     {
       start: { x: 70, y: 340 },
       end: { x: 230, y: 490 },
-      id: 'slope'
+      point: 'start', 
+      axis: 'end',
+      id: 'ramp'
     }
   ]
 
@@ -112,6 +113,7 @@ function init() {
     indicator: document.querySelector('.indicator'),
     shakeButton: document.querySelector('.shake'),
     releaseButton: document.querySelector('.release'),
+    seeInsideButton: document.querySelector('.see-inside'),
     circle: document.querySelector('.circle'),
     handle: document.querySelector('.handle'),
   }
@@ -120,14 +122,20 @@ function init() {
   const { width, height, top, left } = elements.gachaMachine.getBoundingClientRect()
 
   new Array(settings.capsuleNo).fill('').forEach(() => {
-    const capsule = Object.assign(document.createElement('div'), { className: 'capsule pix' })
+    const capsule = Object.assign(document.createElement('div'), 
+      { className: 'capsule-wrapper pix',
+        innerHTML: `<div class="capsule">
+                      <div class="lid"></div>
+                      <div class="toy bunny pix"></div>
+                      <div class="base"></div>
+                    </div>`
+    })
     elements.gachaMachine.appendChild(capsule)
   })
   lineData.forEach(() => {
-    const lineStart =  Object.assign(document.createElement('div'), { className: 'line-start' })
-    lineStart.appendChild(Object.assign(document.createElement('div'), { className: 'line' }),)
     ;[
-      lineStart,
+      Object.assign(document.createElement('div'), 
+        { className: 'line-start', innerHTML: '<div class="line"></div>'}),
       Object.assign(document.createElement('div'), { className: 'line-end' })
     ].forEach(ele => {
       elements.gachaMachine.appendChild(ele)
@@ -138,9 +146,10 @@ function init() {
   const lineStarts = document.querySelectorAll('.line-start')
   const lines = document.querySelectorAll('.line')
   const lineEnds = document.querySelectorAll('.line-end')
+  const toys = document.querySelectorAll('.toy')
 
   const { left: handleX, top: handleY } = elements.circle.getBoundingClientRect()
-  const handlePos = {
+  const handleAxis = {
     x: handleX - left + 80,
     y: handleY - top + 80
   }
@@ -163,7 +172,7 @@ function init() {
   }
 
 
-  let capsuleData = Array.from(document.querySelectorAll('.capsule')).map((c, i) => {
+  let capsuleData = Array.from(document.querySelectorAll('.capsule-wrapper')).map((c, i) => {
     const data = {
       ...vector,
       el: c,
@@ -172,7 +181,8 @@ function init() {
       mass: 1,
       radius: 36, // actual radius should be 32, but setting it higher
       bounce: -0.3, // this reduces the velocity gradually
-      friction: 0.99
+      friction: 0.99,
+      toy: toys[i]
     }
 
     data.velocity = data.create(0, 1)  //? velocity is another vector
@@ -204,16 +214,39 @@ function init() {
     }
   }
 
+  const { width: bodyWidth, height: bodyHeight } = elements.body.getBoundingClientRect()
 
   capsuleData.forEach(c => {
     c.el.addEventListener('click', ()=> {
-      // console.log('test', c, Math.abs(c.prevX - c.x))
       if (
         (c.x + c.radius) > 230 
         && c.y + c.radius > (height - 80)
         ) {
-          elements.gachaMachine.removeChild(c.el)
-          capsuleData = capsuleData.filter(capsule => capsule.id !== c.id)
+          elements.body.classList.add('lock')
+          c.el.classList.add('enlarge')
+          c.selected = true
+          setStyles({
+            el : c.el,
+            x: (bodyWidth / 2) - left,
+            y: (bodyHeight / 2) - top,
+            deg: 0
+          })
+          setStyles({ el: c.toy, deg: 0 })
+          setTimeout(()=> c.el.classList.add('open'), 700)
+
+          setTimeout(()=> {
+            // elements.gachaMachine.removeChild(c.el)
+            // capsuleData = capsuleData.filter(capsule => capsule.id !== c.id)
+            elements.body.classList.remove('lock')
+            
+            // TODO need to update so it get's displayed on top or bottom of page as list, and maybe keep it responsive?
+            c.toy.classList.add('collected')
+            setStyles({
+              el : c.el,
+              x: 20 - left,
+              y: 20 - top,
+            })
+          }, 2000)
         }
     })
     setStyles(c)
@@ -221,6 +254,7 @@ function init() {
 
   setInterval(()=> {
     capsuleData.forEach((c, i) => {
+      if (c.selected) return
       c.prevX = c.x
       c.prevY = c.y
 
@@ -229,13 +263,11 @@ function init() {
       c.addTo(c.velocity)
 
       capsuleData.forEach(c2 =>{
-        if (c.id === c2.id) return
+        if (c.id === c2.id || c2.selected) return
         const distanceBetweenCapsules = distanceBetween(c, c2)
         if (distanceBetweenCapsules < (c.radius * 2)) {
           c.velocity.multiplyBy(-0.6)
-
           const overlap = distanceBetweenCapsules - (c.radius * 2)
-
           c.setXy(
             getNewPosBasedOnTarget({
               start: c,
@@ -298,10 +330,13 @@ function init() {
       } else {
         if (Math.abs(c.prevX - c.x)) {
           // rotate capsule
+          setStyles({
+            el: c.toy,
+            deg: c.deg + (c.x - c.prevX) * 2
+          })
           c.deg += (c.x - c.prevX) * 2
         }
       }
-
       setStyles(capsuleData[i])
     })
   }, 30)
@@ -315,7 +350,7 @@ function init() {
           x: getPage(e, 'X') - left,
           y: getPage(e, 'Y') - top
         },
-        b: handlePos
+        b: handleAxis
       }))
       settings.handleRotate = 0
     })
@@ -345,7 +380,7 @@ function init() {
       settings.prevHandleDeg = settings.handleDeg 
       const deg = radToDeg(angleTo({
         a: { x: getPage(e, 'X') - left, y: getPage(e, 'Y') - top },
-        b: handlePos
+        b: handleAxis
       }))
       settings.handleDeg = deg
   
@@ -380,36 +415,25 @@ function init() {
     })
   }
 
+  const rotateLines = angles => {
+    angles.forEach((angle, i) => {
+      const { axis, point } = lineData[i]
+      lineData[i][point] = rotatePoint({ 
+        angle,
+        axis: lineData[i][axis],
+        point: lineData[i][point]
+      })
+    })
+  }
+
   const openFlap = () => {
     if (settings.flapRotate > -20) {
       settings.flapRotate-= 2
-      lineData[0].end = rotateCoord({ 
-        angle: 2, 
-        origin: lineData[0].start,
-        coord: lineData[0].end
-      })
-
-      lineData[1].start = rotateCoord({ 
-        angle: -2, 
-        origin: lineData[1].end,
-        coord: lineData[1].start
-      })
-
-      lineData[2].start = rotateCoord({ 
-        angle: -4, 
-        origin: lineData[2].end,
-        coord: lineData[2].start
-      })
-      
+      rotateLines([ 2, -2, -4 ])
       updateLines()
-
-      setTimeout(()=> {
-        openFlap()
-      }, 30)
+      setTimeout(openFlap, 30)
     } else {
-      setTimeout(()=> {
-        closeFlap()
-      }, 800)
+      setTimeout(closeFlap, 800)
     }
   }
 
@@ -417,52 +441,34 @@ function init() {
     if (settings.flapRotate < 0) {
       settings.flapRotate+= 1
       if (settings.flapRotate === 0) {
-        lineData[0].end.x = 160
-        lineData[0].end.y = 360
-
-        lineData[1].start.x = 160
-        lineData[1].start.y = 360
-
-        lineData[2].start.x = 70
-        lineData[2].start.y = 340
+        [
+          { x: 160, y: 360 },
+          { x: 160, y: 360 },
+          { x: 70, y: 340 },
+        ].forEach((item, i) => {
+          lineData[i][lineData[i].point].x = item.x
+          lineData[i][lineData[i].point].y = item.y
+        })
       } else {
-        lineData[0].end = rotateCoord({ 
-          angle: -1, 
-          origin: lineData[0].start,
-          coord: lineData[0].end
-        })
-        lineData[1].start = rotateCoord({ 
-          angle: 1, 
-          origin: lineData[1].end,
-          coord: lineData[1].start
-        })
-        lineData[2].start = rotateCoord({ 
-          angle: 2, 
-          origin: lineData[2].end,
-          coord: lineData[2].start
-        })
+        rotateLines([ -1, 1, 2 ])
       }
       updateLines()
-
-      setTimeout(()=> {
-        closeFlap()
-      }, 30)
+      setTimeout(closeFlap, 30)
     }
   }
 
 
-  // TODO shsake (can improve...)
-  elements.shakeButton.addEventListener('click', shake)
-
   const release = () => {
-    // shake()
     settings.flapRotate = 0
-    setTimeout(()=> {
-      openFlap()
-    }, 30)
+    setTimeout(openFlap, 30)
   }
 
   elements.releaseButton.addEventListener('click', release)
+  elements.shakeButton.addEventListener('click', shake)
+  elements.seeInsideButton.addEventListener('click', ()=> {
+    elements.gachaMachine.classList.toggle('see-through')
+    elements.seeInsideButton.innerHTML = elements.gachaMachine.classList.contains('see-through') ? 'hide' : 'see inside!'
+  })
 
   updateLines()
 
