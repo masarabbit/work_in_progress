@@ -3,7 +3,7 @@ function init() {
 
   //TODO adjust position for release
   // add tutorial on how to operate
-  // add logic to update collection
+  // add toys
 
   const settings = {
     capsuleNo: 20,
@@ -12,7 +12,21 @@ function init() {
     handleDeg: 0,
     handleRotate: 0,
     flapRotate: 0,
-    slopeRotate: 0
+    slopeRotate: 0,
+    collectedNo: 0,
+  }
+
+  const elements = {
+    body: document.querySelector('.wrapper'),
+    gachaMachine: document.querySelector('.gacha-machine'),
+    indicator: document.querySelector('.indicator'),
+    shakeButton: document.querySelector('.shake'),
+    releaseButton: document.querySelector('.release'),
+    seeInsideButton: document.querySelector('.see-inside'),
+    circle: document.querySelector('.circle'),
+    handle: document.querySelector('.handle'),
+    toyBox: document.querySelector('.toy-box'),
+    hole: document.querySelector('.hole'),
   }
 
   const vector = {
@@ -24,9 +38,9 @@ function init() {
       obj.y = y
       return obj
     },
-    set: function(elem, n) {
-      this[elem] = n
-    },
+    // set: function(elem, n) {
+    //   this[elem] = n
+    // },
     setXy: function({ x, y }) {
       this.x = x
       this.y = y
@@ -57,7 +71,6 @@ function init() {
     },
   }
 
-
   const rotatePoint = ({ angle, axis, point }) =>{
     const a = degToRad(angle)
     const aX = point.x - axis.x
@@ -68,7 +81,6 @@ function init() {
     }
   }
 
-
   const px = num => `${num}px`
   const randomN = max => Math.ceil(Math.random() * max)
   const degToRad = deg => deg / (180 / Math.PI)
@@ -76,11 +88,12 @@ function init() {
   const angleTo = ({ a, b }) => Math.atan2(b.y - a.y, b.x - a.x)
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
   const getPage = (e, type) => e.type[0] === 'm' ? e[`page${type}`] : e.touches[0][`page${type}`]
+  const calcCollectedX = () => settings.collectedNo % 10 * 32
+  const calcCollectedY = () => Math.floor(settings.collectedNo / 10) * 32
 
   const setStyles = ({ el, x, y, w, deg }) =>{
     if (w) el.style.width = w
     el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0}) rotate(${deg || 0}deg)`
-    // el.style.zIndex = y
   }
 
   const lineData = [
@@ -107,27 +120,13 @@ function init() {
     }
   ]
 
-  const elements = {
-    body: document.querySelector('.wrapper'),
-    gachaMachine: document.querySelector('.gacha-machine'),
-    indicator: document.querySelector('.indicator'),
-    shakeButton: document.querySelector('.shake'),
-    releaseButton: document.querySelector('.release'),
-    seeInsideButton: document.querySelector('.see-inside'),
-    circle: document.querySelector('.circle'),
-    handle: document.querySelector('.handle'),
-  }
-
-
-  const { width, height, top, left } = elements.gachaMachine.getBoundingClientRect()
-
   new Array(settings.capsuleNo).fill('').forEach(() => {
     const capsule = Object.assign(document.createElement('div'), 
       { className: 'capsule-wrapper pix',
         innerHTML: `<div class="capsule">
                       <div class="lid"></div>
                       <div class="toy bunny pix"></div>
-                      <div class="base"></div>
+                      <div class="base ${['red', 'pink', 'white', 'blue'][randomN(4) - 1]}"></div>
                     </div>`
     })
     elements.gachaMachine.appendChild(capsule)
@@ -142,16 +141,19 @@ function init() {
     })
   })
 
-
   const lineStarts = document.querySelectorAll('.line-start')
   const lines = document.querySelectorAll('.line')
   const lineEnds = document.querySelectorAll('.line-end')
   const toys = document.querySelectorAll('.toy')
+  const { left: toyBoxLeft, top: toyBoxTop } = elements.toyBox.getBoundingClientRect()
+  const { width, height, top, left } = elements.gachaMachine.getBoundingClientRect()
 
-  const { left: handleX, top: handleY } = elements.circle.getBoundingClientRect()
-  const handleAxis = {
-    x: handleX - left + 80,
-    y: handleY - top + 80
+  const handleAxis = () => {
+    const { left: handleX, top: handleY } = elements.circle.getBoundingClientRect()
+    return {
+      x: handleX - left + 80,
+      y: handleY - top + 80
+    }
   }
 
   const updateLines = () => {
@@ -171,8 +173,7 @@ function init() {
     })
   }
 
-
-  let capsuleData = Array.from(document.querySelectorAll('.capsule-wrapper')).map((c, i) => {
+  const capsuleData = Array.from(document.querySelectorAll('.capsule-wrapper')).map((c, i) => {
     const data = {
       ...vector,
       el: c,
@@ -188,14 +189,12 @@ function init() {
     data.velocity = data.create(0, 1)  //? velocity is another vector
     data.velocity.setLength(10)
     data.velocity.setAngle(degToRad(90))
-
     data.setXy({
       x: randomN(width - 32), 
       y: randomN(height - 250), 
     })
 
-    //? acceleration is another vector. 
-    // this one is like gravity
+    // gravity
     data.acceleration = data.create(0, 4)  
     data.accelerate = function(acceleration) {
       this.velocity.addTo(acceleration)
@@ -214,198 +213,13 @@ function init() {
     }
   }
 
-  const { width: bodyWidth, height: bodyHeight } = elements.body.getBoundingClientRect()
-
-  capsuleData.forEach(c => {
-    c.el.addEventListener('click', ()=> {
-      if (
-        (c.x + c.radius) > 230 
-        && c.y + c.radius > (height - 80)
-        ) {
-          elements.body.classList.add('lock')
-          c.el.classList.add('enlarge')
-          c.selected = true
-          setStyles({
-            el : c.el,
-            x: (bodyWidth / 2) - left,
-            y: (bodyHeight / 2) - top,
-            deg: 0
-          })
-          setStyles({ el: c.toy, deg: 0 })
-          setTimeout(()=> c.el.classList.add('open'), 700)
-
-          setTimeout(()=> {
-            // elements.gachaMachine.removeChild(c.el)
-            // capsuleData = capsuleData.filter(capsule => capsule.id !== c.id)
-            elements.body.classList.remove('lock')
-            
-            // TODO need to update so it get's displayed on top or bottom of page as list, and maybe keep it responsive?
-            c.toy.classList.add('collected')
-            setStyles({
-              el : c.el,
-              x: 20 - left,
-              y: 20 - top,
-            })
-          }, 2000)
-        }
-    })
-    setStyles(c)
-  })
-
-  setInterval(()=> {
-    capsuleData.forEach((c, i) => {
-      if (c.selected) return
-      c.prevX = c.x
-      c.prevY = c.y
-
-      c.accelerate(c.acceleration)
-      c.velocity.multiplyBy(c.friction)
-      c.addTo(c.velocity)
-
-      capsuleData.forEach(c2 =>{
-        if (c.id === c2.id || c2.selected) return
-        const distanceBetweenCapsules = distanceBetween(c, c2)
-        if (distanceBetweenCapsules < (c.radius * 2)) {
-          c.velocity.multiplyBy(-0.6)
-          const overlap = distanceBetweenCapsules - (c.radius * 2)
-          c.setXy(
-            getNewPosBasedOnTarget({
-              start: c,
-              target: c2,
-              distance: overlap / 2, 
-              fullDistance: distanceBetweenCapsules
-            })
-          )
-        }
-      })
-
-
-      lineData.forEach(l => {
-        // this only works when velocity is from above
-        if ((c.x + c.radius > l.start.x) && (c.x - c.radius < l.end.x)) {
-          const dot = (((c.x - l.start.x) * (l.end.x - l.start.x)) + ((c.y - l.start.y) * (l.end.y - l.start.y))) / Math.pow(l.length, 2)
-          const closestXy = {
-            x: l.start.x + (dot * (l.end.x - l.start.x)),
-            y: l.start.y + (dot * (l.end.y - l.start.y))
-          }
-          const fullDistance = distanceBetween(c, closestXy)
-  
-          if (fullDistance < c.radius) {
-            c.velocity.multiplyBy(-0.6)
-  
-            const overlap = fullDistance - (c.radius)
-            c.setXy(
-              getNewPosBasedOnTarget({
-                start: c,
-                target: closestXy,
-                distance: overlap / 2, 
-                fullDistance
-              })
-            )
-          }
-        }
-      })
-
-      const buffer = 5
-      if (c.x + (c.radius + buffer) > width) {
-        c.x = width - (c.radius + buffer)
-        c.velocity.x = c.velocity.x * c.bounce
-      }
-      if (c.x - (c.radius + buffer) < 0) {
-        c.x = c.radius
-        c.velocity.x = c.velocity.x * c.bounce
-      }
-      if (c.y + c.radius > height) {
-        c.y = height - c.radius
-        c.velocity.y = c.velocity.y * c.bounce
-      }
-      if (c.y - c.radius < 0) {
-        c.y = c.radius
-        c.velocity.y = c.velocity.y * c.bounce
-      }
-
-      if (Math.abs(c.prevX - c.x) < 2 && Math.abs(c.prevY - c.y) < 2) {
-        c.velocity.setXy({ x: 0, y: 0 })
-        c.setXy({ x: c.prevX, y: c.prevY })
-      } else {
-        if (Math.abs(c.prevX - c.x)) {
-          // rotate capsule
-          setStyles({
-            el: c.toy,
-            deg: c.deg + (c.x - c.prevX) * 2
-          })
-          c.deg += (c.x - c.prevX) * 2
-        }
-      }
-      setStyles(capsuleData[i])
-    })
-  }, 30)
-
-
-  ;['mousedown', 'touchstart'].forEach(action => {
-    elements.handle.addEventListener(action, e => {
-      settings.isTurningHandle = true
-      settings.handleDeg = radToDeg(angleTo({
-        a: {
-          x: getPage(e, 'X') - left,
-          y: getPage(e, 'Y') - top
-        },
-        b: handleAxis
-      }))
-      settings.handleRotate = 0
-    })
-  })
-  ;['mouseup', 'touchend'].forEach(action => {
-    elements.handle.addEventListener(action, ()=> {
-      settings.isTurningHandle = false
-      setStyles({
-        el: elements.handle,
-        deg: 0
-      })
-    })
-  })
-
-  elements.circle.addEventListener('mouseleave', ()=> {
-    settings.isTurningHandle = false
-    setStyles({
-      el: elements.handle,
-      deg: 0
-    })
-  })
-
-  ;['mousemove', 'touchmove'].forEach(action => {
-    window.addEventListener(action, e => {
-      if (!settings.isTurningHandle) return
-  
-      settings.prevHandleDeg = settings.handleDeg 
-      const deg = radToDeg(angleTo({
-        a: { x: getPage(e, 'X') - left, y: getPage(e, 'Y') - top },
-        b: handleAxis
-      }))
-      settings.handleDeg = deg
-  
-      const diff = settings.handleDeg - settings.prevHandleDeg
-
-      // elements.indicator.innerHTML = `rotate: ${settings.handleRotate} deg: ${deg} diff:${diff} leverDeg:${settings.handleDeg} prevHandleDeg:${settings.prevHandleDeg}`
-      
-      if (settings.prevHandleDeg === 0 || diff >= 1) {
-        setStyles({
-          el: elements.handle,
-          deg: settings.prevHandleDeg + diff
-        })
-      }
-  
-      if (diff > 0) settings.handleRotate += diff
-      if (settings.handleRotate > 365) {
-        setStyles({
-          el: elements.handle,
-          deg: 0
-        })
-        release()
-        settings.isTurningHandle = false
-      }
-    }) 
-  })
+  const isWithinHole = c => {
+    const { x: holeX, y: holeY, width: holeWidth, height: holeHeight } = elements.hole.getBoundingClientRect()
+    return (c.x + c.radius) > (holeX - left)
+    && (c.x - c.radius) < (holeX + holeWidth - left)
+    && (c.y + c.radius) > (holeY - top)
+    && (c.y - c.radius) < (holeY + holeHeight - top)
+  }
 
   const shake = () => {
     capsuleData.forEach(c => {
@@ -457,11 +271,206 @@ function init() {
     }
   }
 
-
   const release = () => {
     settings.flapRotate = 0
     setTimeout(openFlap, 30)
   }
+
+  capsuleData.forEach(c => {
+    c.el.addEventListener('click', ()=> {
+      const { width: bodyWidth, height: bodyHeight } = elements.body.getBoundingClientRect()
+
+      if (isWithinHole(c)) {
+          elements.body.classList.add('lock')
+          c.el.classList.add('enlarge')
+          c.selected = true
+          setStyles({
+            el : c.el,
+            x: (bodyWidth / 2) - left,
+            y: (bodyHeight / 2) - top,
+            deg: 0
+          })
+          setStyles({ el: c.toy, deg: 0 })
+          setTimeout(()=> c.el.classList.add('open'), 700)
+          setTimeout(()=> {
+            elements.body.classList.remove('lock')
+            c.toy.classList.add('collected')
+            setStyles({
+              el : c.el,
+              x: toyBoxLeft - left + 16 + calcCollectedX(),
+              y: toyBoxTop - top + 16 + calcCollectedY(),
+            })
+            settings.collectedNo++
+          }, 1800)
+        }
+    })
+    setStyles(c)
+  })
+
+  const spaceOutCapsules = c => {
+    capsuleData.forEach(c2 =>{
+      if (c.id === c2.id || c2.selected) return
+      const distanceBetweenCapsules = distanceBetween(c, c2)
+      if (distanceBetweenCapsules < (c.radius * 2)) {
+        c.velocity.multiplyBy(-0.6)
+        const overlap = distanceBetweenCapsules - (c.radius * 2)
+        c.setXy(
+          getNewPosBasedOnTarget({
+            start: c,
+            target: c2,
+            distance: overlap / 2, 
+            fullDistance: distanceBetweenCapsules
+          })
+        )
+      }
+    })
+  }
+
+  const hitCheckLines = c => {
+    lineData.forEach(l => {
+      // this only works when velocity is from above
+      if ((c.x + c.radius > l.start.x) && (c.x - c.radius < l.end.x)) {
+        const dot = (((c.x - l.start.x) * (l.end.x - l.start.x)) + ((c.y - l.start.y) * (l.end.y - l.start.y))) / Math.pow(l.length, 2)
+        const closestXy = {
+          x: l.start.x + (dot * (l.end.x - l.start.x)),
+          y: l.start.y + (dot * (l.end.y - l.start.y))
+        }
+        const fullDistance = distanceBetween(c, closestXy)
+
+        if (fullDistance < c.radius) {
+          c.velocity.multiplyBy(-0.6)
+
+          const overlap = fullDistance - (c.radius)
+          c.setXy(
+            getNewPosBasedOnTarget({
+              start: c,
+              target: closestXy,
+              distance: overlap / 2, 
+              fullDistance
+            })
+          )
+        }
+      }
+    })
+  }
+
+  const hitCheckGachaMachineWalls = c => {
+    const buffer = 5
+    if (c.x + (c.radius + buffer) > width) {
+      c.x = width - (c.radius + buffer)
+      c.velocity.x = c.velocity.x * c.bounce
+    }
+    if (c.x - (c.radius + buffer) < 0) {
+      c.x = c.radius
+      c.velocity.x = c.velocity.x * c.bounce
+    }
+    if (c.y + c.radius > height) {
+      c.y = height - c.radius
+      c.velocity.y = c.velocity.y * c.bounce
+    }
+    if (c.y - c.radius < 0) {
+      c.y = c.radius
+      c.velocity.y = c.velocity.y * c.bounce
+    }
+  }
+
+  const animateCapsules = () => {
+    capsuleData.forEach((c, i) => {
+      if (c.selected) return
+      c.prevX = c.x
+      c.prevY = c.y
+
+      c.accelerate(c.acceleration)
+      c.velocity.multiplyBy(c.friction)
+      c.addTo(c.velocity)
+
+      spaceOutCapsules(c)
+      hitCheckLines(c)
+      hitCheckGachaMachineWalls(c)
+
+      if (Math.abs(c.prevX - c.x) < 2 && Math.abs(c.prevY - c.y) < 2) {
+        c.velocity.setXy({ x: 0, y: 0 })
+        c.setXy({ x: c.prevX, y: c.prevY })
+      } else {
+        if (Math.abs(c.prevX - c.x)) {
+          // rotate capsule
+          setStyles({
+            el: c.toy,
+            deg: c.deg + (c.x - c.prevX) * 2
+          })
+          c.deg += (c.x - c.prevX) * 2
+        }
+      }
+      setStyles(capsuleData[i])
+    })
+  }
+
+
+  const grabHandle = e => {
+    settings.isTurningHandle = true
+    settings.handleDeg = radToDeg(angleTo({
+      a: {
+        x: getPage(e, 'X') - left,
+        y: getPage(e, 'Y') - top
+      },
+      b: handleAxis()
+    }))
+    settings.handleRotate = 0
+  }
+
+  const releaseHandle = () => {
+    settings.isTurningHandle = false
+    setStyles({
+      el: elements.handle,
+      deg: 0
+    })
+  }
+
+  const rotateHandle = e => {
+    if (!settings.isTurningHandle) return
+  
+    settings.prevHandleDeg = settings.handleDeg 
+    const deg = radToDeg(angleTo({
+      a: { x: getPage(e, 'X') - left, y: getPage(e, 'Y') - top },
+      b: handleAxis()
+    }))
+    settings.handleDeg = deg
+
+    const diff = settings.handleDeg - settings.prevHandleDeg
+
+    // elements.indicator.innerHTML = `rotate: ${settings.handleRotate} deg: ${deg} diff:${diff} leverDeg:${settings.handleDeg} prevHandleDeg:${settings.prevHandleDeg}`
+    
+    if (settings.prevHandleDeg === 0 || diff >= 1) {
+      setStyles({
+        el: elements.handle,
+        deg: settings.prevHandleDeg + diff
+      })
+    }
+
+    if (diff > 0 && diff < 50) settings.handleRotate += diff
+    if (settings.handleRotate > 365) {
+      setStyles({
+        el: elements.handle,
+        deg: 0
+      })
+      release()
+      settings.isTurningHandle = false
+    }
+  }
+
+
+  ;['mousedown', 'touchstart'].forEach(action => {
+    elements.handle.addEventListener(action, grabHandle)
+  })
+
+  ;['mouseup', 'mouseleave', 'touchend'].forEach(action => {
+    elements.handle.addEventListener(action, releaseHandle)
+  })
+
+  ;['mousemove', 'touchmove'].forEach(action => {
+    window.addEventListener(action, rotateHandle) 
+  })
+
 
   elements.releaseButton.addEventListener('click', release)
   elements.shakeButton.addEventListener('click', shake)
@@ -471,7 +480,7 @@ function init() {
   })
 
   updateLines()
-
+  setInterval(animateCapsules, 30)
 
 }
   
