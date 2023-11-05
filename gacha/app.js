@@ -1,10 +1,6 @@
 
 function init() { 
 
-  //TODO adjust position for release
-  // add tutorial on how to operate
-  // add toys
-
   const settings = {
     capsuleNo: 20,
     isTurningHandle: false,
@@ -20,14 +16,11 @@ function init() {
   const elements = {
     body: document.querySelector('.wrapper'),
     gachaMachine: document.querySelector('.gacha-machine'),
-    indicator: document.querySelector('.indicator'),
     shakeButton: document.querySelector('.shake'),
-    releaseButton: document.querySelector('.release'),
     seeInsideButton: document.querySelector('.see-inside'),
     circle: document.querySelector('.circle'),
     handle: document.querySelector('.handle'),
     toyBox: document.querySelector('.toy-box'),
-    // exit: document.querySelector('.exit'),
   }
 
   const vector = {
@@ -39,9 +32,6 @@ function init() {
       obj.y = y
       return obj
     },
-    // set: function(elem, n) {
-    //   this[elem] = n
-    // },
     setXy: function({ x, y }) {
       this.x = x
       this.y = y
@@ -123,10 +113,8 @@ function init() {
 
 
   const getRandomToy = () => {
-    return ['bunny', 'duck-yellow', 'duck-pink', 'star', 'water-melon', 'panda', 'dino', 'roboto-san', 'penguin'][randomN(9) - 1]
+    return ['bunny', 'duck-yellow', 'duck-pink', 'star', 'water-melon', 'panda', 'dino', 'roboto-san', 'roboto-sama', 'penguin', 'tortoise'][randomN(11) - 1]
   }
-
-  // const toyTypes = 'water-melon'
 
   new Array(settings.capsuleNo).fill('').forEach(() => {
     const capsule = Object.assign(document.createElement('div'), 
@@ -220,15 +208,6 @@ function init() {
     }
   }
 
-  // const isCapsuleAvailable = c => {
-  //   if (c.selected) return
-  //   const { x: exitX, y: exitY, width: exitWidth, height: exitHeight } = elements.exit.getBoundingClientRect()
-  //   return (c.x + c.radius) > (exitX - left)
-  //   && (c.x - c.radius) < (exitX + exitWidth - left)
-  //   && (c.y + c.radius) > (exitY - top)
-  //   && (c.y - c.radius) < (exitY + exitHeight - top)
-  // }
-
   const shake = () => {
     capsuleData.forEach(c => {
       c.velocity.setAngle(degToRad(randomN(270)))
@@ -259,9 +238,6 @@ function init() {
     }
   }
 
-  // const checkCapsuleRelease = () => {
-  //   elements.exit.classList[capsuleData.some(c => !c.selected && isCapsuleAvailable(c)) ? 'add' : 'remove']('available')
-  // }
 
   const closeFlap = () => {
     if (settings.flapRotate < 0) {
@@ -278,7 +254,6 @@ function init() {
         settings.isHandleLocked = false
       } else {
         rotateLines([ -1, 1, 2 ])
-        // checkCapsuleRelease()
       }
       updateLines()
       setTimeout(closeFlap, 30)
@@ -295,11 +270,10 @@ function init() {
     c.el.addEventListener('click', ()=> {
       const { width: bodyWidth, height: bodyHeight } = elements.body.getBoundingClientRect()
 
-      // if (isCapsuleAvailable(c)) {
         elements.body.classList.add('lock')
         c.el.classList.add('enlarge')
         c.selected = true
-        // checkCapsuleRelease()
+
         setStyles({
           el : c.el,
           x: (bodyWidth / 2) - left,
@@ -318,7 +292,6 @@ function init() {
           })
           settings.collectedNo++
         }, 1800)
-        // }
     })
     setStyles(c)
   })
@@ -455,8 +428,6 @@ function init() {
     settings.handleDeg = deg
 
     const diff = settings.handleDeg - settings.prevHandleDeg
-
-    // elements.indicator.innerHTML = `rotate: ${settings.handleRotate} deg: ${deg} diff:${diff} leverDeg:${settings.handleDeg} prevHandleDeg:${settings.prevHandleDeg}`
     
     if (diff >= 1) {
       setStyles({
@@ -469,7 +440,7 @@ function init() {
     if (settings.handleRotate > 350) {
       setStyles({
         el: elements.handle,
-        deg: 0
+        deg: 10
       })
       release()
       settings.isTurningHandle = false
@@ -489,7 +460,6 @@ function init() {
     window.addEventListener(action, rotateHandle) 
   })
 
-  elements.releaseButton.addEventListener('click', release)
   elements.shakeButton.addEventListener('click', shake)
   elements.seeInsideButton.addEventListener('click', ()=> {
     elements.gachaMachine.classList.toggle('see-through')
