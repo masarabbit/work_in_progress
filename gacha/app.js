@@ -26,7 +26,7 @@ function init() {
     circle: document.querySelector('.circle'),
     handle: document.querySelector('.handle'),
     toyBox: document.querySelector('.toy-box'),
-    hole: document.querySelector('.hole'),
+    exit: document.querySelector('.exit'),
   }
 
   const vector = {
@@ -205,7 +205,6 @@ function init() {
   const getNewPosBasedOnTarget = ({ start, target, distance: d, fullDistance }) => {
     const { x: aX, y: aY } = start
     const { x: bX, y: bY } = target
-
     const remainingD = fullDistance - d
     return {
       x: Math.round(((remainingD * aX) + (d * bX)) / fullDistance),
@@ -213,12 +212,13 @@ function init() {
     }
   }
 
-  const isWithinHole = c => {
-    const { x: holeX, y: holeY, width: holeWidth, height: holeHeight } = elements.hole.getBoundingClientRect()
-    return (c.x + c.radius) > (holeX - left)
-    && (c.x - c.radius) < (holeX + holeWidth - left)
-    && (c.y + c.radius) > (holeY - top)
-    && (c.y - c.radius) < (holeY + holeHeight - top)
+  const isCapsuleAvailable = c => {
+    if (c.selected) return
+    const { x: exitX, y: exitY, width: exitWidth, height: exitHeight } = elements.exit.getBoundingClientRect()
+    return (c.x + c.radius) > (exitX - left)
+    && (c.x - c.radius) < (exitX + exitWidth - left)
+    && (c.y + c.radius) > (exitY - top)
+    && (c.y - c.radius) < (exitY + exitHeight - top)
   }
 
   const shake = () => {
@@ -251,6 +251,10 @@ function init() {
     }
   }
 
+  // const checkCapsuleRelease = () => {
+  //   elements.exit.classList[capsuleData.some(c => !c.selected && isCapsuleAvailable(c)) ? 'add' : 'remove']('available')
+  // }
+
   const closeFlap = () => {
     if (settings.flapRotate < 0) {
       settings.flapRotate+= 1
@@ -265,6 +269,7 @@ function init() {
         })
       } else {
         rotateLines([ -1, 1, 2 ])
+        // checkCapsuleRelease()
       }
       updateLines()
       setTimeout(closeFlap, 30)
@@ -280,10 +285,11 @@ function init() {
     c.el.addEventListener('click', ()=> {
       const { width: bodyWidth, height: bodyHeight } = elements.body.getBoundingClientRect()
 
-      if (isWithinHole(c)) {
+      if (isCapsuleAvailable(c)) {
           elements.body.classList.add('lock')
           c.el.classList.add('enlarge')
           c.selected = true
+          // checkCapsuleRelease()
           setStyles({
             el : c.el,
             x: (bodyWidth / 2) - left,
@@ -356,7 +362,7 @@ function init() {
 
   const hitCheckGachaMachineWalls = c => {
     const buffer = 5
-    if (c.x + (c.radius + buffer) > width) {
+    if (c.x + c.radius + buffer > width) {
       c.x = width - (c.radius + buffer)
       c.velocity.x = c.velocity.x * c.bounce
     }
@@ -364,8 +370,8 @@ function init() {
       c.x = c.radius
       c.velocity.x = c.velocity.x * c.bounce
     }
-    if (c.y + c.radius > height) {
-      c.y = height - c.radius
+    if (c.y + c.radius + buffer > height) {
+      c.y = height - c.radius - buffer
       c.velocity.y = c.velocity.y * c.bounce
     }
     if (c.y - c.radius < 0) {
@@ -373,6 +379,7 @@ function init() {
       c.velocity.y = c.velocity.y * c.bounce
     }
   }
+
 
   const animateCapsules = () => {
     capsuleData.forEach((c, i) => {
@@ -440,10 +447,10 @@ function init() {
 
     // elements.indicator.innerHTML = `rotate: ${settings.handleRotate} deg: ${deg} diff:${diff} leverDeg:${settings.handleDeg} prevHandleDeg:${settings.prevHandleDeg}`
     
-    if (settings.prevHandleDeg === 0 || diff >= 1) {
+    if (diff >= 1) {
       setStyles({
         el: elements.handle,
-        deg: settings.prevHandleDeg + diff
+        deg: settings.handleRotate
       })
     }
 
@@ -471,12 +478,11 @@ function init() {
     window.addEventListener(action, rotateHandle) 
   })
 
-
   elements.releaseButton.addEventListener('click', release)
   elements.shakeButton.addEventListener('click', shake)
   elements.seeInsideButton.addEventListener('click', ()=> {
     elements.gachaMachine.classList.toggle('see-through')
-    elements.seeInsideButton.innerHTML = elements.gachaMachine.classList.contains('see-through') ? 'hide' : 'see inside!'
+    elements.seeInsideButton.innerHTML = elements.gachaMachine.classList.contains('see-through') ? 'hide' : 'see inside'
   })
 
   updateLines()
