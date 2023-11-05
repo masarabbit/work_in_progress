@@ -8,6 +8,7 @@ function init() {
   const settings = {
     capsuleNo: 20,
     isTurningHandle: false,
+    isHandleLocked: false,
     handlePrevDeg: 0,
     handleDeg: 0,
     handleRotate: 0,
@@ -26,7 +27,7 @@ function init() {
     circle: document.querySelector('.circle'),
     handle: document.querySelector('.handle'),
     toyBox: document.querySelector('.toy-box'),
-    exit: document.querySelector('.exit'),
+    // exit: document.querySelector('.exit'),
   }
 
   const vector = {
@@ -120,12 +121,19 @@ function init() {
     }
   ]
 
+
+  const getRandomToy = () => {
+    return ['bunny', 'duck-yellow', 'duck-pink', 'star', 'water-melon', 'panda', 'dino', 'roboto-san', 'penguin'][randomN(9) - 1]
+  }
+
+  // const toyTypes = 'water-melon'
+
   new Array(settings.capsuleNo).fill('').forEach(() => {
     const capsule = Object.assign(document.createElement('div'), 
       { className: 'capsule-wrapper pix',
         innerHTML: `<div class="capsule">
                       <div class="lid"></div>
-                      <div class="toy bunny pix"></div>
+                      <div class="${getRandomToy()} toy pix"></div>
                       <div class="base ${['red', 'pink', 'white', 'blue'][randomN(4) - 1]}"></div>
                     </div>`
     })
@@ -212,14 +220,14 @@ function init() {
     }
   }
 
-  const isCapsuleAvailable = c => {
-    if (c.selected) return
-    const { x: exitX, y: exitY, width: exitWidth, height: exitHeight } = elements.exit.getBoundingClientRect()
-    return (c.x + c.radius) > (exitX - left)
-    && (c.x - c.radius) < (exitX + exitWidth - left)
-    && (c.y + c.radius) > (exitY - top)
-    && (c.y - c.radius) < (exitY + exitHeight - top)
-  }
+  // const isCapsuleAvailable = c => {
+  //   if (c.selected) return
+  //   const { x: exitX, y: exitY, width: exitWidth, height: exitHeight } = elements.exit.getBoundingClientRect()
+  //   return (c.x + c.radius) > (exitX - left)
+  //   && (c.x - c.radius) < (exitX + exitWidth - left)
+  //   && (c.y + c.radius) > (exitY - top)
+  //   && (c.y - c.radius) < (exitY + exitHeight - top)
+  // }
 
   const shake = () => {
     capsuleData.forEach(c => {
@@ -267,6 +275,7 @@ function init() {
           lineData[i][lineData[i].point].x = item.x
           lineData[i][lineData[i].point].y = item.y
         })
+        settings.isHandleLocked = false
       } else {
         rotateLines([ -1, 1, 2 ])
         // checkCapsuleRelease()
@@ -278,6 +287,7 @@ function init() {
 
   const release = () => {
     settings.flapRotate = 0
+    settings.isHandleLocked = true
     setTimeout(openFlap, 30)
   }
 
@@ -285,30 +295,30 @@ function init() {
     c.el.addEventListener('click', ()=> {
       const { width: bodyWidth, height: bodyHeight } = elements.body.getBoundingClientRect()
 
-      if (isCapsuleAvailable(c)) {
-          elements.body.classList.add('lock')
-          c.el.classList.add('enlarge')
-          c.selected = true
-          // checkCapsuleRelease()
+      // if (isCapsuleAvailable(c)) {
+        elements.body.classList.add('lock')
+        c.el.classList.add('enlarge')
+        c.selected = true
+        // checkCapsuleRelease()
+        setStyles({
+          el : c.el,
+          x: (bodyWidth / 2) - left,
+          y: (bodyHeight / 2) - top,
+          deg: 0
+        })
+        setStyles({ el: c.toy, deg: 0 })
+        setTimeout(()=> c.el.classList.add('open'), 700)
+        setTimeout(()=> {
+          elements.body.classList.remove('lock')
+          c.toy.classList.add('collected')
           setStyles({
             el : c.el,
-            x: (bodyWidth / 2) - left,
-            y: (bodyHeight / 2) - top,
-            deg: 0
+            x: toyBoxLeft - left + 16 + calcCollectedX(),
+            y: toyBoxTop - top + 16 + calcCollectedY(),
           })
-          setStyles({ el: c.toy, deg: 0 })
-          setTimeout(()=> c.el.classList.add('open'), 700)
-          setTimeout(()=> {
-            elements.body.classList.remove('lock')
-            c.toy.classList.add('collected')
-            setStyles({
-              el : c.el,
-              x: toyBoxLeft - left + 16 + calcCollectedX(),
-              y: toyBoxTop - top + 16 + calcCollectedY(),
-            })
-            settings.collectedNo++
-          }, 1800)
-        }
+          settings.collectedNo++
+        }, 1800)
+        // }
     })
     setStyles(c)
   })
@@ -414,6 +424,7 @@ function init() {
 
 
   const grabHandle = e => {
+    if (settings.isHandleLocked) return
     settings.isTurningHandle = true
     settings.handleDeg = radToDeg(angleTo({
       a: {
@@ -434,7 +445,7 @@ function init() {
   }
 
   const rotateHandle = e => {
-    if (!settings.isTurningHandle) return
+    if (!settings.isTurningHandle || settings.isHandleLocked) return
   
     settings.prevHandleDeg = settings.handleDeg 
     const deg = radToDeg(angleTo({
@@ -455,7 +466,7 @@ function init() {
     }
 
     if (diff > 0 && diff < 50) settings.handleRotate += diff
-    if (settings.handleRotate > 365) {
+    if (settings.handleRotate > 350) {
       setStyles({
         el: elements.handle,
         deg: 0
