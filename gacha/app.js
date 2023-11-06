@@ -81,6 +81,7 @@ function init() {
   const getPage = (e, type) => e.type[0] === 'm' ? e[`page${type}`] : e.touches[0][`page${type}`]
   const calcCollectedX = () => settings.collectedNo % 10 * 32
   const calcCollectedY = () => Math.floor(settings.collectedNo / 10) * 32
+  const nearest360 = n => n === 0 ? 0 : (n - 1) + Math.abs(((n - 1) % 360) - 360)
 
   const setStyles = ({ el, x, y, w, deg }) =>{
     if (w) el.style.width = w
@@ -280,7 +281,7 @@ function init() {
           el : c.el,
           x: (bodyWidth / 2) - left,
           y: (bodyHeight / 2) - top,
-          deg: 0
+          deg: nearest360(c.deg)
         })
         setStyles({ el: c.toy, deg: 0 })
         setTimeout(()=> c.el.classList.add('open'), 700)
