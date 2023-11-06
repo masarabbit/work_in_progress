@@ -70,7 +70,7 @@ p, h1, h2, h3, h4 {
 
 .gacha-machine.see-through::after,
 .gacha-machine.see-through .circle {
-  opacity: 0.2;
+  opacity: 0.3;
 }
 
 .wrapper.lock {
