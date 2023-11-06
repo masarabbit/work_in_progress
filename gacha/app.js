@@ -15,7 +15,7 @@ function init() {
 
   const elements = {
     body: document.querySelector('.wrapper'),
-    gachaMachine: document.querySelector('.gacha-machine'),
+    capsuleMachine: document.querySelector('.capsule-machine'),
     shakeButton: document.querySelector('.shake'),
     seeInsideButton: document.querySelector('.see-inside'),
     circle: document.querySelector('.circle'),
@@ -125,7 +125,7 @@ function init() {
                       <div class="base ${['red', 'pink', 'white', 'blue'][randomN(4) - 1]}"></div>
                     </div>`
     })
-    elements.gachaMachine.appendChild(capsule)
+    elements.capsuleMachine.appendChild(capsule)
   })
   lineData.forEach(() => {
     ;[
@@ -133,7 +133,7 @@ function init() {
         { className: 'line-start', innerHTML: '<div class="line"></div>'}),
       Object.assign(document.createElement('div'), { className: 'line-end' })
     ].forEach(ele => {
-      elements.gachaMachine.appendChild(ele)
+      elements.capsuleMachine.appendChild(ele)
     })
   })
 
@@ -141,11 +141,11 @@ function init() {
   const lines = document.querySelectorAll('.line')
   const lineEnds = document.querySelectorAll('.line-end')
   const toys = document.querySelectorAll('.toy')
-  const { left: toyBoxLeft, top: toyBoxTop } = elements.toyBox.getBoundingClientRect()
-  const { width, height, top, left } = elements.gachaMachine.getBoundingClientRect()
+  const { width: capsuleMachineWidth, height: capsuleMachineHeight } = elements.capsuleMachine.getBoundingClientRect()
 
   const handleAxis = () => {
     const { left: handleX, top: handleY } = elements.circle.getBoundingClientRect()
+    const { top, left } = elements.capsuleMachine.getBoundingClientRect()
     return {
       x: handleX - left + 80,
       y: handleY - top + 80
@@ -186,8 +186,8 @@ function init() {
     data.velocity.setLength(10)
     data.velocity.setAngle(degToRad(90))
     data.setXy({
-      x: randomN(width - 32), 
-      y: randomN(height - 250), 
+      x: randomN(capsuleMachineWidth - 32), 
+      y: randomN(capsuleMachineHeight - 250), 
     })
 
     // gravity
@@ -269,6 +269,8 @@ function init() {
   capsuleData.forEach(c => {
     c.el.addEventListener('click', ()=> {
       const { width: bodyWidth, height: bodyHeight } = elements.body.getBoundingClientRect()
+      const { top, left } = elements.capsuleMachine.getBoundingClientRect()
+      const { left: toyBoxLeft, top: toyBoxTop } = elements.toyBox.getBoundingClientRect()
 
         elements.body.classList.add('lock')
         c.el.classList.add('enlarge')
@@ -328,7 +330,6 @@ function init() {
 
         if (fullDistance < c.radius) {
           c.velocity.multiplyBy(-0.6)
-
           const overlap = fullDistance - (c.radius)
           c.setXy(
             getNewPosBasedOnTarget({
@@ -343,18 +344,18 @@ function init() {
     })
   }
 
-  const hitCheckGachaMachineWalls = c => {
+  const hitCheckCapsuleMachineWalls = c => {
     const buffer = 5
-    if (c.x + c.radius + buffer > width) {
-      c.x = width - (c.radius + buffer)
+    if (c.x + c.radius + buffer > capsuleMachineWidth) {
+      c.x = capsuleMachineWidth - (c.radius + buffer)
       c.velocity.x = c.velocity.x * c.bounce
     }
     if (c.x - (c.radius + buffer) < 0) {
       c.x = c.radius
       c.velocity.x = c.velocity.x * c.bounce
     }
-    if (c.y + c.radius + buffer > height) {
-      c.y = height - c.radius - buffer
+    if (c.y + c.radius + buffer > capsuleMachineHeight) {
+      c.y = capsuleMachineHeight - c.radius - buffer
       c.velocity.y = c.velocity.y * c.bounce
     }
     if (c.y - c.radius < 0) {
@@ -376,7 +377,7 @@ function init() {
 
       spaceOutCapsules(c)
       hitCheckLines(c)
-      hitCheckGachaMachineWalls(c)
+      hitCheckCapsuleMachineWalls(c)
 
       if (Math.abs(c.prevX - c.x) < 2 && Math.abs(c.prevY - c.y) < 2) {
         c.velocity.setXy({ x: 0, y: 0 })
@@ -398,6 +399,7 @@ function init() {
 
   const grabHandle = e => {
     if (settings.isHandleLocked) return
+    const { top, left } = elements.capsuleMachine.getBoundingClientRect()
     settings.isTurningHandle = true
     settings.handleDeg = radToDeg(angleTo({
       a: {
@@ -419,6 +421,7 @@ function init() {
 
   const rotateHandle = e => {
     if (!settings.isTurningHandle || settings.isHandleLocked) return
+    const { top, left } = elements.capsuleMachine.getBoundingClientRect()
   
     settings.prevHandleDeg = settings.handleDeg 
     const deg = radToDeg(angleTo({
@@ -461,8 +464,8 @@ function init() {
 
   elements.shakeButton.addEventListener('click', shake)
   elements.seeInsideButton.addEventListener('click', ()=> {
-    elements.gachaMachine.classList.toggle('see-through')
-    elements.seeInsideButton.innerHTML = elements.gachaMachine.classList.contains('see-through') ? 'hide' : 'see inside'
+    elements.capsuleMachine.classList.toggle('see-through')
+    elements.seeInsideButton.innerHTML = elements.capsuleMachine.classList.contains('see-through') ? 'hide' : 'see inside'
   })
 
   updateLines()
