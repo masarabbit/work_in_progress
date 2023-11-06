@@ -456,7 +456,7 @@ function init() {
   })
 
   ;['mouseup', 'mouseleave', 'touchend'].forEach(action => {
-    elements.handle.addEventListener(action, releaseHandle)
+    elements.circle.addEventListener(action, releaseHandle)
   })
 
   ;['mousemove', 'touchmove'].forEach(action => {
