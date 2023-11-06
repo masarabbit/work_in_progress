@@ -113,7 +113,7 @@ function init() {
 
 
   const getRandomToy = () => {
-    return ['bunny', 'duck-yellow', 'duck-pink', 'star', 'water-melon', 'panda', 'dino', 'roboto-san', 'roboto-sama', 'penguin', 'tortoise'][randomN(11) - 1]
+    return ['bunny', 'duck-yellow', 'duck-pink', 'star', 'water-melon', 'panda', 'dino', 'roboto-san', 'roboto-sama', 'penguin', 'turtle'][randomN(11) - 1]
   }
 
   new Array(settings.capsuleNo).fill('').forEach(() => {
@@ -446,7 +446,6 @@ function init() {
       settings.isTurningHandle = false
     }
   }
-
 
   ;['mousedown', 'touchstart'].forEach(action => {
     elements.handle.addEventListener(action, grabHandle)
