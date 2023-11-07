@@ -14,7 +14,7 @@ function init() {
   }
 
   const elements = {
-    body: document.querySelector('.wrapper'),
+    wrapper: document.querySelector('.wrapper'),
     capsuleMachine: document.querySelector('.capsule-machine'),
     shakeButton: document.querySelector('.shake'),
     seeInsideButton: document.querySelector('.see-inside'),
@@ -215,6 +215,9 @@ function init() {
       c.velocity.setXy({ x: 10, y: 10})        
       c.accelerate(c.acceleration)
     })
+    elements.capsuleMachine.classList.add('shake')
+    setTimeout(()=> elements.capsuleMachine.classList.remove('shake'), 500)
+
   }
 
   const rotateLines = angles => {
@@ -269,11 +272,11 @@ function init() {
 
   capsuleData.forEach(c => {
     c.el.addEventListener('click', ()=> {
-      const { width: bodyWidth, height: bodyHeight } = elements.body.getBoundingClientRect()
+      const { width: bodyWidth, height: bodyHeight } = elements.wrapper.getBoundingClientRect()
       const { top, left } = elements.capsuleMachine.getBoundingClientRect()
       const { left: toyBoxLeft, top: toyBoxTop } = elements.toyBox.getBoundingClientRect()
 
-        elements.body.classList.add('lock')
+        elements.wrapper.classList.add('lock')
         c.el.classList.add('enlarge')
         c.selected = true
 
@@ -286,7 +289,7 @@ function init() {
         setStyles({ el: c.toy, deg: 0 })
         setTimeout(()=> c.el.classList.add('open'), 700)
         setTimeout(()=> {
-          elements.body.classList.remove('lock')
+          elements.wrapper.classList.remove('lock')
           c.toy.classList.add('collected')
           setStyles({
             el : c.el,
