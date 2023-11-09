@@ -52,6 +52,7 @@ div {
 }
 
 .bunny {
+  border: yellow 1px solid;
   width: 300px;
   height: 300px;
 }
@@ -217,6 +218,7 @@ div {
   width: calc(var(--w) * var(--m));
   height: calc(var(--h) * var(--m));
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAGCAYAAADDl76dAAAAAXNSR0IArs4c6QAAACZJREFUKFNjZBD0+M9ARcA4Eg0EhR+1wvH9DkZGeHxQauj7HWCzAF4qC2fF8n2/AAAAAElFTkSuQmCC);
+  bottom: 20px; /* maybe adjust this to walk ?*/
 }
 
 
