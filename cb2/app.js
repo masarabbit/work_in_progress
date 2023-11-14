@@ -1,5 +1,5 @@
 function init() {  
-  console.log('cb2')
+
   
   // TODO need someway of drawing map
   // TODO refactor to simplify functions
@@ -9,11 +9,9 @@ function init() {
     wrapper: document.querySelector('.wrapper'),
     mapCover: document.querySelector('.map-cover'), 
     player: document.querySelector('.player'), 
-    mapImage: {
-      el: document.querySelector('.map-image'),
-      // ctx: null,
-    },
-    indicator: document.querySelector('.indicator')
+    mapImage: document.querySelector('.map-image'),
+    indicator: document.querySelector('.indicator'),
+    cursor: document.querySelector('.cursor')
   }
 
   const decompress = arr =>{
@@ -32,7 +30,6 @@ function init() {
   const player = {
     pos: 314,
     frameOffset: 0,
-    // animationTimer: null,
     el: elements.player,
     sprite: document.querySelector('.player').childNodes[1],
     facingDirection: 'down',
@@ -42,27 +39,38 @@ function init() {
   }
 
   const settings = {
-    // d: 32,
     transitionTimer: null,
     isWindowActive: false,
-    npcs: [],
+    npcs: [
+      {
+        id: 'dog_1',
+        el: Object.assign(document.createElement('div'), 
+        { className: 'db',
+        }),
+        x: 0,
+        y: 0,
+        pos: 100
+      }
+    ],
     mapImage: {
-      el: elements.mapImage.el.parentNode,
-      canvas: elements.mapImage.el,
-      ctx: elements.mapImage.el.getContext('2d'),
-      x: 0,
-      y: 0,
-      w: 0,
-      h: 0
+      el: elements.mapImage.parentNode,
+      canvas: elements.mapImage,
+      ctx: elements.mapImage.getContext('2d'),
+      x: 0, y: 0, w: 0, h: 0
     },
     map: {
       el: elements.mapCover, 
-      w: 30,
-      h: 20,
+      w: 30, h: 20,
       d: 32,
       column: 30,
       row: 20,
+      data: [],
+      blocks: [],
     }, 
+    cursor: {
+      el: elements.cursor,
+      x: 0, y: 0,
+    }
   }
 
 
@@ -78,6 +86,8 @@ function init() {
     if (h) el.style.height = px(h * m)
     el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0})`
   }
+  const nearestN = (n, denom) => n === 0 ? 0 : (n - 1) + Math.abs(((n - 1) % denom) - denom)
+
 
   const outputMap = ({ i, tile }) => {
     const { column, d } = settings.map
@@ -86,8 +96,6 @@ function init() {
     settings.mapImage.ctx.fillStyle = tile === '$' ? '#a2fcf0' : '#06a1a1'
     settings.mapImage.ctx.fillRect(mapX, mapY, d, d)
   }
-
-
 
   const adjustMapWidthAndHeight = () =>{
     const { offsetWidth: w, offsetHeight: h } = elements.wrapper
@@ -107,7 +115,6 @@ function init() {
     settings.mapImage.y = mapY() * -d + y
     setStyles(settings.mapImage)
     
-  
     settings.mapImage.el.classList.add('transition')
     clearTimeout(settings.transitionTimer)
     settings.transitionTimer = setTimeout(()=> {
@@ -123,29 +130,25 @@ function init() {
 
   const setupMap = () => {
     const { d, column, row } = settings.map
-    // settings.map.data = new Array(column * row).fill('x')
     settings.map.data = decompress('$14,2,$17,8,$2,8,$7,1,$4,8,$2,5,$2,1,$3,1,$3,1,$2,5,$2,10,$2,9,$2,4,$4,16,$2,2,$2,4,$4,16,$2,2,$2,4,$6,18,$2,4,$6,18,$4,2,$4,20,$4,2,$1,1,$2,20,$2,28,$2,28,$2,28,$15,1,$29,1,$29,1,$135').map(t => t ||'x')
-    // TODO may add walls
     settings.mapImage.w = column * d
     settings.mapImage.h = row * d
 
-  
     setUpCanvas(settings.mapImage)
     adjustMapWidthAndHeight()
 
     settings.map.data.forEach((tile, i) => {
       outputMap({ i, tile })
     })
-
   }
 
   const noWall = pos =>{    
-    const { map: { data } } = settings
-    if (!data[pos] || player.pos === pos ) return false
+    const { map: { data, blocks }, npcs } = settings
+    if (!data[pos] || player.pos === pos || blocks[pos] || npcs.some(npc => npc.pos === pos)) return false
     return settings.map.data[pos] !== '$'
   }
 
-  const handleWalk = dir =>{
+  const handleWalk = dir => {
     if (player.walkingDirection !== dir){
       clearInterval(player.walkingInterval)
       player.walkingDirection = dir
@@ -156,7 +159,6 @@ function init() {
       }, 150)
     }
   }
-
 
   const getWalkConfig = dir => {
     const { column , d } = settings.map
@@ -171,7 +173,6 @@ function init() {
   const walk = ({ actor, dir }) => {
     if (!dir || player.pause) return
     const { diff, para, dist } = getWalkConfig(dir) 
-
     // TODO add logic for turning animation
   
     if (noWall(actor.pos + diff)) {
@@ -190,16 +191,55 @@ function init() {
 
   const handleKeyAction = e => {
     const key = e.key ? e.key.toLowerCase().replace('arrow','') : e
-    if (e.key && e.key[0] === 'A'){
-      handleWalk(key)
+    if (e.key && e.key[0] === 'A') handleWalk(key)
+  }
+
+  const placeBlock = () => {
+    const { d, column } = settings.map
+    const { x, y } = settings.cursor
+    const { left, top } = settings.mapImage.canvas.getBoundingClientRect()
+    const drawPos = {
+      x: x - left + window.scrollX,
+      y: y - top + window.scrollY
+    }
+    const index = (((drawPos.y) / d) * column) + drawPos.x / d
+
+    if (noWall(index)) {
+      settings.map.blocks[index] = 'b'
+      settings.mapImage.ctx.fillStyle = '#ffffff'
+      settings.mapImage.ctx.fillRect(drawPos.x, drawPos.y, d, d) 
     }
   }
 
+  const moveCursor = e => {
+    const { d } = settings.map
+    const { left, top } = settings.mapImage.canvas.getBoundingClientRect()
+    settings.cursor.x = nearestN(e.pageX - left - window.scrollX, d) - d + left + window.scrollX
+    settings.cursor.y = nearestN(e.pageY - top - window.scrollY, d) - d + top + window.scrollY
+
+    setStyles(settings.cursor)
+  }
+
+  const addNpcs = () => {
+    settings.npcs.forEach(npc => {
+      const { pos } = npc
+      const { column, d } = settings.map
+      npc.x = Math.floor(pos % column) * d
+      npc.y = Math.floor(pos / column) * d
+      setStyles(npc)
+      settings.mapImage.el.appendChild(npc.el)
+    })
+  }
+
+
   setupMap()
+  addNpcs()
 
   console.log('settings', settings)
   
   window.addEventListener('resize', adjustMapWidthAndHeight)
+  window.addEventListener('mousemove', moveCursor )
+  settings.map.el.addEventListener('click', placeBlock)
   window.addEventListener('keyup', () => {
     player.walkingDirection = null
     clearInterval(player.walkingInterval)

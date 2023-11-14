@@ -23,6 +23,7 @@ body {
 canvas {
   position: absolute;
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAADtJREFUWEft10ERADAMArBW9CzPRndTQR/BAFx+dAUz504H+8sAAgQIECBAgAABAgQIECCwQ+CvSD7kB6O0a0FtUcGvAAAAAElFTkSuQmCC);
+  /* border: 1px solid green; */
 }
 
 .flex-center {
@@ -36,6 +37,7 @@ canvas {
 }
 
 .map-image-wrapper {
+  position: absolute;
   transition: 0.3s;
 }
 
@@ -60,6 +62,8 @@ canvas {
   background-repeat: repeat;
   image-rendering: pixelated;
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAADtJREFUWEft10ERADAMArBW9CzPRndTQR/BAFx+dAUz504H+8sAAgQIECBAgAABAgQIECCwQ+CvSD7kB6O0a0FtUcGvAAAAAElFTkSuQmCC);
+  pointer-events: all;
+  /* border: 1px solid red; */
 }
 
 
@@ -83,6 +87,26 @@ canvas {
   image-rendering: pixelated;
 }
 
+.db {
+  position: absolute;
+  --size: 32px;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background-color: darkslategray;
+  z-index: 1;
+}
+
+.cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  --size: 32px;
+  width: var(--size);
+  height: var(--size);
+  border: 1px solid rgb(252, 252, 130);
+}
 
 
 .sign {
