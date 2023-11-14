@@ -49,7 +49,15 @@ function init() {
         }),
         x: 0,
         y: 0,
-        pos: 100
+        pos: 100,
+        // start: 31,
+        goal: 0,
+        carryOn: true,
+        delay: 10,
+        // displayTimer: null,
+        motionTimer: null,
+        searchMemory: null,
+        route: [],
       }
     ],
     mapImage: {
@@ -70,7 +78,7 @@ function init() {
     cursor: {
       el: elements.cursor,
       x: 0, y: 0,
-    }
+    },
   }
 
 
@@ -142,9 +150,94 @@ function init() {
     })
   }
 
+  const defaultPathMemory = arr => arr.map(()=>{
+    return {
+      path: null,
+      searched: false,
+      prev: null
+    }
+  })
+
+  const y = i => Math.floor(i / settings.map.column)
+  const x = i => i % settings.map.column
+  const distance = (a, b) => Math.abs(x(a) - x(b)) + Math.abs(y(a) - y(b))
+
+  const chainMotion = ({ npc, instruction, index }) => {
+    if (index >= instruction.length) return
+    npc.pos = instruction[index]
+    moveNpc({ npc, pos: instruction[index] })
+    npc.motionTimer = setTimeout(()=>{
+      chainMotion({ npc, instruction, index: index + 1 })
+    }, 500)
+  }
+
+
+  const selectPath = ({ character, current }) =>{
+    character.searchMemory[current].path = 'path'
+    character.route.push(current)
+  
+    if (character.searchMemory[current].prev) {
+      selectPath({ 
+        character, 
+        current: character.searchMemory[current].prev 
+      })
+    } else {
+      chainMotion({
+        npc: character,
+        instruction: character.route.reverse(),
+        index: 0
+      })
+    }
+  }
+
+  const decideNextMove = ({ character, current, count }) =>{
+    const { pos, goal, searchMemory } = character
+    const { column: w } = settings.map
+    if (!character.carryOn) return
+    const possibleDestination = [1, -1, -w, w].map(d => d + current)
+    if (!possibleDestination.some(c => c === goal)) {
+      const mapInfo = []
+      possibleDestination.forEach(cell =>{  
+        if (noWall(cell) && !searchMemory[cell].searched && cell !== pos) {
+          mapInfo.push({ 
+            cell, 
+            prev: current, 
+            distanceToGoal: distance(goal, cell) 
+          })
+        }
+      })
+      const minValue = Math.min(...mapInfo.map(c => c.distanceToGoal))
+      mapInfo.filter(c => c.distanceToGoal === minValue).forEach(c =>{
+        character.searchMemory[c.cell].searched = true 
+        character.searchMemory[c.cell].prev = current 
+        decideNextMove({ 
+          character, 
+          current: c.cell, 
+          count: count + 1 
+        })
+      })
+    } else {
+      character.carryOn = false
+      character.searchMemory[goal].prev = current
+      clearTimeout(character.motionTimer)
+      selectPath({ character, current: goal })
+    }  
+  }
+
+  const triggerNpcMotion = npc => {
+    // console.log('trigger', npc)
+    npc.searchMemory = defaultPathMemory(settings.map.data)
+    npc.carryOn = true
+    // clearTimeout(npc.displayTimer)
+    // clearTimeout(npc.motionTimer)
+    npc.goal = player.pos
+    decideNextMove({ character: npc, current: npc.pos })
+  }
+  
+
   const noWall = pos =>{    
     const { map: { data, blocks }, npcs } = settings
-    if (!data[pos] || player.pos === pos || blocks[pos] || npcs.some(npc => npc.pos === pos)) return false
+    if (!data[pos] || blocks[pos] || player.pos === pos || npcs.some(npc => npc.pos === pos)) return false
     return settings.map.data[pos] !== '$'
   }
 
@@ -176,17 +269,18 @@ function init() {
     // TODO add logic for turning animation
   
     if (noWall(actor.pos + diff)) {
-      if (actor === player) {
+      if (actor === player) { // TODO may not require this if this is only used for player
         settings.mapImage[para] += dist
         setStyles(settings.mapImage)
         player.pos += diff
         elements.indicator.innerHTML = `pos:${player.pos} dataX:${mapX()} dataY:${mapY()}`
-      } else {
-        actor[para] -= dist // note that dist needs to be flipped around
-        setPos(actor)
-        actor.pos += diff
-      }
+      } 
     }
+
+    settings.npcs.forEach(npc => {
+      // clearTimeout(npc.displayTimer)
+      triggerNpcMotion(npc)
+    })
   }
 
   const handleKeyAction = e => {
@@ -220,14 +314,19 @@ function init() {
     setStyles(settings.cursor)
   }
 
+  const moveNpc = ({ npc, pos }) => {
+    const { column, d } = settings.map
+    npc.x = Math.floor(pos % column) * d
+    npc.y = Math.floor(pos / column) * d
+    setPos(npc)
+  }
+
   const addNpcs = () => {
     settings.npcs.forEach(npc => {
       const { pos } = npc
-      const { column, d } = settings.map
-      npc.x = Math.floor(pos % column) * d
-      npc.y = Math.floor(pos / column) * d
-      setStyles(npc)
+      moveNpc({ npc, pos })
       settings.mapImage.el.appendChild(npc.el)
+      triggerNpcMotion(npc)
     })
   }
 

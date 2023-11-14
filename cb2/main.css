@@ -95,6 +95,7 @@ canvas {
   border-radius: 50%;
   background-color: darkslategray;
   z-index: 1;
+  transition: 0.5s;
 }
 
 .cursor {
