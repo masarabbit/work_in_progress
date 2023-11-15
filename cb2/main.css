@@ -97,6 +97,9 @@ canvas {
   z-index: 1;
   transition: 0.5s;
 }
+.db.attacking {
+  background-color: red;
+}
 
 .cursor {
   position: absolute;

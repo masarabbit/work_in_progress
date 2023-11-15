@@ -1,8 +1,10 @@
 function init() {  
 
   
-  // TODO need someway of drawing map
   // TODO refactor to simplify functions
+  // TODO change how the block is added so it can be removed more easily
+  // TODO make npc run away
+  // TODO enable npc to break block
 
 
   const elements = {
@@ -58,6 +60,9 @@ function init() {
         motionTimer: null,
         searchMemory: null,
         route: [],
+        isHunting: true,
+        track: [],
+        pause: false
       }
     ],
     mapImage: {
@@ -152,7 +157,7 @@ function init() {
 
   const defaultPathMemory = arr => arr.map(()=>{
     return {
-      path: null,
+      // path: null,
       searched: false,
       prev: null
     }
@@ -162,18 +167,52 @@ function init() {
   const x = i => i % settings.map.column
   const distance = (a, b) => Math.abs(x(a) - x(b)) + Math.abs(y(a) - y(b))
 
-  const chainMotion = ({ npc, instruction, index }) => {
-    if (index >= instruction.length) return
-    npc.pos = instruction[index]
-    moveNpc({ npc, pos: instruction[index] })
-    npc.motionTimer = setTimeout(()=>{
-      chainMotion({ npc, instruction, index: index + 1 })
-    }, 500)
+  const chainMotion = ({ npc, route, index }) => {
+    const newPos = route[index]
+    const { column } = settings.map
+
+    // This bit ensures npc doesn't stay in one place when it get's trapped
+    npc.track.push(newPos)
+    npc.track = npc.track.slice(-9)
+    if (npc.track.filter(cell => cell === newPos).length > 4) {
+      npc.isHunting = false
+      npc.track.length = 0
+
+      // TODO npc identifies wall close by and attacks it
+      const wallCloseBy = [newPos + 1, newPos - 1, newPos + column, newPos - column].find(p => settings.map.blocks[p])
+      if (wallCloseBy) {
+        clearTimeout(npc.motionTimer)
+        npc.el.classList.add('attacking')
+        npc.pause = true
+        return
+      }
+  
+    } else if (npc.track.length > 4) {
+      npc.isHunting = true
+    }
+
+
+
+
+    if (settings.map.blocks[newPos]) {
+      triggerNpcMotion(npc)
+      return
+    } 
+    npc.pos = newPos
+    moveNpc({ npc, pos: newPos})
+    if (npc.pos === npc.goal || index + 1 >= route.length) {      
+      clearTimeout(npc.motionTimer)
+      console.log('goal')
+    } else {
+      npc.motionTimer = setTimeout(()=>{
+        chainMotion({ npc, route, index: index + 1 })
+      }, 500)
+    }
   }
 
 
   const selectPath = ({ character, current }) =>{
-    character.searchMemory[current].path = 'path'
+    // character.searchMemory[current].path = 'path'
     character.route.push(current)
   
     if (character.searchMemory[current].prev) {
@@ -184,10 +223,53 @@ function init() {
     } else {
       chainMotion({
         npc: character,
-        instruction: character.route.reverse(),
+        route: character.route.reverse(),
         index: 0
       })
     }
+  }
+
+  function avoidPlayer(cpu){
+    const { pos } = cpu
+    const { column } = settings.map
+
+    let motion = [ 1, -1, column, -column ]
+
+    if ([pos + 1, pos + 2, pos + 3, pos + 1 - column, pos + 1 + column].includes(player.pos)){
+      motion = cpu.motion.filter(option => option !== 1)
+    }
+    if ( [pos - 1, pos - 2, pos - 3, pos - 1 - column, pos - 1 + column].includes(player.pos)){
+      motion = cpu.motion.filter(option => option !== -1)
+    }
+
+    // if (cpu.position - width === player.position || cpu.position - (width * 2) === player.position || cpu.position - (width * 3) === player.position || (cpu.position - width) - 1 === player.position || (cpu.position - width) + 1 === player.position ){
+    //   cpu.filteredMotion = cpu.motion.filter(option => {
+    //     return option !== 'up'
+    //   })
+    //   cpu.motion = cpu.filteredMotion
+    // }
+
+    // if (cpu.position + width === player.position || cpu.position + (width * 2) === player.position || cpu.position + (width * 3 ) === player.position || (cpu.position + width) - 1 === player.position || (cpu.position + width) + 1 === player.position){
+    //   cpu.filteredMotion = cpu.motion.filter(option => {
+    //     return option !== 'down'
+    //   })
+    //   cpu.motion = cpu.filteredMotion
+    // }
+
+
+    // //* motion added to go in the opposite direction of player
+    // if (cpu.horizontalPosition > player.horizontalPosition){  //* movement based on target position
+    //   cpu.motion.push('right')
+    // } else {
+    //   cpu.motion.push('left')
+    // }
+
+    // if (cpu.verticalPosition > player.verticalPosition){
+    //   cpu.motion.push('down')
+    // } else {
+    //   cpu.motion.push('up')
+    // }
+    
   }
 
   const decideNextMove = ({ character, current, count }) =>{
@@ -225,11 +307,11 @@ function init() {
   }
 
   const triggerNpcMotion = npc => {
-    // console.log('trigger', npc)
+    console.log('triggerNpcMotion')
+    clearTimeout(npc.motionTimer)
+    if (npc.pause || npc.pos === player.pos) return
     npc.searchMemory = defaultPathMemory(settings.map.data)
     npc.carryOn = true
-    // clearTimeout(npc.displayTimer)
-    // clearTimeout(npc.motionTimer)
     npc.goal = player.pos
     decideNextMove({ character: npc, current: npc.pos })
   }
@@ -276,12 +358,17 @@ function init() {
         elements.indicator.innerHTML = `pos:${player.pos} dataX:${mapX()} dataY:${mapY()}`
       } 
     }
-
+    
     settings.npcs.forEach(npc => {
-      // clearTimeout(npc.displayTimer)
-      triggerNpcMotion(npc)
+      if (!npc.isHunting) triggerNpcMotion(npc)
     })
   }
+
+  setInterval(()=> {
+    settings.npcs.forEach(npc => {
+      if (npc.isHunting) triggerNpcMotion(npc)
+    })
+  }, 600)
 
   const handleKeyAction = e => {
     const key = e.key ? e.key.toLowerCase().replace('arrow','') : e
