@@ -99,11 +99,9 @@ function init() {
 
 
   const outputMap = ({ i, tile }) => {
-    const { column, d } = settings.map
-    const mapX = (i % column) * d
-    const mapY = Math.floor(i / column) * d
+    const { d } = settings.map
     settings.mapImage.ctx.fillStyle = tile === '$' ? '#a2fcf0' : '#06a1a1'
-    settings.mapImage.ctx.fillRect(mapX, mapY, d, d)
+    settings.mapImage.ctx.fillRect(mapX(i) * d, mapY(i) * d, d, d)
   }
 
   const adjustMapWidthAndHeight = () =>{
