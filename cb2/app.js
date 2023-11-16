@@ -1,11 +1,8 @@
 function init() {  
-
   
   // TODO refactor to simplify functions
   // TODO change how the block is added so it can be removed more easily
-  // TODO make npc run away
   // TODO enable npc to break block
-
 
   const elements = {
     wrapper: document.querySelector('.wrapper'),
@@ -33,11 +30,11 @@ function init() {
     pos: 314,
     frameOffset: 0,
     el: elements.player,
-    sprite: document.querySelector('.player').childNodes[1],
-    facingDirection: 'down',
+    sprite: document.querySelector('.player').childNodes[1].childNodes[1],
     walkingDirection: '',
     walkingInterval: '',
     pause: false,
+    id: 'cb'
   }
 
   const settings = {
@@ -47,16 +44,16 @@ function init() {
       {
         id: 'dog_1',
         el: Object.assign(document.createElement('div'), 
-        { className: 'db',
+        { 
+          className: 'npc sprite-container overflow-hidden',
+          innerHTML: '<div><div class="db sprite"></div></div>'
         }),
         x: 0,
         y: 0,
         pos: 100,
-        // start: 31,
         goal: 0,
         carryOn: true,
         delay: 10,
-        // displayTimer: null,
         motionTimer: null,
         searchMemory: null,
         route: [],
@@ -86,9 +83,8 @@ function init() {
     },
   }
 
-
-  const mapX = () => player.pos % settings.map.column 
-  const mapY = () => Math.floor(player.pos / settings.map.column)
+  const mapX = i => i % settings.map.column
+  const mapY = i => Math.floor(i / settings.map.column)
   const getMapCoord = para => (Math.floor(settings.map[para] / 2) - 1) * settings.map.d
   const clampMax = (n, max) =>  n < max ? n : max
   const px = n => `${n}px`
@@ -124,8 +120,8 @@ function init() {
     setPos({ el: elements.player, x, y })
 
     // adjust mapPosition
-    settings.mapImage.x = mapX() * -d + x
-    settings.mapImage.y = mapY() * -d + y
+    settings.mapImage.x = mapX(player.pos) * -d + x
+    settings.mapImage.y = mapY(player.pos) * -d + y
     setStyles(settings.mapImage)
     
     settings.mapImage.el.classList.add('transition')
@@ -150,22 +146,17 @@ function init() {
     setUpCanvas(settings.mapImage)
     adjustMapWidthAndHeight()
 
-    settings.map.data.forEach((tile, i) => {
-      outputMap({ i, tile })
-    })
+    settings.map.data.forEach((tile, i) => outputMap({ i, tile }))
   }
 
-  const defaultPathMemory = arr => arr.map(()=>{
+  const defaultPathMemory = arr => arr.map(()=> {
     return {
-      // path: null,
       searched: false,
       prev: null
     }
   })
 
-  const y = i => Math.floor(i / settings.map.column)
-  const x = i => i % settings.map.column
-  const distance = (a, b) => Math.abs(x(a) - x(b)) + Math.abs(y(a) - y(b))
+  const distance = (a, b) => Math.abs(mapX(a) - mapX(b)) + Math.abs(mapY(a) - mapY(b))
 
   const chainMotion = ({ npc, route, index }) => {
     const newPos = route[index]
@@ -179,27 +170,24 @@ function init() {
       npc.track.length = 0
 
       // TODO npc identifies wall close by and attacks it
-      const wallCloseBy = [newPos + 1, newPos - 1, newPos + column, newPos - column].find(p => settings.map.blocks[p])
+      const wallCloseBy = [npc.pos + 1, npc.pos - 1, npc.pos + column, npc.pos - column].find(p => settings.map.blocks[p])
       if (wallCloseBy) {
         clearTimeout(npc.motionTimer)
         npc.el.classList.add('attacking')
+        turnSprite({ actor: npc, newPos: wallCloseBy })
         npc.pause = true
         return
       }
-  
     } else if (npc.track.length > 4) {
       npc.isHunting = true
     }
-
-
-
 
     if (settings.map.blocks[newPos]) {
       triggerNpcMotion(npc)
       return
     } 
-    npc.pos = newPos
-    moveNpc({ npc, pos: newPos})
+
+    moveNpc({ npc, newPos })
     if (npc.pos === npc.goal || index + 1 >= route.length) {      
       clearTimeout(npc.motionTimer)
       console.log('goal')
@@ -212,9 +200,7 @@ function init() {
 
 
   const selectPath = ({ character, current }) =>{
-    // character.searchMemory[current].path = 'path'
     character.route.push(current)
-  
     if (character.searchMemory[current].prev) {
       selectPath({ 
         character, 
@@ -229,47 +215,40 @@ function init() {
     }
   }
 
-  function avoidPlayer(cpu){
-    const { pos } = cpu
-    const { column } = settings.map
 
-    let motion = [ 1, -1, column, -column ]
-
-    if ([pos + 1, pos + 2, pos + 3, pos + 1 - column, pos + 1 + column].includes(player.pos)){
-      motion = cpu.motion.filter(option => option !== 1)
+  const avoidPlayer = npc => {
+    const { pos: p } = npc
+    const { column: w } = settings.map
+    let motion = [ 1, -1, w, -w ]
+    const checkAndRemoveDir = ({ arr, dir }) => {
+      if (arr.includes(player.pos)) {
+        motion = motion.filter(option => option !== dir)
+      }
     }
-    if ( [pos - 1, pos - 2, pos - 3, pos - 1 - column, pos - 1 + column].includes(player.pos)){
-      motion = cpu.motion.filter(option => option !== -1)
-    }
+    ;[
+      {
+        arr: [p + 1, p + 2, p + 3, p + 1 - w, p + 1 + w],
+        dir: 1,
+      },
+      {
+        arr: [p - 1, p - 2, p - 3, p - 1 - w, p - 1 + w],
+        dir: -1,
+      },
+      {
+        arr:[p - w, p - (2 * w), p - (3 * w), p - w - 1, p - w + 1],
+        dir: -w,
+      },
+      {
+        arr: [p + w, p + (2 * w), p + (3 * w), p + w - 1, p + w + 1],
+        dir: w,
+      },
+    ].forEach(config => checkAndRemoveDir(config))
 
-    // if (cpu.position - width === player.position || cpu.position - (width * 2) === player.position || cpu.position - (width * 3) === player.position || (cpu.position - width) - 1 === player.position || (cpu.position - width) + 1 === player.position ){
-    //   cpu.filteredMotion = cpu.motion.filter(option => {
-    //     return option !== 'up'
-    //   })
-    //   cpu.motion = cpu.filteredMotion
-    // }
-
-    // if (cpu.position + width === player.position || cpu.position + (width * 2) === player.position || cpu.position + (width * 3 ) === player.position || (cpu.position + width) - 1 === player.position || (cpu.position + width) + 1 === player.position){
-    //   cpu.filteredMotion = cpu.motion.filter(option => {
-    //     return option !== 'down'
-    //   })
-    //   cpu.motion = cpu.filteredMotion
-    // }
-
-
-    // //* motion added to go in the opposite direction of player
-    // if (cpu.horizontalPosition > player.horizontalPosition){  //* movement based on target position
-    //   cpu.motion.push('right')
-    // } else {
-    //   cpu.motion.push('left')
-    // }
-
-    // if (cpu.verticalPosition > player.verticalPosition){
-    //   cpu.motion.push('down')
-    // } else {
-    //   cpu.motion.push('up')
-    // }
+    motion.push(npc.x > player.x ? 1 : -1)
+    motion.push(npc.y > player.y ? w : -w)
+    motion = motion.filter(pos => noWall(npc.pos + pos))
     
+    moveNpc({ npc, newPos:npc.pos + (motion[Math.floor(Math.random() * motion.length)]) })
   }
 
   const decideNextMove = ({ character, current, count }) =>{
@@ -307,7 +286,6 @@ function init() {
   }
 
   const triggerNpcMotion = npc => {
-    console.log('triggerNpcMotion')
     clearTimeout(npc.motionTimer)
     if (npc.pause || npc.pos === player.pos) return
     npc.searchMemory = defaultPathMemory(settings.map.data)
@@ -348,17 +326,17 @@ function init() {
   const walk = ({ actor, dir }) => {
     if (!dir || player.pause) return
     const { diff, para, dist } = getWalkConfig(dir) 
-    // TODO add logic for turning animation
+
+    turnSprite({ actor: player, newPos: player.pos + diff })
   
     if (noWall(actor.pos + diff)) {
       if (actor === player) { // TODO may not require this if this is only used for player
         settings.mapImage[para] += dist
         setStyles(settings.mapImage)
         player.pos += diff
-        elements.indicator.innerHTML = `pos:${player.pos} dataX:${mapX()} dataY:${mapY()}`
+        elements.indicator.innerHTML = `pos:${player.pos} dataX:${mapX(player.pos)} dataY:${mapY(player.pos)}`
       } 
     }
-    
     settings.npcs.forEach(npc => {
       if (!npc.isHunting) triggerNpcMotion(npc)
     })
@@ -367,6 +345,7 @@ function init() {
   setInterval(()=> {
     settings.npcs.forEach(npc => {
       if (npc.isHunting) triggerNpcMotion(npc)
+      // avoidPlayer(npc)
     })
   }, 600)
 
@@ -386,9 +365,14 @@ function init() {
     const index = (((drawPos.y) / d) * column) + drawPos.x / d
 
     if (noWall(index)) {
-      settings.map.blocks[index] = 'b'
-      settings.mapImage.ctx.fillStyle = '#ffffff'
-      settings.mapImage.ctx.fillRect(drawPos.x, drawPos.y, d, d) 
+      const block = {
+        el: Object.assign(document.createElement('div'), { className: 'block' }),
+        x: drawPos.x,
+        y: drawPos.y
+      }
+      setPos(block)
+      settings.map.blocks[index] = block
+      settings.mapImage.el.appendChild(block.el)
     }
   }
 
@@ -401,17 +385,37 @@ function init() {
     setStyles(settings.cursor)
   }
 
-  const moveNpc = ({ npc, pos }) => {
+  const turnSprite = ({ actor, newPos }) => {
     const { column, d } = settings.map
-    npc.x = Math.floor(pos % column) * d
-    npc.y = Math.floor(pos / column) * d
+    const { pos, sprite: el } = actor
+    const diff = pos - newPos
+
+    if (diff === 1) { // left
+      setPos({ el, x: -d })
+      actor.el.classList.remove('flip')
+    }
+    if (diff === -1) { // right
+      setPos({ el, x: -d })
+      actor.el.classList.add('flip')
+    }
+    if (diff === column)  setPos({ el, x: -d * 2 }) // down
+    if (diff === -column) setPos({ el, x: 0 }) // up
+  } 
+
+  const moveNpc = ({ npc, newPos }) => {
+    turnSprite({ actor: npc, newPos })
+    npc.pos = newPos
+    const { column, d } = settings.map
+    npc.x = Math.floor(newPos % column) * d
+    npc.y = Math.floor(newPos / column) * d
     setPos(npc)
   }
 
   const addNpcs = () => {
     settings.npcs.forEach(npc => {
       const { pos } = npc
-      moveNpc({ npc, pos })
+      npc.sprite = npc.el.childNodes[0].childNodes[0]
+      moveNpc({ npc, newPos:pos })
       settings.mapImage.el.appendChild(npc.el)
       triggerNpcMotion(npc)
     })
@@ -431,8 +435,6 @@ function init() {
     clearInterval(player.walkingInterval)
   })
   window.addEventListener('keydown', handleKeyAction)
-
-
 }
 
 window.addEventListener('DOMContentLoaded', init)

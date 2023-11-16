@@ -66,6 +66,17 @@ canvas {
   /* border: 1px solid red; */
 }
 
+.block {
+  position: absolute;
+  --c: 32px;
+  width: var(--c);
+  height: var(--c);
+  /* background-color: white; */
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAADBJREFUOE9jZACBzf//g2lSgS8jIyNI82IDUnVC1MdeYGAYNWA0DEbTAdXyAoXZGQDsyEe/qyq3hwAAAABJRU5ErkJggg==);
+  background-size: var(--c); 
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
 
 .sprite-container {
   position: absolute;
@@ -73,32 +84,44 @@ canvas {
   width: var(--c);
   height: var(--c);
   z-index: 1;
+  /* background-color: rgb(252, 252, 130); */
+  /* border-radius: 50%; */
+}
 
-  background-color: rgb(252, 252, 130);
-  border-radius: 50%;
+.flip > div {
+  transform: scale(-1, 1);
+  /* border: 1px solid red; */
+}
+
+.sprite-container:has(.db) {
+  transition: 0.5s;
 }
 
 .sprite  {
   position: absolute;
-  width: calc(var(--c) * 7);
+  width: calc(var(--c) * 3);
   height: var(--c);
-  background-size: calc(var(--c) * 7) var(--c); 
+  background-size: calc(var(--c) * 3) var(--c); 
   background-repeat: no-repeat;
   image-rendering: pixelated;
 }
 
+.cb {
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAQCAYAAABQrvyxAAAAAXNSR0IArs4c6QAAAPpJREFUSEvtVu0OxCAI0/d/aC94w2MIFaLJsuT2a1ErbfmItbz8qwb/Vkqx1uko2ovsR+xKxddEW2ut1NqXM3udPMAy8aUB2fiSZCfAnxKB9gY5xu8YkI3vCugp+GaCrL2lPkBwKhVgzmSAEgHjQwFewRoCbhmSODqbMSDSJDI+C3AJRESkwb/sbsefLrAckym16pwEIJxlAuqxTBZcAZIQ/+u1a1KN6WOVil7T5SXviBDXTU4CYP1aTYyaTDb+KivekIgKITwUsLroBAFkUCT+X8Cug7v47TF2pTk9SU9PoW5ExA2ue+ut9ATee42i/vFequNJsGi+o/gPkyrhDVxkkmkAAAAASUVORK5CYII=);
+}
+
 .db {
-  position: absolute;
+  /* position: absolute;
   --size: 32px;
   width: var(--size);
   height: var(--size);
   border-radius: 50%;
   background-color: darkslategray;
-  z-index: 1;
-  transition: 0.5s;
+  z-index: 1; */
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAQCAYAAABQrvyxAAAAAXNSR0IArs4c6QAAASdJREFUSEvVVkESwjAINBf/1Zf3X17iUIsTyMISdTqjpxrYDQuEpN3+/Ndc/P3879fVLbMzbCVVjGOyj4H23l/21o7lSVzFHmCFjwZX4ffxQQFAxFvchwJZcg6BKmBl/1DAQCLMpvxZhU6b8V/Bj0DlyvCpgKhpgQCTPcWJn9+8UkF2WMb9VQAMICMaSZbB8zlbptD9fyLA9y/LIOvxFbwREJXc96W0hWZAUhf1qgaK2siJ+KoCfkLAvkWHmgnOhGVDolIBxUsFQvWVANzsDsWjoBg/EyJ4KABltrqG2o1MsyXRnj+sgJ/nyTh8B1DBVOY8y/w4pukUeuz74X/ftuwyM20YYUDwdH92F5mLTJyjiTGqPr/hQ/BqPHp12nfDnILopaqel+KfODntDVtnoa4AAAAASUVORK5CYII=);
 }
 .db.attacking {
-  background-color: red;
+  border: 1px solid red;
 }
 
 .cursor {
