@@ -28,29 +28,30 @@ function init() {
 
   const player = {
     pos: 314,
-    frameOffset: 0,
     el: elements.player,
     sprite: document.querySelector('.player').childNodes[1].childNodes[1],
     walkingDirection: '',
     walkingInterval: '',
     pause: false,
-    id: 'cb'
+    id: 'cb',
+    d: 40,
   }
 
   const settings = {
     transitionTimer: null,
     isWindowActive: false,
+    yOffset: 0,
     npcs: [
       {
         id: 'dog_1',
+        pos: 100,
         el: Object.assign(document.createElement('div'), 
         { 
-          className: 'npc sprite-container overflow-hidden',
-          innerHTML: '<div><div class="db sprite"></div></div>'
+          className: 'npc sprite-container',
+          innerHTML: '<div class="overflow-hidden"><div class="db sprite"></div></div>'
         }),
         x: 0,
         y: 0,
-        pos: 100,
         goal: 0,
         carryOn: true,
         delay: 10,
@@ -59,7 +60,30 @@ function init() {
         route: [],
         isHunting: true,
         track: [],
-        pause: false
+        pause: false,
+        d: 40,
+      },
+      {
+        id: 'mouse',
+        pos: 200,
+        el: Object.assign(document.createElement('div'), 
+        { 
+          className: 'npc sprite-container sm',
+          innerHTML: '<div class="overflow-hidden"><div class="mouse sprite"></div></div>'
+        }),
+        x: 0,
+        y: 0,
+        goal: 0,
+        carryOn: true,
+        delay: 10,
+        motionTimer: null,
+        searchMemory: null,
+        route: [],
+        isHunting: false,
+        isFleeing: true,
+        track: [],
+        pause: false,
+        d: 32,
       }
     ],
     mapImage: {
@@ -97,6 +121,16 @@ function init() {
   }
   const nearestN = (n, denom) => n === 0 ? 0 : (n - 1) + Math.abs(((n - 1) % denom) - denom)
 
+
+  setInterval(()=> {
+    ;[player, ...settings.npcs].forEach(actor => {
+      settings.yOffset = settings.yOffset + 1 === 4
+        ? 0
+        : settings.yOffset + 1
+      const { sprite: el, d } = actor
+      setPos({ el, y: [0, -d, -(d * 2), -d][settings.yOffset] })
+    })
+  }, 200)
 
   const outputMap = ({ i, tile }) => {
     const { d } = settings.map
@@ -218,8 +252,9 @@ function init() {
     const { pos: p } = npc
     const { column: w } = settings.map
     let motion = [ 1, -1, w, -w ]
+    const target = settings.npcs[0]
     const checkAndRemoveDir = ({ arr, dir }) => {
-      if (arr.includes(player.pos)) {
+      if (arr.includes(target.pos)) {
         motion = motion.filter(option => option !== dir)
       }
     }
@@ -242,9 +277,11 @@ function init() {
       },
     ].forEach(config => checkAndRemoveDir(config))
 
-    motion.push(npc.x > player.x ? 1 : -1)
-    motion.push(npc.y > player.y ? w : -w)
+    motion.push(npc.x > target.x ? 1 : -1)
+    motion.push(npc.y > target.y ? w : -w)
     motion = motion.filter(pos => noWall(npc.pos + pos))
+
+    // TODO need something here to ensure there's way out?
     
     moveNpc({ npc, newPos:npc.pos + (motion[Math.floor(Math.random() * motion.length)]) })
   }
@@ -285,10 +322,11 @@ function init() {
 
   const triggerNpcMotion = npc => {
     clearTimeout(npc.motionTimer)
-    if (npc.pause || npc.pos === player.pos) return
+    const target = settings.npcs[1]
+    if (npc.pause || npc.pos === target.pos) return
     npc.searchMemory = defaultPathMemory(settings.map.data)
     npc.carryOn = true
-    npc.goal = player.pos
+    npc.goal = target.pos
     decideNextMove({ character: npc, current: npc.pos })
   }
   
@@ -325,7 +363,7 @@ function init() {
     if (!dir || player.pause) return
     const { diff, para, dist } = getWalkConfig(dir) 
 
-    turnSprite({ actor: player, newPos: player.pos + diff })
+    turnSprite({ actor: player, diff })
   
     if (noWall(actor.pos + diff)) {
       if (actor === player) { // TODO may not require this if this is only used for player
@@ -336,14 +374,15 @@ function init() {
       } 
     }
     settings.npcs.forEach(npc => {
-      if (!npc.isHunting) triggerNpcMotion(npc)
+      if (!npc.isHunting && !npc.isFleeing) triggerNpcMotion(npc)
     })
   }
 
   setInterval(()=> {
     settings.npcs.forEach(npc => {
-      if (npc.isHunting) triggerNpcMotion(npc)
-      // avoidPlayer(npc)
+      if (npc.isFleeing) {
+        avoidPlayer(npc)
+      } else if (npc.isHunting) triggerNpcMotion(npc)
     })
   }, 600)
 
@@ -383,21 +422,23 @@ function init() {
     setStyles(settings.cursor)
   }
 
-  const turnSprite = ({ actor, newPos }) => {
-    const { column, d } = settings.map
-    const { pos, sprite: el } = actor
-    const diff = pos - newPos
 
-    if (diff === 1) { // left
+
+  const turnSprite = ({ actor, diff, newPos = 0 }) => {
+    const { column } = settings.map
+    const { pos, sprite: el, d } = actor
+    const pDiff = diff || newPos - pos 
+
+    if (pDiff === -1) { // left
       setPos({ el, x: -d })
       actor.el.classList.remove('flip')
     }
-    if (diff === -1) { // right
+    if (pDiff === 1) { // right
       setPos({ el, x: -d })
       actor.el.classList.add('flip')
     }
-    if (diff === column)  setPos({ el, x: -d * 2 }) // down
-    if (diff === -column) setPos({ el, x: 0 }) // up
+    if (pDiff === -column) setPos({ el, x: -d * 2 }) // down
+    if (pDiff === column) setPos({ el, x: 0 }) // up
   } 
 
   const moveNpc = ({ npc, newPos }) => {
