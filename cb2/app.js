@@ -1,8 +1,8 @@
 function init() {  
   
   // TODO refactor to simplify functions
-  // TODO change how the block is added so it can be removed more easily
   // TODO enable npc to break block
+  // TODO enable npcs to be in the same pos?
 
   const elements = {
     wrapper: document.querySelector('.wrapper'),
@@ -34,7 +34,7 @@ function init() {
     walkingInterval: '',
     pause: false,
     id: 'cb',
-    d: 40,
+    d: 44,
   }
 
   const settings = {
@@ -61,15 +61,15 @@ function init() {
         isHunting: true,
         track: [],
         pause: false,
-        d: 40,
+        d: 44,
       },
       {
         id: 'mouse',
         pos: 200,
         el: Object.assign(document.createElement('div'), 
         { 
-          className: 'npc sprite-container sm',
-          innerHTML: '<div class="overflow-hidden"><div class="mouse sprite"></div></div>'
+          className: 'npc sprite-container',
+          innerHTML: '<div class="overflow-hidden small"><div class="mouse sprite"></div></div>'
         }),
         x: 0,
         y: 0,
@@ -83,7 +83,7 @@ function init() {
         isFleeing: true,
         track: [],
         pause: false,
-        d: 32,
+        d: 36,
       }
     ],
     mapImage: {
@@ -134,7 +134,7 @@ function init() {
 
   const outputMap = ({ i, tile }) => {
     const { d } = settings.map
-    settings.mapImage.ctx.fillStyle = tile === '$' ? '#a2fcf0' : '#06a1a1'
+    settings.mapImage.ctx.fillStyle = tile === '$' ? '#a2fcf0' : '#2e1a66'
     settings.mapImage.ctx.fillRect(mapX(i) * d, mapY(i) * d, d, d)
   }
 
@@ -206,6 +206,7 @@ function init() {
       if (wallCloseBy) {
         clearTimeout(npc.motionTimer)
         npc.el.classList.add('attacking')
+        npc.el.classList.add(Math.abs(npc.pos - wallCloseBy) === 1 ? 'horizontal' : 'vertical')
         turnSprite({ actor: npc, newPos: wallCloseBy })
         npc.pause = true
         return
