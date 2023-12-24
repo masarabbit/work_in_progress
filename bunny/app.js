@@ -11,6 +11,10 @@ function init() {
     ears: document.querySelectorAll('.ear-joint'),
   }
 
+  const config = {
+    shoulders: [12, -12]
+  }
+
   const poses = {
     shrug: [
       { el: parts.neck, deg: 20 },
@@ -53,10 +57,10 @@ function init() {
 
   poses.neutral = Object.keys(parts).map(part => {
     return parts[part].length
-      ? Array.from(parts[part]).map(p => {
-        return { el:p, deg: 0 }
+      ? Array.from(parts[part]).map((p, i) => {
+        return { el: p, deg: config[part]?.[i] || 0 }
       })
-      : { el: parts[part], deg: 0 }
+      : { el: parts[part], deg: config[part] || 0 }
   }).flat(1)
   
 
@@ -79,7 +83,7 @@ function init() {
     })
   }
   
-
+  pose('neutral')
 }
   
 window.addEventListener('DOMContentLoaded', init)

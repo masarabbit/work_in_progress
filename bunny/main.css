@@ -136,7 +136,7 @@ div {
 .mouth {
   border: 1px solid yellow;
   --w: 4px;
-  --h: 2px;
+  --h: 3px;
   width: calc(var(--w) * var(--m));
   height: calc(var(--h) * var(--m));
   bottom: 10px;
@@ -178,8 +178,8 @@ div {
 }
 
 .upper-body {
-  width: calc(100% + var(--joint) * 1.5);
-  left: calc(var(--joint) * -0.75);
+  width: calc(100% + var(--joint) * 1.4);
+  left: calc(var(--joint) * -0.7);
 }
 
 .upper-body,
