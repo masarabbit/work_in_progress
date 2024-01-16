@@ -3,6 +3,10 @@ function init() {
 
   // TODO add experessions
 
+  const elements = {
+    testButton: document.querySelector('.test')
+  }
+
   const parts = {
     neck: document.querySelector('.neck-base'),
     shoulders: document.querySelectorAll('.shoulder'),
@@ -64,9 +68,9 @@ function init() {
   }).flat(1)
   
 
-  document.querySelector('.buttons').innerHTML =  Object.keys(poses).map(pose => `<button>${pose}</button>`).join('')
+  document.querySelector('.buttons').innerHTML =  Object.keys(poses).map(pose => `<button class="btn">${pose}</button>`).join('')
   
-  document.querySelectorAll('button').forEach(b => b.addEventListener('click', ()=> {
+  document.querySelectorAll('.btn').forEach(b => b.addEventListener('click', ()=> {
     pose('neutral')
     pose(b.innerHTML)
   }))
@@ -84,6 +88,46 @@ function init() {
   }
   
   pose('neutral')
+
+  const stopButton = document.getElementById("stopButton")
+
+
+
+  async function startRecording() {
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+      video: true,
+      audio: true
+    })
+    const mime = MediaRecorder.isTypeSupported("video/webm; codecs=vp9") ? "video/webm; codecs=vp9" : "video/webm";
+    const recorder = new MediaRecorder(stream, { mimeType: mime });
+
+    const chunks = [];
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: chunks[0].type });
+      console.log(blob);
+      stream.getVideoTracks()[0].stop();
+
+      const filename= 'video.webm'
+      var elem = window.document.createElement('a');
+      elem.href = window.URL.createObjectURL(blob);
+      elem.download = filename;        
+      document.body.appendChild(elem);
+      elem.click();        
+      document.body.removeChild(elem);
+    };
+    recorder.start();
+  }
+
+
+  elements.testButton.addEventListener("click", ()=> startRecording())
+
+  stopButton.addEventListener('click', ()=> {
+    console.log('test')
+    const audio = document.createElement('audio')
+    audio.src = `mi.wav`
+    audio.play()
+  })
 }
   
 window.addEventListener('DOMContentLoaded', init)

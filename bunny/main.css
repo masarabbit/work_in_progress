@@ -42,7 +42,7 @@ div {
 } */
 
 .body {
-  width: 80px;
+  width: 72px;
   height: 60px;
   /* border: 1px solid yellow; */
   top: 0;
@@ -172,10 +172,10 @@ div {
   bottom: 0;
 }
 
-.upper-body {
+/* .upper-body {
   width: calc(100% + var(--joint));
   left: calc(var(--joint) / -2);
-}
+} */
 
 .upper-body {
   width: calc(100% + var(--joint) * 1.4);
@@ -212,10 +212,10 @@ div {
 }
 
 .waist {
-  --w: 20px;
+  /* --w: 15px; */
   --h: 6px;
   --m: 4;
-  width: calc(var(--w) * var(--m));
+  /* width: calc(var(--w) * var(--m)); */
   height: calc(var(--h) * var(--m));
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAGCAYAAADDl76dAAAAAXNSR0IArs4c6QAAACZJREFUKFNjZBD0+M9ARcA4Eg0EhR+1wvH9DkZGeHxQauj7HWCzAF4qC2fF8n2/AAAAAElFTkSuQmCC);
   bottom: 20px; /* maybe adjust this to walk ?*/
@@ -235,11 +235,12 @@ div {
 
 .waist {
   height: var(--joint);
-  width: 80px;
+  width: 72px;
   /* background-color: rgba(92, 183, 208, 0.275); */
   left: 50%;
   transform: translateX(-50%);
 }
+
 
 .lower-spine {
   width: var(--joint);
@@ -300,7 +301,7 @@ a:hover {
 
 .buttons {
   position: absolute;
-  top: 0;
+  top: 50px;
   width: 100%;
 }
 

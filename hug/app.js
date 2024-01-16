@@ -2,12 +2,18 @@ function init() {
   const elements = {
     wrapper: document.querySelector('.wrapper'),
     mapCover: document.querySelector('.map-cover'), 
-    mapImage: {
-      el: document.querySelector('.map-image'),
-      ctx: null,
-    },
     indicator: document.querySelector('.indicator'),
     player: document.querySelector('.player'), 
+  }
+
+  const control = {
+    wrapper: document.querySelector('.control-wrapper'),
+    el: document.querySelector('.control'),
+    active: false,
+    direction: null,
+    timer: null,
+    pos: { x: 0, y: 0 },
+    movePos: { x: 0, y: 0 },
   }
 
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
@@ -28,6 +34,7 @@ function init() {
     walkingDirection: '',
     walkingInterval: null,
     pause: false,
+    buffer: 20,
   }
 
   const triggerBunnyWalk = bunny => {
@@ -47,10 +54,18 @@ function init() {
     }, 2000)
   }
 
+  const getRandomX = () => {
+    return 20 * randomN((settings.map.w / 20) - 1)
+  }
+
+  const getRandomY = () => {
+    return 20 * randomN((settings.map.h / 20) - 1)
+  }
+
   const addBunny = () => {
     const bunny = {
-      id: settings.npcs.length + 1,
-      x: 20 * randomN(19), y: 20 * randomN(19),
+      id: settings.elements.length + 1,
+      x: getRandomX(), y: getRandomY(),
       frameOffset: 1,
       animationTimer: null,
       el: Object.assign(document.createElement('div'), 
@@ -63,15 +78,34 @@ function init() {
           x: 0, y: 0
         },
       sad: true,
+      buffer: 30,
     }
 
-    settings.npcs.push(bunny)
+    settings.elements.push(bunny)
     settings.map.el.appendChild(bunny.el)
 
     bunny.sprite.el = bunny.el.childNodes[0]
+    bunny.el.style.zIndex = bunny.y
     setPos(bunny)
 
-    triggerBunnyWalk(bunny)
+    if (randomN(2) === 2) triggerBunnyWalk(bunny)
+  }
+
+  const addTree = () => {
+    const tree = {
+      id: settings.elements.length + 1,
+      x: getRandomX(), y: getRandomY(),
+      el: Object.assign(document.createElement('div'), 
+      { 
+        className: 'tree',
+        innerHTML: '<div></div>' 
+      }),
+      buffer: 30,
+    }
+    settings.elements.push(tree)
+    settings.map.el.appendChild(tree.el)
+    tree.el.style.zIndex = tree.y
+    setPos(tree)
   }
 
   const settings = {
@@ -79,27 +113,13 @@ function init() {
     offsetPos: {
       x: 0, y: 0,
     },
-    npcs: [],
-    mapData: {
-      // column: 30,
-      // row: 20,
-      // walls: '',
-      // pos: {
-      // }
-      x: 20, y: 20,
-    },
+    elements: [],
     map: {
-      el: document.querySelector('.map-image-wrapper'),
-      canvas: document.querySelector('.map-image'),
+      el: document.querySelector('.map'),
       walls: [],
-      w: 20 * 20,
-      h: 20 * 20,
-    }, 
-    mapImage: {
-      el: elements.mapImage.el.parentNode,
-      canvas: elements.mapImage.el,
+      w: 20 * 200,
+      h: 20 * 200,
       x: 0, y: 0,
-      w: 0, h: 0
     },
     transitionTimer: null,
     isWindowActive: true,
@@ -141,43 +161,63 @@ function init() {
 
   const setPos = ({ el, x, y }) => Object.assign(el.style, { left: `${x}px`, top: `${y}px` })
 
+  const hugBunny = bunny => {
+    const classToAdd = bunny.x > player.x ? 'hug-bear-bunny' : 'hug-bunny-bear'
+    player.el.classList.add('d-none')
+    bunny.el.classList.add(classToAdd)
+    clearInterval(bunny.animationTimer)
+    player.pause = true
+    player.y = bunny.y + 2
+    if (classToAdd === 'hug-bear-bunny') {
+      player.x = bunny.x - 40
+      animateSprite(player, 'right')
+      animateSprite(bunny, 'left')
+    } else {
+      player.x = bunny.x + 40
+      animateSprite(player, 'left')
+      animateSprite(bunny, 'right')
+    }
+
+    positionMap()
+    settings.map.el.classList.add('slow-transition')
+    setPos(settings.map)
+    player.el.parentNode.style.zIndex = player.y
+
+    setTimeout(()=> {
+      player.el.classList.remove('d-none')
+      ;[classToAdd, 'sad'].forEach(c => bunny.el.classList.remove(c))
+      bunny.sad = false
+      stopSprite(bunny)
+      triggerBunnyWalk(bunny)
+      player.pause = false
+      settings.map.el.classList.remove('slow-transition')
+    }, 1800)
+  }
+
   const noWall = (actor, para, dist) => {
     const newPos = {...actor}
     newPos[para] += dist
     if (actor === player && !player.pause) {
-      const bunnyToHug = settings.npcs.filter(c => c.sad && c.id !== actor.id).find(c => distanceBetween(c, newPos) <= 20)
+      const bunnyToHug = settings.elements.filter(el => el.sad && el.id !== actor.id).find(el => distanceBetween(el, newPos) <= el.buffer)
       if (bunnyToHug) {
-        const classToAdd = bunnyToHug.x > player.x ? 'hug-bear-bunny' : 'hug-bunny-bear'
-        player.el.classList.add('d-none')
-        bunnyToHug.el.classList.add(classToAdd)
-        clearInterval(bunnyToHug.animationTimer)
-        player.pause = true
-
-        setTimeout(()=> {
-          player.pause = false
-          player.el.classList.remove('d-none')
-          ;[classToAdd, 'sad'].forEach(c => bunnyToHug.el.classList.remove(c))
-          bunnyToHug.sad = false
-          triggerBunnyWalk(bunnyToHug)
-          animateSprite(bunnyToHug, 'down')
-          stopSprite(bunnyToHug)
-          // ;['x', 'y'].forEach(para => player[para] = bunnyToHug[para])
-
-          // walk(player,'down')
-          // setTimeout(()=> {
-          //   stopSprite(player)
-          // }, 200)
-        }, 1400)
+        hugBunny(bunnyToHug)
         return 
       }
     } 
     
-    if (settings.npcs.filter(c => c.id !== actor.id).some(c => distanceBetween(c, newPos) < 20)) return
-
+    if (settings.elements.filter(el => el.id !== actor.id).some(el => {
+      return distanceBetween(el, newPos) <= el.buffer 
+            && distanceBetween(el, actor) > el.buffer // TODO need to check if this works
+    })) return
+    
+    const buffer = 40
     if (para === 'x') {
-      return actor.x + dist - 10 > 0 && actor.x + dist + 10 < settings.map.w 
+      if (dist < 0) return actor.x + dist - buffer > 0
+      return actor.x + dist + buffer < settings.map.w 
+    } else {
+      if (dist < 0) return actor.y + dist - buffer > 0
+      return (actor.y + dist) < settings.map.h - buffer
     }
-    return (actor.y + dist) > 10 && (actor.y + dist) < settings.map.h  - 10
   }
 
   const walk = (actor, dir) => {
@@ -188,8 +228,8 @@ function init() {
       animateSprite(actor, dir)
       if (actor === player) {
         player[para] += dist
-        positionMapImage()
-        setPos(settings.mapImage)
+        positionMap()
+        setPos(settings.map)
         player.el.parentNode.style.zIndex = player.y
         elements.indicator.innerHTML = `x:${player.x} | y:${player.y}`
       } else {
@@ -208,20 +248,20 @@ function init() {
     }
   }
 
-  const positionMapImage = () => {
-    settings.mapImage.x = settings.offsetPos.x - player.x
-    settings.mapImage.y = settings.offsetPos.y - player.y
+  const positionMap = () => {
+    settings.map.x = settings.offsetPos.x - player.x
+    settings.map.y = settings.offsetPos.y - player.y
   }
 
   const resizeAndRepositionMap = () => {
-    settings.mapImage.el.classList.add('transition')
+    settings.map.el.classList.add('transition')
     clearTimeout(settings.transitionTimer)
     settings.transitionTimer = setTimeout(()=> {
-      settings.mapImage.el.classList.remove('transition')
+      settings.map.el.classList.remove('transition')
     }, 500)
     updateOffset()
-    positionMapImage()
-    setPos(settings.mapImage)
+    positionMap()
+    setPos(settings.map)
   }
 
   const stopSprite = actor => {
@@ -242,14 +282,78 @@ function init() {
     }
   }
 
+  const addEvents = (target, event, action, array) => {
+    array.forEach(a => event === 'remove' ? target.removeEventListener(a, action) : target.addEventListener(a, action))
+  }
+
+  const mouse = {
+    up: (t, e, a) => addEvents(t, e, a, ['mouseup', 'touchend']),
+    move: (t, e, a) => addEvents(t, e, a, ['mousemove', 'touchmove']),
+    down: (t, e, a) => addEvents(t, e, a, ['mousedown', 'touchstart']),
+    enter: (t, e, a) => addEvents(t, e, a, ['mouseenter', 'touchstart']),
+    leave: (t, e, a) => addEvents(t, e, a, ['mouseleave'])
+  }
+
+  const ePos = (e, type) => Math.round(e.type[0] === 'm' ? e[`page${type}`] : e.touches[0][`page${type}`])
+
+  const drag = (el, pos, x, y) =>{
+    pos.a.x = pos.b.x - x
+    pos.a.y = pos.b.y - y
+    const newX = el.offsetLeft - pos.a.x
+    const newY = el.offsetTop - pos.a.y
+    const distance = distanceBetween({ x: 0, y: 0 }, { x: newX, y: newY })
+    if (distance < 35) {
+      setPos({ el, x: newX, y: newY })
+      control.direction = Math.abs(newX) < Math.abs(newY)
+        ? newY < 0 ? 'up' : 'down'
+        : newX < 0 ? 'left' : 'right'
+    }  
+  }
+
+  const addTouchAction = el =>{
+    const pos = { a: { x: 0, y: 0 }, b: { x: 0, y: 0 } }
+    const onGrab = e =>{
+      pos.b.x = ePos(e, 'X')
+      pos.b.x = ePos(e, 'Y')  
+      mouse.up(document, 'add', onLetGo)
+      mouse.move(document, 'add', onDrag)
+      control.active = true
+      control.timer = setInterval(()=> {
+        if (control.active) walk(player, control.direction)
+      }, 200)
+    }
+    const onDrag = e =>{
+      const x = ePos(e, 'X')
+      const y = ePos(e, 'Y')
+      drag(el, pos, x, y)
+      pos.b.x = x
+      pos.b.y = y
+    }
+    const onLetGo = () => {
+      mouse.up(document, 'remove', onLetGo)
+      mouse.move(document,'remove', onDrag)
+      el.style.transition = '0.2s'
+      setPos({ el, x: 0, y: 0 })
+      setTimeout(()=>{
+        el.style.transition = '0s'
+      }, 200)
+      clearInterval(control.timer)
+      control.active = false
+      stopSprite(player)
+    }
+    mouse.down(el,'add', onGrab)
+  }
 
 
-  player.x = settings.mapData.x
-  player.y = settings.mapData.y
+  player.x = getRandomX()
+  player.y = getRandomY()
   player.el.style.zIndex = player.y
   setSize(settings.map)
 
-  window.addEventListener('keydown', e => handleWalk(e.key.toLowerCase().replace('arrow','')))
+  window.addEventListener('keydown', e => {
+    if (e.key[0] !== 'A') return
+    handleWalk(e.key.toLowerCase().replace('arrow',''))
+  })
   window.addEventListener('keyup', () => {
     player.walkingDirection = null
     stopSprite(player)
@@ -260,9 +364,10 @@ function init() {
 
   window.addEventListener('resize', resizeAndRepositionMap)
   resizeAndRepositionMap()
+  addTouchAction(control.el)
   
-  new Array(4).fill('').forEach(()=> addBunny())
-
+  new Array(40).fill('').forEach(()=> addBunny())
+  new Array(80).fill('').forEach(()=> addTree())
 }
 
 window.addEventListener('DOMContentLoaded', init)
