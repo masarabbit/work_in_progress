@@ -12,6 +12,7 @@ function init() {
 
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
   const randomN = max => Math.ceil(Math.random() * max)
+  const px = n => `${n}px`
 
   const player = {
     id: 'bear',
@@ -97,17 +98,12 @@ function init() {
     mapImage: {
       el: elements.mapImage.el.parentNode,
       canvas: elements.mapImage.el,
-      x: 0,
-      y: 0,
-      w: 0,
-      h: 0
+      x: 0, y: 0,
+      w: 0, h: 0
     },
     transitionTimer: null,
     isWindowActive: true,
   }
-
-
-  const px = n => `${n}px`
 
   const setSize = ({ el, w, h, d }) => {
     const m = d || 1
@@ -149,7 +145,7 @@ function init() {
     const newPos = {...actor}
     newPos[para] += dist
     if (actor === player && !player.pause) {
-      const bunnyToHug = settings.npcs.filter(c => c.sad && c.id !== actor.id).find(c => distanceBetween(c, newPos) < 20)
+      const bunnyToHug = settings.npcs.filter(c => c.sad && c.id !== actor.id).find(c => distanceBetween(c, newPos) <= 20)
       if (bunnyToHug) {
         const classToAdd = bunnyToHug.x > player.x ? 'hug-bear-bunny' : 'hug-bunny-bear'
         player.el.classList.add('d-none')
@@ -165,7 +161,8 @@ function init() {
           triggerBunnyWalk(bunnyToHug)
           animateSprite(bunnyToHug, 'down')
           stopSprite(bunnyToHug)
-          ;['x', 'y'].forEach(para => player[para] = bunnyToHug[para])
+          // ;['x', 'y'].forEach(para => player[para] = bunnyToHug[para])
+
           // walk(player,'down')
           // setTimeout(()=> {
           //   stopSprite(player)
@@ -173,7 +170,9 @@ function init() {
         }, 1400)
         return 
       }
-    } else if (settings.npcs.filter(c => c.id !== actor.id).some(c => distanceBetween(c, newPos) < 20)) return
+    } 
+    
+    if (settings.npcs.filter(c => c.id !== actor.id).some(c => distanceBetween(c, newPos) < 20)) return
 
     if (para === 'x') {
       return actor.x + dist - 10 > 0 && actor.x + dist + 10 < settings.map.w 
@@ -187,11 +186,9 @@ function init() {
   
     if (noWall(actor, para, dist)) {
       animateSprite(actor, dir)
-
       if (actor === player) {
         player[para] += dist
         positionMapImage()
-        // setStyles(settings.mapImage)
         setPos(settings.mapImage)
         player.el.parentNode.style.zIndex = player.y
         elements.indicator.innerHTML = `x:${player.x} | y:${player.y}`
@@ -202,7 +199,6 @@ function init() {
       }
     }
   }
-
 
   const updateOffset = () => {
     const { width, height } = elements.wrapper.getBoundingClientRect()
@@ -262,7 +258,6 @@ function init() {
   window.addEventListener('focus', ()=> settings.isWindowActive = true)
   window.addEventListener('blur', ()=> settings.isWindowActive = false)
 
-  
   window.addEventListener('resize', resizeAndRepositionMap)
   resizeAndRepositionMap()
   
