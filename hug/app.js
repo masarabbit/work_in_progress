@@ -19,6 +19,25 @@ function init() {
   const distanceBetween = (a, b) => Math.round(Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)))
   const randomN = max => Math.ceil(Math.random() * max)
   const px = n => `${n}px`
+  const addEvents = (target, event, action, array) => {
+    array.forEach(a => event === 'remove' ? target.removeEventListener(a, action) : target.addEventListener(a, action))
+  }
+  const ePos = (e, type) => Math.round(e.type[0] === 'm' ? e[`page${type}`] : e.touches[0][`page${type}`])
+  const setPos = ({ el, x, y }) => Object.assign(el.style, { left: `${x}px`, top: `${y}px` })
+
+  const setSize = ({ el, w, h, d }) => {
+    const m = d || 1
+    if (w) el.style.width = px(w * m)
+    if (h) el.style.height = px(h * m)
+  }
+
+  const mouse = {
+    up: (t, e, a) => addEvents(t, e, a, ['mouseup', 'touchend']),
+    move: (t, e, a) => addEvents(t, e, a, ['mousemove', 'touchmove']),
+    down: (t, e, a) => addEvents(t, e, a, ['mousedown', 'touchstart']),
+    enter: (t, e, a) => addEvents(t, e, a, ['mouseenter', 'touchstart']),
+    leave: (t, e, a) => addEvents(t, e, a, ['mouseleave'])
+  }
 
   const player = {
     id: 'bear',
@@ -100,7 +119,7 @@ function init() {
         className: 'tree',
         innerHTML: '<div></div>' 
       }),
-      buffer: 30,
+      buffer: 40,
     }
     settings.elements.push(tree)
     settings.map.el.appendChild(tree.el)
@@ -125,12 +144,6 @@ function init() {
     isWindowActive: true,
   }
 
-  const setSize = ({ el, w, h, d }) => {
-    const m = d || 1
-    if (w) el.style.width = px(w * m)
-    if (h) el.style.height = px(h * m)
-  }
-  
   const getWalkConfig = dir => {
     const { d } = settings
     return {
@@ -159,7 +172,13 @@ function init() {
     setBackgroundPos(actor.sprite)
   }
 
-  const setPos = ({ el, x, y }) => Object.assign(el.style, { left: `${x}px`, top: `${y}px` })
+  const triggerBunnyMessage = (bunny, classToAdd) => {
+    bunny.el.setAttribute('message', ['thanks!', 'arigato!', 'yeah!', '^ _ ^', 'thank you!'][randomN(5) - 1])
+    bunny.el.classList.add(classToAdd)
+    setTimeout(()=>{
+      bunny.el.classList.remove(classToAdd)
+    }, 800)
+  }
 
   const hugBunny = bunny => {
     const classToAdd = bunny.x > player.x ? 'hug-bear-bunny' : 'hug-bunny-bear'
@@ -167,7 +186,7 @@ function init() {
     bunny.el.classList.add(classToAdd)
     clearInterval(bunny.animationTimer)
     player.pause = true
-    player.y = bunny.y + 2
+    player.y = bunny.y
     if (classToAdd === 'hug-bear-bunny') {
       player.x = bunny.x - 40
       animateSprite(player, 'right')
@@ -191,6 +210,7 @@ function init() {
       triggerBunnyWalk(bunny)
       player.pause = false
       settings.map.el.classList.remove('slow-transition')
+      triggerBunnyMessage(bunny, classToAdd === 'hug-bear-bunny' ? 'happy-left' : 'happy-right')
     }, 1800)
   }
 
@@ -278,23 +298,9 @@ function init() {
         player.walkingDirection && !settings.activeEvent
           ? walk(player, dir)
           : stopSprite(player)
-      }, 150)
+      }, 200)
     }
   }
-
-  const addEvents = (target, event, action, array) => {
-    array.forEach(a => event === 'remove' ? target.removeEventListener(a, action) : target.addEventListener(a, action))
-  }
-
-  const mouse = {
-    up: (t, e, a) => addEvents(t, e, a, ['mouseup', 'touchend']),
-    move: (t, e, a) => addEvents(t, e, a, ['mousemove', 'touchmove']),
-    down: (t, e, a) => addEvents(t, e, a, ['mousedown', 'touchstart']),
-    enter: (t, e, a) => addEvents(t, e, a, ['mouseenter', 'touchstart']),
-    leave: (t, e, a) => addEvents(t, e, a, ['mouseleave'])
-  }
-
-  const ePos = (e, type) => Math.round(e.type[0] === 'm' ? e[`page${type}`] : e.touches[0][`page${type}`])
 
   const drag = (el, pos, x, y) =>{
     pos.a.x = pos.b.x - x
@@ -344,7 +350,6 @@ function init() {
     mouse.down(el,'add', onGrab)
   }
 
-
   player.x = getRandomX()
   player.y = getRandomY()
   player.el.style.zIndex = player.y
@@ -366,8 +371,8 @@ function init() {
   resizeAndRepositionMap()
   addTouchAction(control.el)
   
-  new Array(40).fill('').forEach(()=> addBunny())
-  new Array(80).fill('').forEach(()=> addTree())
+  new Array(45).fill('').forEach(()=> addBunny())
+  new Array(100).fill('').forEach(()=> addTree())
 }
 
 window.addEventListener('DOMContentLoaded', init)
