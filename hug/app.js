@@ -298,7 +298,7 @@ function init() {
         player.walkingDirection && !settings.activeEvent
           ? walk(player, dir)
           : stopSprite(player)
-      }, 200)
+      }, 150)
     }
   }
 
@@ -326,7 +326,7 @@ function init() {
       control.active = true
       control.timer = setInterval(()=> {
         if (control.active) walk(player, control.direction)
-      }, 200)
+      }, 150)
     }
     const onDrag = e =>{
       const x = ePos(e, 'X')
