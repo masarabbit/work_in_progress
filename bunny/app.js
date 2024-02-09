@@ -125,8 +125,23 @@ function init() {
   stopButton.addEventListener('click', ()=> {
     console.log('test')
     const audio = document.createElement('audio')
-    audio.src = `mi.wav`
+    audio.src = `tst.wav`
     audio.play()
+
+    // const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+    // const audioSource = audioCtx.createMediaElementSource(audio)
+    // const analyser = audioCtx.createAnalyser()
+    // audioSource.connect(analyser)
+
+
+    // analyser.connect(audioCtx.destination)
+    // setInterval(()=>{
+    //       const bufferLength = analyser.frequencyBinCount
+    // const dataArray = new Uint8Array(bufferLength)
+    //   console.log(analyser.getByteFrequencyData(dataArray))
+    // }, 200)
+
+    
   })
 }
   

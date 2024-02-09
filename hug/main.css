@@ -173,7 +173,7 @@ body {
   }
   100% {
     width: calc(24px * var(--m));
-    background-color: rgb(3, 201, 175);
+    background-color: rgb(59, 245, 180);
   }
 }
 
