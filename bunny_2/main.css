@@ -1,0 +1,160 @@
+
+* {
+  box-sizing: border-box;
+} 
+
+body {
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+  background-color: rgb(230, 230, 230);
+  --blue: rgb(50, 50, 97);
+}
+
+p, h1, h2, h3, h4 {
+  display: inline-block;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
+}
+
+:root {
+  --m: 24px;
+}
+
+.wrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100vh - 100px);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  border: 1px solid var(--blue);
+}
+
+.avatar {
+  position: absolute;
+  border: 1px solid red;
+  --w: 100px;
+  --h: 100px;
+  width: var(--w);
+  height: var(--h);
+}
+
+.avatar div {
+  position: absolute;
+}
+
+.joint {
+  width: 0;
+  height: 0;
+  border: 1px solid blue;
+}
+
+.joint.head-joint {
+  left: calc(var(--w) / 2);
+  top: 40px;
+}
+
+.head {
+  border: 1px solid red;
+  width: 50px;
+  height: 40px;
+  left: -25px;
+  top: -40px;
+}
+
+.joint.ear-left-joint {
+  top: 0;
+  left: 10px;
+}
+
+.joint.ear-right-joint {
+  top: 0;
+  right: 10px;
+}
+
+.ear-left,
+.ear-right {
+  width: 16px;
+  height: 16px;
+  border: 1px solid red;
+  left: -8px;
+  top: -16px;
+}
+
+.body-joint {
+  left: calc(var(--w) / 2);
+  top: 55px;
+}
+
+.body {
+  border: 1px solid red;
+  width: 40px;
+  height: 30px;
+  top: -15px;
+  left: -20px;
+}
+
+.arm-left-joint {
+  top: 5px;
+  left: 0;
+}
+
+.arm-right-joint {
+  top: 5px;
+  right: 0;
+}
+
+.arm-left {
+  border: 1px solid red;
+  width: 16px;
+  height: 16px;
+  left: -16px;
+  top: -8px;
+}
+
+.arm-right {
+  border: 1px solid red;
+  width: 16px;
+  height: 16px;
+  right: -16px;
+  top: -8px;
+}
+
+.sign {
+  position: absolute;
+  color: #9e9e9e;
+  bottom: 10px;
+  right: 10px;
+  font-size: 10px;
+}
+
+a {
+  color: #9e9e9e;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.indicator {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  color: #9e9e9e;
+}
+
+.buttons {
+  position: absolute;
+  top: 50px;
+  width: 100%;
+}
+
+.buttons button {
+  margin: 8px;
+}
