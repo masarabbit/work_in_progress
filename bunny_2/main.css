@@ -135,6 +135,33 @@ p, h1, h2, h3, h4 {
   right: 5px;
 }
 
+.leg-left {
+  border: 1px solid red;
+  width: 16px;
+  height: 16px;
+  left: -8px;
+  top: 0;
+}
+
+.leg-right {
+  border: 1px solid red;
+  width: 16px;
+  height: 16px;
+  left: -8px;
+  top: 0px;
+}
+
+.foot-left-joint {
+  bottom: 0;
+  left: 8px;
+}
+
+.foot-right-joint {
+  bottom: 0;
+  right: 8px;
+}
+
+
 .sign {
   position: absolute;
   color: #9e9e9e;
