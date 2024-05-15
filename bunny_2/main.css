@@ -125,6 +125,16 @@ p, h1, h2, h3, h4 {
   top: -8px;
 }
 
+.leg-left-joint {
+  bottom: 0;
+  left: 5px;
+}
+
+.leg-right-joint {
+  bottom: 0;
+  right: 5px;
+}
+
 .sign {
   position: absolute;
   color: #9e9e9e;
