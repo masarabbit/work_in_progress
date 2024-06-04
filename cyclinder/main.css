@@ -42,6 +42,9 @@ span {
   background-color: rgb(94, 164, 164);
   transition: 1s;
   perspective: 1000px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .face {
@@ -51,6 +54,8 @@ span {
   /* border: 1px solid yellow; */
   border-radius: 50%;
   transition: transform 1s;
+  transform-style: preserve-3d;
+  perspective: 1000px;
 }
 
 .back {
@@ -62,8 +67,22 @@ span {
   background-color: white;
 }
 
+.cat-face {
+  width: calc(var(--size) * 2);
+  height: calc(var(--size) * 2);
+  --size: 25px;
+  background-size: calc(var(--size) * 2);
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAAXNSR0IArs4c6QAAAFZJREFUSEtjZKADYKSDHQyjlpAUyqPBNRpc8BD4D2WRkyiw6kU3CKYIZiMpFuHUOyCWgHxA8+AiKWkSq5iSMAfZQZR+ohQR62Jc6kYtISkER4NrhAYXAG5FCRptv6hzAAAAAElFTkSuQmCC);
+  transition: 1s;
+  image-rendering: pixelated;
+}
+
 .cylinder.flip .front {
   background-color: rgb(94, 164, 164);
+}
+
+.cylinder.flip .cat-face {
+  display: none;
 }
 
 .cylinder.flip .back {
@@ -73,19 +92,27 @@ span {
 .cylinder.shrink {
   height: 90px;
 }
-
-/* .cylinder.bottom-left {
+/* 
+.cylinder.bottom-left {
   transform: rotate(45deg);
-}
+} */
 
 .bottom-left .face {
-  transform-style: preserve-3d;
-  transform: rotateX(45deg);
-} */
+  /* transform-style: preserve-3d; */
+  /* perspective: 100px; */
+  /* transform: rotateX(45deg) rotateZ(-45deg) ; */
+}
 
 .indicator {
   position: absolute;
   top: 10px;
   right: 10px;
   color: white;
+}
+
+.marker {
+  position: absolute;
+  border: 1px solid red;
+  width: 1px;
+  height: 1px;
 }

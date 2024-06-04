@@ -11,8 +11,12 @@
       // el.style.zIndex = y
     }
 
+    const normalisedAngle = deg => {
+      return deg % 360
+    }
+
     const rotateX = ({ el, deg }) => {
-      el.style.transform = `rotateX(${deg}deg)`
+      el.style.transform = `rotateX(${deg}deg) rotateZ(-${deg}deg)`
     }
   
     const cylinder = {
@@ -20,36 +24,53 @@
       deg: 0,
       front: document.querySelector('.front'),
       back: document.querySelector('.back'),
+      catFace: document.querySelector('.cat-face'),
+      x: 0,
+      y: 0,
+      marker: document.querySelector('.marker')
     }
 
-    const normalisedAngle = deg => {
-      return deg % 360
-    }
+
     
-    cylinder.el.addEventListener('click', ()=> {
-      cylinder.deg += 45
+    cylinder.el.addEventListener('click', e => {
+      // cylinder.deg += 45
+      const { x, y } = cylinder.marker.getBoundingClientRect()
+      // this amount should be calculated with PI in mind
+      const yDiff = y < e.pageY ? 90 : -90
+      const xDiff = x < e.pageX ? 90 : -90
+    
       const adjustedAngle = normalisedAngle(cylinder.deg)
 
       if (cylinder.deg % 180 === 90) {
         cylinder.h = 100
+        cylinder.y -= yDiff
+    
       } else if (cylinder.deg % 180 === 0) {
         cylinder.h = 60
+        cylinder.x -= xDiff
       } else {
         cylinder.h = 80
+        cylinder.x -= xDiff
+        cylinder.y -= yDiff
       }
 
       setStyles(cylinder)
       rotateX({ el: cylinder.front, deg: cylinder.deg })
       rotateX({ el: cylinder.back, deg: cylinder.deg })
 
+      const faceAngle = cylinder.x % 360
+      setStyles({ el: cylinder.catFace, deg: faceAngle * 3})
+
       cylinder.el.classList[
         adjustedAngle > 90 && adjustedAngle <= 270 
           ? 'add'
           : 'remove'
       ]('flip')
+      
+  
 
-
-      document.querySelector('.indicator').innerHTML = `${adjustedAngle}deg  ${cylinder.deg % 180}deg`
+      document.querySelector('.indicator').innerHTML = `${adjustedAngle}deg  ${cylinder.deg % 180}deg
+      `
     })
   }
   
