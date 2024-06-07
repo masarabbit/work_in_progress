@@ -1,15 +1,22 @@
 
   function init() { 
-
-    const isNum = x => typeof x === 'number'
     const px = n => `${n}px`
 
-    const setStyles = ({ el, x, y, w, h, deg }) =>{
-      if (isNum(w)) el.style.width = px(w)
-      if (isNum(h)) el.style.height = px(h)
+    const setStyles = ({ el, x, y, deg }) =>{
       el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0}) rotate(${deg || 0}deg)`
     }
 
+    const nearest360 = n =>{
+      return n === 0 ? 0 : (n - 1) + Math.abs(((n - 1) % 360) - 360)
+    }
+
+    const normalisedAngle = deg => {
+      return deg % 360
+    }
+
+    const rotateX = ({ el, deg }) => {
+      el.style.transform = `rotateX(${deg}deg) rotateZ(-${deg}deg)`
+    }
 
     const addEvents = (target, event, action, array) => {
       array.forEach(a => event === 'remove' ? target.removeEventListener(a, action) : target.addEventListener(a, action))
@@ -23,48 +30,47 @@
       leave: (t, e, a) => addEvents(t, e, a, ['mouseleave'])
     }
 
-    const normalisedAngle = deg => {
-      return deg % 360
-    }
+    const wrapper = document.querySelector('.wrapper')
 
-    const rotateX = ({ el, deg }) => {
-      el.style.transform = `rotateX(${deg}deg) rotateZ(-${deg}deg)`
-    }
-  
     const cylinder = {
       el: document.querySelector('.cylinder'),
-      deg: 0,
       front: document.querySelector('.front'),
       back: document.querySelector('.back'),
       catElements: document.querySelectorAll('.cat-el'),
+      panels: document.querySelectorAll('.panel'),
+      deg: 0,
       x: 0,
       y: 0,
-      panels: document.querySelectorAll('.panel'),
       roll: {
         x: 0,
         y: 0,
-      }
+      },
+      isWalking: false,
+      idleCount: 4,
     }
 
     const drag = (el, pos, x, y) =>{
-      pos.a = pos.c - x
-      pos.b = pos.d - y
-      const newX = el.offsetLeft - pos.a
-      const newY = el.offsetTop - pos.b
+      pos.a.x = pos.b.x - x
+      pos.a.y = pos.b.y - y
+      const newX = el.offsetLeft - pos.a.x
+      const newY = el.offsetTop - pos.a.y
 
-      cylinder.roll.x = newX > el.offsetLeft ? -4 : 4
-      cylinder.roll.y = newY >el.offsetTop ? -4 : 4
+      cylinder.roll.x = newX > el.offsetLeft ? -7 : 7
+      cylinder.roll.y = newY >el.offsetTop ? -7 : 7
     }
 
     const client = (e, type) => e.type[0] === 'm' ? e[`client${type}`] : e.touches[0][`client${type}`]
     const roundedClient = (e, type) => Math.round(client(e, type))
 
     const addTouchAction = el =>{
-      const pos = { a: 0, b: 0, c: 0, d: 0 }
-      
+      const pos = { 
+        a: { x: 0, y: 0 },
+        b: { x: 0, y: 0 },
+      }
       const onGrab = e =>{
-        pos.c = roundedClient(e, 'X')
-        pos.d = roundedClient(e, 'Y')  
+        cylinder.idleCount = 4
+        pos.b.x = roundedClient(e, 'X')
+        pos.b.y = roundedClient(e, 'Y')  
         mouse.up(document, 'add', onLetGo)
         mouse.move(document, 'add', onDrag)
       }
@@ -72,9 +78,9 @@
         const x = roundedClient(e, 'X')
         const y = roundedClient(e, 'Y')
         drag(el, pos, x, y)
-        pos.c = x
-        pos.d = y
-        moveCylinder(e)
+        pos.b.x = x
+        pos.b.y = y
+        rollCylinder(e)
       }
       const onLetGo = () => {
         mouse.up(document, 'remove', onLetGo)
@@ -84,10 +90,7 @@
     }
 
 
-    const moveCylinder = () => {
-      console.log('moveCylinder')
-
-    
+    const rollCylinder = () => {
       const { roll } = cylinder
         // angle: -
       if (cylinder.deg % 180 === 90) {
@@ -121,26 +124,73 @@
         ? cylinder.y % 360
         : cylinder.x % 360
 
+      //TODO maybe this roll distance should be calulated based on pi (I think the distance is perhaps not matching because I'm not setting this properly)
+
       const adjustedAngle = normalisedAngle(cylinder.deg)
       cylinder.catElements.forEach(el => {
         setStyles({ el, deg: adjustedAngle > 90 && adjustedAngle <= 270  ? elAngle * -3 : elAngle * 3})
       })
+    }
+
+    const cylinderWalk = () => {
+      cylinder.catElements.forEach(el => {
+        setStyles({ el, deg: nearest360(cylinder.deg)})
+      })
+      const d = 20
+      const distanceKey = {
+        0: { x: 0, y: d },
+        45: { x: -d, y: d },
+        90: { x: -d, y: 0 },
+        135: { x: -d, y: -d },
+        180: { x: 0, y: -d },
+        225: { x: d, y: -d },
+        270: { x: d, y: 0 },
+        315: { x: d, y: d },
+      }
+
+      const { width, height } = wrapper.getBoundingClientRect()
+      const xBound = (width / 2) - 100
+      const yBound = (height / 2) - 100
+    
+      const distance = distanceKey[normalisedAngle(cylinder.deg)]
+      let shouldSpin
+      if (
+        distance.x < 0 && (cylinder.x + distance.x > -xBound) || 
+        distance.x > 0 && (cylinder.x + distance.x < xBound)
+      ) {
+        cylinder.x += distance.x
+      } else {
+        shouldSpin = true
+      }
+
+      if (
+        distance.y < 0 && (cylinder.y + distance.y > -yBound) || 
+        distance.y > 0 && (cylinder.y + distance.y < yBound)
+      ) {
+        cylinder.y += distance.y
+      } else {
+        shouldSpin = true
+      }
+
+      shouldSpin
+        ? spinCat()
+        : setStyles(cylinder)
 
     }
 
-    addTouchAction(cylinder.el)
 
     const spinCat = () => {
       cylinder.deg += 45
       const adjustedAngle = normalisedAngle(cylinder.deg)
 
-      if (cylinder.deg % 180 === 90) {
-        cylinder.h = 100
-      } else if (cylinder.deg % 180 === 0) {
-        cylinder.h = 60
-      } else {
-        cylinder.h = 80
-      }
+      cylinder.el.style.setProperty('--h', px(
+        cylinder.deg % 180 === 90
+        ? 100
+        : cylinder.deg % 180 === 0
+        ? 60
+        : 80
+      ))
+
       setStyles(cylinder)
       cylinder.panels.forEach(el => {
         rotateX({ el, deg: cylinder.deg })
@@ -152,14 +202,29 @@
           : 'remove'
       ]('flip')
 
-      document.querySelector('.indicator').innerHTML = `${adjustedAngle}deg  ${cylinder.deg % 180}deg
-      `
+      // console.log(`${adjustedAngle}deg ${cylinder.deg % 180}deg`)      
     }
     
+
+    addTouchAction(cylinder.el)
     ;[cylinder.front, cylinder.back].forEach(el => {
       el.addEventListener('click', spinCat)
     })
-    document.querySelector('button').addEventListener('click', spinCat)
+
+    setInterval(()=> {
+      cylinder.idleCount -= 1
+
+      if (cylinder.idleCount < 0) {
+        cylinder.el.classList.add('walk')
+        cylinderWalk()
+        if (cylinder.idleCount < -10) {
+          cylinder.idleCount = 4
+        }
+        console.log(cylinder.idleCount)
+      } else {
+        cylinder.el.classList.remove('walk')
+      }
+    }, 1000)
   }
   
   window.addEventListener('DOMContentLoaded', init)
