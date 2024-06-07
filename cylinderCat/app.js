@@ -54,9 +54,9 @@
       pos.a.y = pos.b.y - y
       const newX = el.offsetLeft - pos.a.x
       const newY = el.offsetTop - pos.a.y
-
-      cylinder.roll.x = newX > el.offsetLeft ? -7 : 7
-      cylinder.roll.y = newY >el.offsetTop ? -7 : 7
+      const rollD = 7
+      cylinder.roll.x = newX > el.offsetLeft ? -rollD : rollD
+      cylinder.roll.y = newY >el.offsetTop ? -rollD : rollD
     }
 
     const client = (e, type) => e.type[0] === 'm' ? e[`client${type}`] : e.touches[0][`client${type}`]
@@ -123,8 +123,6 @@
       const elAngle = cylinder.deg % 180 === 90 
         ? cylinder.y % 360
         : cylinder.x % 360
-
-      //TODO maybe this roll distance should be calulated based on pi (I think the distance is perhaps not matching because I'm not setting this properly)
 
       const adjustedAngle = normalisedAngle(cylinder.deg)
       cylinder.catElements.forEach(el => {
@@ -205,7 +203,6 @@
       // console.log(`${adjustedAngle}deg ${cylinder.deg % 180}deg`)      
     }
     
-
     addTouchAction(cylinder.el)
     ;[cylinder.front, cylinder.back].forEach(el => {
       el.addEventListener('click', spinCat)
@@ -213,7 +210,6 @@
 
     setInterval(()=> {
       cylinder.idleCount -= 1
-
       if (cylinder.idleCount < 0) {
         cylinder.el.classList.add('walk')
         cylinderWalk()
