@@ -32,11 +32,11 @@
 
     const wrapper = document.querySelector('.wrapper')
 
-    const cylinder = {
-      el: document.querySelector('.cylinder'),
+    const cat = {
+      el: document.querySelector('.cat'),
       front: document.querySelector('.front'),
       back: document.querySelector('.back'),
-      catElements: document.querySelectorAll('.cat-el'),
+      images: document.querySelectorAll('.img'),
       panels: document.querySelectorAll('.panel'),
       deg: 0,
       x: 0,
@@ -55,8 +55,8 @@
       const newX = el.offsetLeft - pos.a.x
       const newY = el.offsetTop - pos.a.y
       const rollD = 7
-      cylinder.roll.x = newX > el.offsetLeft ? -rollD : rollD
-      cylinder.roll.y = newY >el.offsetTop ? -rollD : rollD
+      cat.roll.x = newX > el.offsetLeft ? -rollD : rollD
+      cat.roll.y = newY >el.offsetTop ? -rollD : rollD
     }
 
     const client = (e, type) => e.type[0] === 'm' ? e[`client${type}`] : e.touches[0][`client${type}`]
@@ -68,7 +68,7 @@
         b: { x: 0, y: 0 },
       }
       const onGrab = e =>{
-        cylinder.idleCount = 4
+        cat.idleCount = 4
         pos.b.x = roundedClient(e, 'X')
         pos.b.y = roundedClient(e, 'Y')  
         mouse.up(document, 'add', onLetGo)
@@ -80,7 +80,7 @@
         drag(el, pos, x, y)
         pos.b.x = x
         pos.b.y = y
-        rollCylinder(e)
+        roll(e)
       }
       const onLetGo = () => {
         mouse.up(document, 'remove', onLetGo)
@@ -90,49 +90,49 @@
     }
 
 
-    const rollCylinder = () => {
-      const { roll } = cylinder
+    const roll = () => {
+      const { roll } = cat
         // angle: -
-      if (cylinder.deg % 180 === 90) {
-        cylinder.y -= roll.y
+      if (cat.deg % 180 === 90) {
+        cat.y -= roll.y
         // angle: |
-      } else if (cylinder.deg % 180 === 0) {
-        cylinder.x -= roll.x
+      } else if (cat.deg % 180 === 0) {
+        cat.x -= roll.x
       } else {
         //  angle: \
-        if (cylinder.deg % 180 === 135
+        if (cat.deg % 180 === 135
             && (
                 (roll.x < 0 && roll.y > 0) ||
                 (roll.x > 0 && roll.y < 0)
               )){
-                  cylinder.x -= roll.x
-                  cylinder.y -= roll.y
+                  cat.x -= roll.x
+                  cat.y -= roll.y
                 }
         //  angle: /
-        if (cylinder.deg % 180 === 45 
+        if (cat.deg % 180 === 45 
           && (
               (roll.x > 0 && roll.y > 0) ||
               (roll.x < 0 && roll.y < 0)
             )){
-                cylinder.x -= roll.x
-                cylinder.y -= roll.y
+                cat.x -= roll.x
+                cat.y -= roll.y
               }
       }
 
-      setStyles(cylinder)
-      const elAngle = cylinder.deg % 180 === 90 
-        ? cylinder.y % 360
-        : cylinder.x % 360
+      setStyles(cat)
+      const elAngle = cat.deg % 180 === 90 
+        ? cat.y % 360
+        : cat.x % 360
 
-      const adjustedAngle = normalisedAngle(cylinder.deg)
-      cylinder.catElements.forEach(el => {
+      const adjustedAngle = normalisedAngle(cat.deg)
+      cat.images.forEach(el => {
         setStyles({ el, deg: adjustedAngle > 90 && adjustedAngle <= 270  ? elAngle * -3 : elAngle * 3})
       })
     }
 
-    const cylinderWalk = () => {
-      cylinder.catElements.forEach(el => {
-        setStyles({ el, deg: nearest360(cylinder.deg)})
+    const walk = () => {
+      cat.images.forEach(el => {
+        setStyles({ el, deg: nearest360(cat.deg)})
       })
       const d = 20
       const distanceKey = {
@@ -150,75 +150,75 @@
       const xBound = (width / 2) - 100
       const yBound = (height / 2) - 100
     
-      const distance = distanceKey[normalisedAngle(cylinder.deg)]
+      const distance = distanceKey[normalisedAngle(cat.deg)]
       let shouldSpin
       if (
-        distance.x < 0 && (cylinder.x + distance.x > -xBound) || 
-        distance.x > 0 && (cylinder.x + distance.x < xBound)
+        distance.x < 0 && (cat.x + distance.x > -xBound) || 
+        distance.x > 0 && (cat.x + distance.x < xBound)
       ) {
-        cylinder.x += distance.x
+        cat.x += distance.x
       } else {
         shouldSpin = true
       }
 
       if (
-        distance.y < 0 && (cylinder.y + distance.y > -yBound) || 
-        distance.y > 0 && (cylinder.y + distance.y < yBound)
+        distance.y < 0 && (cat.y + distance.y > -yBound) || 
+        distance.y > 0 && (cat.y + distance.y < yBound)
       ) {
-        cylinder.y += distance.y
+        cat.y += distance.y
       } else {
         shouldSpin = true
       }
 
       shouldSpin
         ? spinCat()
-        : setStyles(cylinder)
+        : setStyles(cat)
 
     }
 
 
     const spinCat = () => {
-      cylinder.deg += 45
-      const adjustedAngle = normalisedAngle(cylinder.deg)
+      cat.deg += 45
+      const adjustedAngle = normalisedAngle(cat.deg)
 
-      cylinder.el.style.setProperty('--h', px(
-        cylinder.deg % 180 === 90
+      cat.el.style.setProperty('--h', px(
+        cat.deg % 180 === 90
         ? 100
-        : cylinder.deg % 180 === 0
+        : cat.deg % 180 === 0
         ? 60
         : 80
       ))
 
-      setStyles(cylinder)
-      cylinder.panels.forEach(el => {
-        rotateX({ el, deg: cylinder.deg })
+      setStyles(cat)
+      cat.panels.forEach(el => {
+        rotateX({ el, deg: cat.deg })
       })
 
-      cylinder.el.classList[
+      cat.el.classList[
         adjustedAngle > 90 && adjustedAngle <= 270 
           ? 'add'
           : 'remove'
       ]('flip')
 
-      // console.log(`${adjustedAngle}deg ${cylinder.deg % 180}deg`)      
+      // console.log(`${adjustedAngle}deg ${cat.deg % 180}deg`)      
     }
     
-    addTouchAction(cylinder.el)
-    ;[cylinder.front, cylinder.back].forEach(el => {
+    addTouchAction(cat.el)
+    ;[cat.front, cat.back].forEach(el => {
       el.addEventListener('click', spinCat)
     })
 
     setInterval(()=> {
-      cylinder.idleCount -= 1
-      if (cylinder.idleCount < 0) {
-        cylinder.el.classList.add('walk')
-        cylinderWalk()
-        if (cylinder.idleCount < -10) {
-          cylinder.idleCount = 4
+      cat.idleCount -= 1
+      if (cat.idleCount < 0) {
+        cat.el.classList.add('walk')
+        walk()
+        if (cat.idleCount < -10) {
+          cat.idleCount = 4
         }
-        console.log(cylinder.idleCount)
+        // console.log(cat.idleCount)
       } else {
-        cylinder.el.classList.remove('walk')
+        cat.el.classList.remove('walk')
       }
     }, 1000)
   }
