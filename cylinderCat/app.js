@@ -67,7 +67,7 @@
       const newY = el.offsetTop - pos.a.y
       const rollD = 7
       cat.roll.x = newX > el.offsetLeft ? -rollD : rollD
-      cat.roll.y = newY >el.offsetTop ? -rollD : rollD
+      cat.roll.y = newY > el.offsetTop ? -rollD : rollD
     }
 
     const client = (e, type) => e.type[0] === 'm' ? e[`client${type}`] : e.touches[0][`client${type}`]
@@ -256,7 +256,17 @@
         cat.el.classList.remove('walk')
       }
     }, 1000)
-    // cat.el.addEventListener('click', spin)
+
+    // cat.el.addEventListener('click', ()=> {
+    //   console.log(cat.deg, cat.spinDeg)
+    //   spin()
+    // })
+
+    // window.addEventListener('keydown' , e=> {
+    //   if (e.key === ' ') {
+    //     cat.spinDeg *= -1
+    //   }
+    // })
   }
   
   window.addEventListener('DOMContentLoaded', init)
