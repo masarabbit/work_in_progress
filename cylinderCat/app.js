@@ -22,7 +22,18 @@
     }
 
     const rotateX = ({ el, deg }) => {
-      el.style.transform = `rotateX(${deg}deg) rotateZ(${deg * -1}deg)`
+      const zKey = {
+        0: -deg,
+        45: -deg,
+        90: -deg,
+        135: -deg + 90,
+        180: -deg + 180,
+        225: -deg - 90,
+        270: -deg,
+        315: -deg,
+        360: -deg
+      }
+      el.style.transform = `rotateX(${deg}deg) rotateZ(${zKey[moduloN(deg, 360)]}deg)`
     }
 
     const addEvents = (target, event, action, array) => {
@@ -222,7 +233,7 @@
       const normalisedAngle = moduloN(cat.deg, 360)
       let action
 
-      if (cat.deg >= 0) {
+      if (cat.spinDeg === 45) {
         action = normalisedAngle > 90 && normalisedAngle <= 270
           ? 'add'
           : 'remove'
@@ -255,11 +266,13 @@
       } else {
         cat.el.classList.remove('walk')
       }
+      
     }, 1000)
 
     // cat.el.addEventListener('click', ()=> {
     //   console.log(cat.deg, cat.spinDeg)
     //   spin()
+    //   document.querySelector('.indicator').innerHTML = JSON.stringify(cat)
     // })
 
     // window.addEventListener('keydown' , e=> {
@@ -267,6 +280,7 @@
     //     cat.spinDeg *= -1
     //   }
     // })
+
   }
   
   window.addEventListener('DOMContentLoaded', init)

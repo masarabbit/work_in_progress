@@ -12,6 +12,7 @@ body {
   color: white;
   overscroll-behavior: contain;
   --cat-color: #9febf8;
+  /* --cat-color: #0a3f48; */
   --dark: #703110;
 }
 
@@ -92,6 +93,10 @@ body {
   --w: 25px;
   --h: 25px;
 }
+/* 
+.cat.flip {
+  background-color: red;
+} */
 
 .cat.flip .face {
   display: none;
