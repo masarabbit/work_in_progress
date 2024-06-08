@@ -6,21 +6,23 @@
       el.style.transform = `translate(${x ? px(x) : 0}, ${y ? px(y) : 0}) rotate(${deg || 0}deg)`
     }
 
-    const nearest360 = n =>{
-      if (n < 0) {
-        const adjustedN = n * -1
-        const ans = (adjustedN - 1) + Math.abs(((adjustedN - 1) % 360) - 360)
-        return -ans
+    const nearest360 = deg =>{
+      const nearestN = n => (n - 1) + Math.abs(((n - 1) % 360) - 360)
+      if (deg < 0) {
+        return -nearestN(deg * -1)
       }
-      return n === 0 ? 0 : (n - 1) + Math.abs(((n - 1) % 360) - 360)
+      return deg === 0 ? 0 : nearestN(deg)
     }
 
-    const normalisedAngle = deg => {
-      return deg % 360
+    const moduloN = (deg, n) => {
+      if (deg < 0) {
+        return (deg % n) + n
+      }
+      return deg % n
     }
 
     const rotateX = ({ el, deg }) => {
-      el.style.transform = `rotateX(${deg}deg) rotateZ(-${deg}deg)`
+      el.style.transform = `rotateX(${deg}deg) rotateZ(${deg * -1}deg)`
     }
 
     const addEvents = (target, event, action, array) => {
@@ -55,6 +57,7 @@
       },
       isWalking: false,
       idleCount: 4,
+      spinDeg: 45
     }
 
     const drag = (el, pos, x, y) =>{
@@ -105,14 +108,14 @@
     const roll = () => {
       const { roll } = cat
         // angle: -
-      if (cat.deg % 180 === 90) {
+      if (moduloN(cat.deg, 180) === 90) {
         cat.y -= roll.y
         // angle: |
-      } else if (cat.deg % 180 === 0) {
+      } else if (moduloN(cat.deg, 180) === 0) {
         cat.x -= roll.x
       } else {
         //  angle: \
-        if (cat.deg % 180 === 135
+        if (moduloN(cat.deg, 180) === 135
             && (
                 (roll.x < 0 && roll.y > 0) ||
                 (roll.x > 0 && roll.y < 0)
@@ -121,7 +124,7 @@
                   cat.y -= roll.y
                 }
         //  angle: /
-        if (cat.deg % 180 === 45 
+        if (moduloN(cat.deg, 180) === 45 
           && (
               (roll.x > 0 && roll.y > 0) ||
               (roll.x < 0 && roll.y < 0)
@@ -132,19 +135,19 @@
       }
 
       setStyles(cat)
-      const diff = cat.deg % 180 === 90 
+      const diff = moduloN(cat.deg, 180) === 90 
         ? roll.y * 3
         : roll.x * 3
 
-      const adjustedAngle = normalisedAngle(cat.deg)
-      cat.images.deg += adjustedAngle > 90 && adjustedAngle <= 270  ? diff : -diff
+      const normalisedAngle = moduloN(cat.deg, 360)
+      cat.images.deg += normalisedAngle > 90 && normalisedAngle <= 270  ? diff : -diff
       rollCatImage()
     }
 
     const walk = () => {
       cat.images.deg = nearest360(cat.images.deg)
       rollCatImage()
-      
+
       const d = 20
       const distanceKey = {
         0: { x: 0, y: d },
@@ -155,13 +158,13 @@
         225: { x: d, y: -d },
         270: { x: d, y: 0 },
         315: { x: d, y: d },
+        360: { x: 0, y: d },
       }
 
       const { width, height } = wrapper.getBoundingClientRect()
       const xBound = (width / 2) - 100
       const yBound = (height / 2) - 100
-    
-      const distance = distanceKey[normalisedAngle(cat.deg)]
+      const distance = distanceKey[moduloN(cat.deg, 360)]
       let shouldSpin
       if (
         distance.x < 0 && (cat.x + distance.x > -xBound) || 
@@ -184,18 +187,15 @@
       shouldSpin
         ? spin()
         : setStyles(cat)
-
     }
 
 
     const spin = () => {
-      cat.deg += 45
-      const adjustedAngle = normalisedAngle(cat.deg)
-
+      cat.deg += cat.spinDeg
       cat.el.style.setProperty('--h', px(
-        cat.deg % 180 === 90
+        moduloN(cat.deg, 180) === 90
         ? 100
-        : cat.deg % 180 === 0
+        : moduloN(cat.deg, 180) === 0
         ? 60
         : 80
       ))
@@ -205,13 +205,20 @@
         rotateX({ el, deg: cat.deg })
       })
 
-      cat.el.classList[
-        adjustedAngle > 90 && adjustedAngle <= 270 
+      const normalisedAngle = moduloN(cat.deg, 360)
+      let action
+
+      if (cat.deg > 0) {
+        action = normalisedAngle > 90 && normalisedAngle <= 270
           ? 'add'
           : 'remove'
-      ]('flip')
-
-      // console.log(`${adjustedAngle}deg ${cat.deg % 180}deg`)      
+      } else {
+        action = normalisedAngle >= 90 && normalisedAngle < 270
+          ? 'add'
+          : 'remove'
+      }
+      cat.el.classList[action]('flip')  
+      // console.log(`${normalisedAngle}deg ${moduloN(cat.deg, 180)}deg`)      
     }
     
     addTouchAction(cat.el)
@@ -225,6 +232,8 @@
         cat.el.classList.add('walk')
         walk()
         if (cat.idleCount < -10) {
+          cat.spinDeg *= -1
+          // console.log(cat.spinDeg)
           cat.idleCount = 4
         }
         // console.log(cat.idleCount)
