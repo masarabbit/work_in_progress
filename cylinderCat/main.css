@@ -36,6 +36,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: grab;
 }
 
 .panel {
@@ -51,6 +52,7 @@ body {
   top: -25px;
   border-radius: 50%;
   background-color: var(--cat-color);
+  cursor: pointer;
   z-index: 1;
 }
 
@@ -61,6 +63,7 @@ body {
 
 .front {
   bottom: -25px;
+  cursor: pointer;
   z-index: 3;
 }
 

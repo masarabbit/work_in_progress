@@ -7,6 +7,11 @@
     }
 
     const nearest360 = n =>{
+      if (n < 0) {
+        const adjustedN = n * -1
+        const ans = (adjustedN - 1) + Math.abs(((adjustedN - 1) % 360) - 360)
+        return -ans
+      }
       return n === 0 ? 0 : (n - 1) + Math.abs(((n - 1) % 360) - 360)
     }
 
@@ -36,7 +41,10 @@
       el: document.querySelector('.cat'),
       front: document.querySelector('.front'),
       back: document.querySelector('.back'),
-      images: document.querySelectorAll('.img'),
+      images: {
+        els: document.querySelectorAll('.img'),
+        deg: 0
+      },
       panels: document.querySelectorAll('.panel'),
       deg: 0,
       x: 0,
@@ -89,6 +97,10 @@
       mouse.down(el,'add', onGrab)
     }
 
+    const rollCatImage = () => {
+      cat.images.els.forEach(el => setStyles({ el, deg: cat.images.deg }))
+    }
+
 
     const roll = () => {
       const { roll } = cat
@@ -120,20 +132,19 @@
       }
 
       setStyles(cat)
-      const elAngle = cat.deg % 180 === 90 
-        ? cat.y % 360
-        : cat.x % 360
+      const diff = cat.deg % 180 === 90 
+        ? roll.y * 3
+        : roll.x * 3
 
       const adjustedAngle = normalisedAngle(cat.deg)
-      cat.images.forEach(el => {
-        setStyles({ el, deg: adjustedAngle > 90 && adjustedAngle <= 270  ? elAngle * -3 : elAngle * 3})
-      })
+      cat.images.deg += adjustedAngle > 90 && adjustedAngle <= 270  ? diff : -diff
+      rollCatImage()
     }
 
     const walk = () => {
-      cat.images.forEach(el => {
-        setStyles({ el, deg: nearest360(cat.deg)})
-      })
+      cat.images.deg = nearest360(cat.images.deg)
+      rollCatImage()
+      
       const d = 20
       const distanceKey = {
         0: { x: 0, y: d },
@@ -171,13 +182,13 @@
       }
 
       shouldSpin
-        ? spinCat()
+        ? spin()
         : setStyles(cat)
 
     }
 
 
-    const spinCat = () => {
+    const spin = () => {
       cat.deg += 45
       const adjustedAngle = normalisedAngle(cat.deg)
 
@@ -205,7 +216,7 @@
     
     addTouchAction(cat.el)
     ;[cat.front, cat.back].forEach(el => {
-      el.addEventListener('click', spinCat)
+      el.addEventListener('click', spin)
     })
 
     setInterval(()=> {
