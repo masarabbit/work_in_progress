@@ -222,7 +222,7 @@
       const normalisedAngle = moduloN(cat.deg, 360)
       let action
 
-      if (cat.deg > 0) {
+      if (cat.deg >= 0) {
         action = normalisedAngle > 90 && normalisedAngle <= 270
           ? 'add'
           : 'remove'
@@ -256,6 +256,7 @@
         cat.el.classList.remove('walk')
       }
     }, 1000)
+    // cat.el.addEventListener('click', spin)
   }
   
   window.addEventListener('DOMContentLoaded', init)
