@@ -104,6 +104,22 @@
       cat.images.els.forEach(el => setStyles({ el, deg: cat.images.deg }))
     }
 
+    const getBound = () => {
+      const { width, height } = wrapper.getBoundingClientRect()
+      return {
+        x: (width / 2) - 100,
+        y: (height / 2) - 100
+      }
+    }
+
+    const isOutsideBound = () => {
+      const bound = getBound()
+
+      return  cat.x < -bound.x || 
+              cat.x > bound.x ||
+              cat.y > bound.y ||
+              cat.y < -bound.y
+    }
 
     const roll = () => {
       const { roll } = cat
@@ -148,7 +164,7 @@
       cat.images.deg = nearest360(cat.images.deg)
       rollCatImage()
 
-      const d = 20
+      const d = isOutsideBound() ? 60: 20 
       const distanceKey = {
         0: { x: 0, y: d },
         45: { x: -d, y: d },
@@ -161,14 +177,12 @@
         360: { x: 0, y: d },
       }
 
-      const { width, height } = wrapper.getBoundingClientRect()
-      const xBound = (width / 2) - 100
-      const yBound = (height / 2) - 100
+      const bound = getBound()
       const distance = distanceKey[moduloN(cat.deg, 360)]
       let shouldSpin
       if (
-        distance.x < 0 && (cat.x + distance.x > -xBound) || 
-        distance.x > 0 && (cat.x + distance.x < xBound)
+        distance.x < 0 && (cat.x + distance.x > -bound.x) || 
+        distance.x > 0 && (cat.x + distance.x < bound.x)
       ) {
         cat.x += distance.x
       } else {
@@ -176,8 +190,8 @@
       }
 
       if (
-        distance.y < 0 && (cat.y + distance.y > -yBound) || 
-        distance.y > 0 && (cat.y + distance.y < yBound)
+        distance.y < 0 && (cat.y + distance.y > -bound.y) || 
+        distance.y > 0 && (cat.y + distance.y < bound.y)
       ) {
         cat.y += distance.y
       } else {
@@ -227,7 +241,8 @@
     })
 
     setInterval(()=> {
-      cat.idleCount -= 1
+      cat.idleCount = isOutsideBound() ? -1 : cat.idleCount - 1
+
       if (cat.idleCount < 0) {
         cat.el.classList.add('walk')
         walk()
