@@ -138,7 +138,7 @@
       if (moduloN(cat.deg, 180) === 90) {
         cat.y -= roll.y
         // angle: |
-      } else if (moduloN(cat.deg, 180) === 0) {
+      } else if ([0, 180].includes(moduloN(cat.deg, 180))) {
         cat.x -= roll.x
       } else {
         //  angle: \
